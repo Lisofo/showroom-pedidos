@@ -9,10 +9,10 @@ class Fechas extends StatefulWidget {
 
 class _FechasState extends State<Fechas> {
   String _fecha = '';
-  TextEditingController _inputFieldDateController = new TextEditingController();
+  final TextEditingController _inputFieldDateController = TextEditingController();
   String _fechaVencimiento = '';
-  TextEditingController _inputFieldDateControllerVencimiento =
-      new TextEditingController();
+  final TextEditingController _inputFieldDateControllerVencimiento =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class _FechasState extends State<Fechas> {
       children: [
         Row(
           children: [
-            Text(
+            const Text(
               'Fecha: ',
               style: TextStyle(fontSize: 24),
             ),
@@ -32,12 +32,12 @@ class _FechasState extends State<Fechas> {
                 child: _crearFecha(context))
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         Row(
           children: [
-            Text(
+            const Text(
               'Fecha de Vencimiento: ',
               style: TextStyle(fontSize: 24),
             ),
@@ -57,12 +57,12 @@ class _FechasState extends State<Fechas> {
     return TextField(
       controller: _inputFieldDateController,
       enableInteractiveSelection: false,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         icon: Icon(Icons.calendar_today),
         hintText: 'Fecha de Compra',
       ),
       onTap: () {
-        FocusScope.of(context).requestFocus(new FocusNode());
+        FocusScope.of(context).requestFocus(FocusNode());
         _selecDate(context);
       },
     );
@@ -71,10 +71,10 @@ class _FechasState extends State<Fechas> {
   _selecDate(BuildContext context) async {
     DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: new DateTime.now(),
-        firstDate: new DateTime(2020),
-        lastDate: new DateTime(2090),
-        locale: Locale('es', 'UY'));
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2020),
+        lastDate: DateTime(2090),
+        locale: const Locale('es', 'UY'));
     if (picked != null) {
       setState(() {
         _fecha = picked.toString();
@@ -87,12 +87,12 @@ class _FechasState extends State<Fechas> {
     return TextField(
       controller: _inputFieldDateControllerVencimiento,
       enableInteractiveSelection: false,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         icon: Icon(Icons.calendar_today),
         hintText: 'Fecha de Vencimiento',
       ),
       onTap: () {
-        FocusScope.of(context).requestFocus(new FocusNode());
+        FocusScope.of(context).requestFocus(FocusNode());
         _selecDateVencimiento(context);
       },
     );
@@ -101,10 +101,10 @@ class _FechasState extends State<Fechas> {
   _selecDateVencimiento(BuildContext context) async {
     DateTime? pickedVencimiento = await showDatePicker(
         context: context,
-        initialDate: new DateTime.now(),
-        firstDate: new DateTime(2020),
-        lastDate: new DateTime(2090),
-        locale: Locale('es', 'UY'));
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2020),
+        lastDate: DateTime(2090),
+        locale: const Locale('es', 'UY'));
     if (pickedVencimiento != null) {
       setState(() {
         _fechaVencimiento = pickedVencimiento.toString();

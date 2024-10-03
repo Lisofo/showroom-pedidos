@@ -12,6 +12,8 @@ class ProductPage extends StatelessWidget {
     '3XL',
   ];
 
+  ProductPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,12 +22,12 @@ class ProductPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TopBody(),
+              const TopBody(),
               MiddleBody(talles: talles),
-              SizedBox(
+              const SizedBox(
                 height: 115,
               ),
-              BottomBody(),
+              const BottomBody(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -37,9 +39,9 @@ class ProductPage extends StatelessWidget {
                       },
                       child: Container(
                         padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                            const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                         decoration: BoxDecoration(
-                            color: Color(0xFFFD725A),
+                            color: const Color(0xFFFD725A),
                             borderRadius: BorderRadius.circular(30)),
                         child: Text(
                           'Atras',
@@ -60,9 +62,9 @@ class ProductPage extends StatelessWidget {
                       },
                       child: Container(
                         padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                            const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                         decoration: BoxDecoration(
-                            color: Color(0xFFFD725A),
+                            color: const Color(0xFFFD725A),
                             borderRadius: BorderRadius.circular(30)),
                         child: Text(
                           'Guardar',
@@ -93,10 +95,10 @@ class TopBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+      margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5), color: Colors.blueGrey[200]),
-      child: Row(
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
@@ -138,61 +140,61 @@ class _MiddleBodyState extends State<MiddleBody> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 10, right: 10, top: 25),
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 25),
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
             color: Colors.blueGrey[200]),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Image(
+          const Image(
               height: 370,
               image: AssetImage(
                 'images/AH-5838.jpeg',
               )),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           Container(
-            margin: EdgeInsets.only(top: 15),
+            margin: const EdgeInsets.only(top: 15),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
+                SizedBox(
                     width: MediaQuery.of(context).size.width / 1.5,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Descripcion: ',
                           style: TextStyle(
                               fontSize: 14, fontWeight: FontWeight.w500),
                         ),
-                        Container(
+                        SizedBox(
                           width: MediaQuery.of(context).size.width / 2,
-                          child: Text(
+                          child: const Text(
                               'Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,'),
                         )
                       ],
                     )),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 Row(
                   children: [
-                    Text(
+                    const Text(
                       'Talles: ',
                       style:
                           TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 90,
                     ),
                     for (int i = 0; i < widget.talles.length; i++)
                       Container(
-                        margin: EdgeInsets.symmetric(horizontal: 8),
-                        padding: EdgeInsets.all(8),
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                            color: Color(0xFFF7F8FA),
+                            color: const Color(0xFFF7F8FA),
                             borderRadius: BorderRadius.circular(30)),
                         child: Text(widget.talles[i]),
                       ),
@@ -200,7 +202,7 @@ class _MiddleBodyState extends State<MiddleBody> {
                 ),
                 Row(
                   children: [
-                    Column(
+                    const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -217,10 +219,10 @@ class _MiddleBodyState extends State<MiddleBody> {
                             InkWell(
                               onTap: () {},
                               child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 8),
-                                padding: EdgeInsets.all(13),
+                                margin: const EdgeInsets.symmetric(horizontal: 8),
+                                padding: const EdgeInsets.all(13),
                                 decoration: BoxDecoration(
-                                    color: Color(0xFF031C3C),
+                                    color: const Color(0xFF031C3C),
                                     borderRadius: BorderRadius.circular(20)),
                               ),
                             ),
@@ -229,52 +231,52 @@ class _MiddleBodyState extends State<MiddleBody> {
                               children: [
                                 Row(
                                   children: [
-                                    Text('Disp:'),
-                                    SizedBox(width: 30  ,),
+                                    const Text('Disp:'),
+                                    const SizedBox(width: 30  ,),
                                     for (int d = 0; d < widget.talles.length; d++)
                                       Container(
                                         margin:
-                                            EdgeInsets.symmetric(horizontal: 4),
-                                        padding: EdgeInsets.all(4),
+                                            const EdgeInsets.symmetric(horizontal: 4),
+                                        padding: const EdgeInsets.all(4),
                                         child: Text(d.toString()),
                                       )
                                   ],
                                 ),
                                 Row(
                                   children: [
-                                    Text('Ped:'),
-                                    SizedBox(width: 35,),
+                                    const Text('Ped:'),
+                                    const SizedBox(width: 35,),
                                     for (int d = 0; d < widget.talles.length; d++)
                                       Container(
                                         margin:
-                                            EdgeInsets.symmetric(horizontal: 4),
-                                        padding: EdgeInsets.all(4),
+                                            const EdgeInsets.symmetric(horizontal: 4),
+                                        padding: const EdgeInsets.all(4),
                                         child: Text(d.toString()),
                                       )
                                   ],
                                 ),
                                 Row(
                                   children: [
-                                    Text('Precio:'),
-                                    SizedBox(width: 20,),
+                                    const Text('Precio:'),
+                                    const SizedBox(width: 20,),
                                     for (int d = 0; d < widget.talles.length; d++)
                                       Container(
                                         margin:
-                                            EdgeInsets.symmetric(horizontal: 4),
-                                        padding: EdgeInsets.all(4),
+                                            const EdgeInsets.symmetric(horizontal: 4),
+                                        padding: const EdgeInsets.all(4),
                                         child: Text(d.toString()),
                                       )
                                   ],
                                 ),
                                 Row(
                                   children: [
-                                    Text('Cant:'),
-                                    SizedBox(width: 30,),
+                                    const Text('Cant:'),
+                                    const SizedBox(width: 30,),
                                     for (int d = 0; d < widget.talles.length; d++)
                                       Container(
                                         margin:
-                                            EdgeInsets.symmetric(horizontal: 4),
-                                        padding: EdgeInsets.all(4),
+                                            const EdgeInsets.symmetric(horizontal: 4),
+                                        padding: const EdgeInsets.all(4),
                                         child: Text(d.toString()),
                                       )
                                   ],
@@ -287,10 +289,10 @@ class _MiddleBodyState extends State<MiddleBody> {
                     ),
                   ],
                 ),
-                Divider(),
+                const Divider(),
                 Row(
                   children: [
-                    Column(
+                    const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -307,10 +309,10 @@ class _MiddleBodyState extends State<MiddleBody> {
                             InkWell(
                               onTap: () {},
                               child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 8),
-                                padding: EdgeInsets.all(13),
+                                margin: const EdgeInsets.symmetric(horizontal: 8),
+                                padding: const EdgeInsets.all(13),
                                 decoration: BoxDecoration(
-                                    color: Color.fromARGB(255, 16, 255, 16),
+                                    color: const Color.fromARGB(255, 16, 255, 16),
                                     borderRadius: BorderRadius.circular(20)),
                               ),
                             ),
@@ -319,52 +321,52 @@ class _MiddleBodyState extends State<MiddleBody> {
                               children: [
                                 Row(
                                   children: [
-                                    Text('Disp:'),
-                                    SizedBox(width: 30  ,),
+                                    const Text('Disp:'),
+                                    const SizedBox(width: 30  ,),
                                     for (int d = 0; d < widget.talles.length; d++)
                                       Container(
                                         margin:
-                                            EdgeInsets.symmetric(horizontal: 4),
-                                        padding: EdgeInsets.all(4),
+                                            const EdgeInsets.symmetric(horizontal: 4),
+                                        padding: const EdgeInsets.all(4),
                                         child: Text(d.toString()),
                                       )
                                   ],
                                 ),
                                 Row(
                                   children: [
-                                    Text('Ped:'),
-                                    SizedBox(width: 35,),
+                                    const Text('Ped:'),
+                                    const SizedBox(width: 35,),
                                     for (int d = 0; d < widget.talles.length; d++)
                                       Container(
                                         margin:
-                                            EdgeInsets.symmetric(horizontal: 4),
-                                        padding: EdgeInsets.all(4),
+                                            const EdgeInsets.symmetric(horizontal: 4),
+                                        padding: const EdgeInsets.all(4),
                                         child: Text(d.toString()),
                                       )
                                   ],
                                 ),
                                 Row(
                                   children: [
-                                    Text('Precio:'),
-                                    SizedBox(width: 20,),
+                                    const Text('Precio:'),
+                                    const SizedBox(width: 20,),
                                     for (int d = 0; d < widget.talles.length; d++)
                                       Container(
                                         margin:
-                                            EdgeInsets.symmetric(horizontal: 4),
-                                        padding: EdgeInsets.all(4),
+                                            const EdgeInsets.symmetric(horizontal: 4),
+                                        padding: const EdgeInsets.all(4),
                                         child: Text(d.toString()),
                                       )
                                   ],
                                 ),
                                 Row(
                                   children: [
-                                    Text('Cant:'),
-                                    SizedBox(width: 30,),
+                                    const Text('Cant:'),
+                                    const SizedBox(width: 30,),
                                     for (int d = 0; d < widget.talles.length; d++)
                                       Container(
                                         margin:
-                                            EdgeInsets.symmetric(horizontal: 4),
-                                        padding: EdgeInsets.all(4),
+                                            const EdgeInsets.symmetric(horizontal: 4),
+                                        padding: const EdgeInsets.all(4),
                                         child: Text(d.toString()),
                                       )
                                   ],
@@ -390,7 +392,7 @@ class _MiddleBodyState extends State<MiddleBody> {
       children: [
         InkWell(
           onTap: _bajarContador,
-          child: Icon(
+          child: const Icon(
             Icons.remove,
           ),
         ),
@@ -403,19 +405,19 @@ class _MiddleBodyState extends State<MiddleBody> {
             textAlign: TextAlign.center,
             initialValue: '$_contador',
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
                 constraints: BoxConstraints(
                     maxWidth: 40, maxHeight: 44, minWidth: 20, minHeight: 22)),
           ),
         ),
         InkWell(
           onTap: _incrementarContador,
-          child: Icon(
+          child: const Icon(
             Icons.add,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -436,8 +438,8 @@ class _MiddleBodyState extends State<MiddleBody> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -458,12 +460,12 @@ class _MiddleBodyState extends State<MiddleBody> {
             ],
           ),
         ),
-        Text(
+        const Text(
           'Precio: UYU',
           style: TextStyle(
               fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black),
         ),
-        SizedBox(
+        const SizedBox(
           width: 10,
         ),
         Container(
@@ -475,7 +477,7 @@ class _MiddleBodyState extends State<MiddleBody> {
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
             initialValue: '237.5',
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
                 constraints: BoxConstraints(
                     maxWidth: 50, maxHeight: 39, minWidth: 30, minHeight: 22)),
           ),
@@ -493,18 +495,18 @@ class BottomBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
             color: Colors.blueGrey[200]),
-        child: Column(
+        child: const Column(
           children: [
             // SizedBox(
             //   height: 180,
             // ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -532,7 +534,7 @@ class BottomBody extends StatelessWidget {
               height: 20,
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 10, right: 20, bottom: 10),
+              padding: EdgeInsets.only(left: 10, right: 20, bottom: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

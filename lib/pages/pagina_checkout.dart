@@ -7,9 +7,9 @@ class PaginaCheckout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Checkout'),
+        title: const Text('Checkout'),
         elevation: 0,
-        backgroundColor: Color(0xFFFD725A),
+        backgroundColor: const Color(0xFFFD725A),
       ),
       body: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -26,17 +26,17 @@ class PaginaCheckout extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Condiciones:',
                         style: TextStyle(
                             fontSize: 24, fontWeight: FontWeight.w600),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
-                      Container(
+                      SizedBox(
                           width: MediaQuery.of(context).size.width / 3.5,
-                          child: TextField(
+                          child: const TextField(
                             minLines: 1,
                             maxLines: 10,
                             // decoration:
@@ -44,23 +44,23 @@ class PaginaCheckout extends StatelessWidget {
                           ))
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 40,
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Metodo de Envio:',
                         style: TextStyle(
                             fontSize: 24, fontWeight: FontWeight.w600),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
-                      Container(
+                      SizedBox(
                           width: MediaQuery.of(context).size.width / 3.5,
-                          child: TextField(
+                          child: const TextField(
                             minLines: 1,
                             maxLines: 10,
                             // decoration:
@@ -70,10 +70,10 @@ class PaginaCheckout extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
@@ -89,7 +89,7 @@ class PaginaCheckout extends StatelessWidget {
                   ),
                 ],
               ),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
@@ -105,7 +105,7 @@ class PaginaCheckout extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               Row(
@@ -117,9 +117,9 @@ class PaginaCheckout extends StatelessWidget {
                     },
                     child: Container(
                       padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                          const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                       decoration: BoxDecoration(
-                          color: Color(0xFFFD725A),
+                          color: const Color(0xFFFD725A),
                           borderRadius: BorderRadius.circular(30)),
                       child: Text(
                         'Guardar Pedido',

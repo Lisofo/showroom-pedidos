@@ -6,6 +6,8 @@ import '../widgets/dropdown.dart';
 import '../widgets/fechas.dart';
 
 class NuevoPedido extends StatefulWidget {
+  const NuevoPedido({super.key});
+
   @override
   State<NuevoPedido> createState() => _NuevoPedidoState();
 }
@@ -17,9 +19,9 @@ class _NuevoPedidoState extends State<NuevoPedido> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nuevo Pedido'),
+        title: const Text('Nuevo Pedido'),
         elevation: 0,
-        backgroundColor: Color(0xFFFD725A),
+        backgroundColor: const Color(0xFFFD725A),
       ),
       body: SafeArea(
           child: Padding(
@@ -28,7 +30,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
           children: [
             Row(
               children: [
-                Text(
+                const Text(
                   'Pedido: ',
                   style: TextStyle(fontSize: 24),
                 ),
@@ -42,17 +44,17 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                     ))
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Fechas(),
-            SizedBox(
+            const Fechas(),
+            const SizedBox(
               height: 20,
             ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Descripcion: ',
                   style: TextStyle(fontSize: 24),
                 ),
@@ -64,34 +66,34 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                     child: TextFormField(
                       minLines: 1,
                       maxLines: 10,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                           // border: InputBorder.none,
                           hintText: 'Ingrese Descripcion'),
                     ))
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            CrearDropdown(),
-            SizedBox(
+            const CrearDropdown(),
+            const SizedBox(
               height: 20,
             ),
             Row(
               children: [
-                Text('Descuento: ', style: TextStyle(fontSize: 24)),
+                const Text('Descuento: ', style: TextStyle(fontSize: 24)),
                 Container(
                   width: MediaQuery.of(context).size.width / 5,
                   decoration: BoxDecoration(
                       // border: Border.all(),
                       borderRadius: BorderRadius.circular(5)),
-                  child: TextField(
+                  child: const TextField(
                     decoration: InputDecoration(),
                   ),
                 )
               ],
             ),
-            Expanded(child: Text('')),
+            const Expanded(child: Text('')),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -100,9 +102,9 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                     Navigator.popAndPushNamed(context, 'pedidoInterno');
                   },
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                     decoration: BoxDecoration(
-                        color: Color(0xFFFD725A),
+                        color: const Color(0xFFFD725A),
                         borderRadius: BorderRadius.circular(30)),
                     child: Text(
                       'Agregar',

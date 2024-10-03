@@ -1,112 +1,135 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:showroom_maqueta/config/router/app_router.dart';
+import 'package:showroom_maqueta/models/client.dart';
+import 'package:showroom_maqueta/models/pedido.dart';
+import 'package:showroom_maqueta/providers/item_provider.dart';
+import 'package:showroom_maqueta/services/pedidos_services.dart';
 
-class PaginaCliente extends StatelessWidget {
-  List listaPedidos = [
-    'Pedido 114',
-    'Pedido 115',
-    'Pedido 116',
-    'Pedido 117',
-    'Pedido 118',
-    'Pedido 119',
-    'Pedido 120',
-    'Pedido 121',
-    'Pedido 122',
-    'Pedido 123',
-  ];
+class PaginaCliente extends StatefulWidget {
+
+  const PaginaCliente({super.key});
+
+  @override
+  State<PaginaCliente> createState() => _PaginaClienteState();
+}
+
+class _PaginaClienteState extends State<PaginaCliente> {
+  List<Pedido> listaPedidos = [];
+  late Client clienteSeleccionado = Client.empty();
+  late String token = '';
+
+  @override
+  void initState() {
+    super.initState();
+    cargarDatos();
+  }
+
+  cargarDatos() async {
+    token = context.read<ItemProvider>().token;
+    clienteSeleccionado = context.read<ItemProvider>().client;
+    listaPedidos = await PedidosServices().getPedidosCliente(context, clienteSeleccionado.clienteId, token);
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Color(0xFFFD725A),
-          title: Text('Pedidos del Cliente'),
-        ),
-        body: SafeArea(
-            child: Column(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: const Color(0xFFFD725A),
+        title: const Text('Pedidos del Cliente'),
+      ),
+      body: SafeArea(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              child: Padding(
-                padding: EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Miguel Ohara',
-                      style:
-                          TextStyle(fontSize: 50, fontWeight: FontWeight.w500),
-                    ),
-                    Text('1431',
-                        style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.w200,
-                            color: Colors.black54.withOpacity(0.6)))
-                  ],
-                ),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    clienteSeleccionado.nombre,
+                    style: const TextStyle(fontSize: 50, fontWeight: FontWeight.w500),
+                  ),
+                  Text(clienteSeleccionado.codCliente,
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w200,
+                      color: Colors.black54.withOpacity(0.6)
+                    )
+                  )
+                ],
               ),
             ),
-            Divider(thickness: 15.0),
+            const Divider(thickness: 15.0),
             Expanded(
-                child: ListView.builder(
-                    itemCount: listaPedidos.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        onTap: () {
-                          Navigator.pushNamed(context, 'pedidoInterno');
-                        },
-                        title: Text(listaPedidos[index]),
-                        subtitle: Text('Estado: En Proceso'),
-                        trailing: Icon(
-                          Icons.chevron_right,
-                          size: 50,
-                        ),
-                      );
-                    })),
+              child: ListView.builder(
+                itemCount: listaPedidos.length,
+                itemBuilder: (context, i) {
+                  var pedido = listaPedidos[i];
+                  return ListTile(
+                    onTap: () {
+                      Provider.of<ItemProvider>(context, listen: false).setPedido(pedido);
+                      appRouter.push('/pedidoInterno');
+                    },
+                    title: Text(pedido.numeroOrdenTrabajo),
+                    subtitle: Text('Estado: ${pedido.estado}'),
+                    trailing: const Icon(
+                      Icons.chevron_right,
+                      size: 50,
+                    ),
+                  );
+                }
+              )
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
                   InkWell(
                     onTap: () {
-                      Navigator.pop(context);
+                      appRouter.pop();
                     },
                     child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                       decoration: BoxDecoration(
-                          color: Color(0xFFFD725A),
-                          borderRadius: BorderRadius.circular(30)),
+                        color: const Color(0xFFFD725A),
+                        borderRadius: BorderRadius.circular(30)
+                      ),
                       child: Text(
                         'Atras',
                         style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1,
-                            color: Colors.white.withOpacity(0.9)),
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                          color: Colors.white.withOpacity(0.9)
+                        ),
                       ),
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   InkWell(
                     onTap: () {
-                      Navigator.pushNamed(context,'nuevoPedido');
+                      appRouter.push('/nuevoPedido');
                     },
                     child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                       decoration: BoxDecoration(
-                          color: Color(0xFFFD725A),
-                          borderRadius: BorderRadius.circular(30)),
+                        color: const Color(0xFFFD725A),
+                        borderRadius: BorderRadius.circular(30)
+                      ),
                       child: Text(
                         'Nuevo Pedido',
                         style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1,
-                            color: Colors.white.withOpacity(0.9)),
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                          color: Colors.white.withOpacity(0.9)
+                        ),
                       ),
                     ),
                   ),
@@ -114,6 +137,8 @@ class PaginaCliente extends StatelessWidget {
               ),
             )
           ],
-        )));
+        )
+      )
+    );
   }
 }

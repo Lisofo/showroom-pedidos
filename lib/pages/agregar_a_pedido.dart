@@ -11,13 +11,15 @@ class AgregarPedido extends StatelessWidget {
     'AD-1234',
   ];
 
+  AgregarPedido({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Buscar Item'),
+        title: const Text('Buscar Item'),
         elevation: 0,
-        backgroundColor: Color(0xFFFD725A),
+        backgroundColor: const Color(0xFFFD725A),
       ),
       body: SafeArea(
           child: Column(
@@ -29,16 +31,16 @@ class AgregarPedido extends StatelessWidget {
                   border: Border.all(style: BorderStyle.solid),
                   borderRadius: BorderRadius.circular(5),
                 ),
-                child: TextField(
+                child: const TextField(
                   decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Buscar o escanear item...'),
                 )),
           ),
-          Divider(
+          const Divider(
             thickness: 10.0,
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Expanded(
@@ -47,7 +49,7 @@ class AgregarPedido extends StatelessWidget {
                   itemCount: listItems.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      leading: Icon(
+                      leading: const Icon(
                         Icons.image,
                         size: 50,
                       ),
@@ -55,8 +57,8 @@ class AgregarPedido extends StatelessWidget {
                         Navigator.pushNamed(context, 'paginaProducto');
                       },
                       title: Text(listItems[index]),
-                      subtitle: Text('Descripcion corta del producto'),
-                      trailing: Icon(
+                      subtitle: const Text('Descripcion corta del producto'),
+                      trailing: const Icon(
                         Icons.chevron_right,
                         size: 50,
                       ),

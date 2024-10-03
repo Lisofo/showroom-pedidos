@@ -10,6 +10,8 @@ class ProductosSamples extends StatelessWidget {
     'AD-1234',
   ];
 
+  ProductosSamples({super.key});
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -17,15 +19,15 @@ class ProductosSamples extends StatelessWidget {
         children: [
           for (int i = 0; i < imgList.length; i++)
             Container(
-              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-              padding: EdgeInsets.all(10),
+              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                   color: Colors.white38,
                   borderRadius: BorderRadius.circular(10)),
               child: Row(
                 children: [
                   Checkbox(
-                      activeColor: Color(0xFFFD725A),
+                      activeColor: const Color(0xFFFD725A),
                       value: true,
                       onChanged: (value) {}),
                   Container(
@@ -36,7 +38,7 @@ class ProductosSamples extends StatelessWidget {
                     child: Image.asset('images/${imgList[i]}.jpeg'),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -52,20 +54,20 @@ class ProductosSamples extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    child: SizedBox(
                       width: MediaQuery.of(context).size.width / 1.7,
                       child: Column(
                         children: [
-                          Text('Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500', style: TextStyle(fontSize: 24),),
+                          const Text('Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500', style: TextStyle(fontSize: 24),),
                           tabla(),
                         ],
                       ),
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 5),
+                    padding: const EdgeInsets.symmetric(vertical: 5),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -76,15 +78,15 @@ class ProductosSamples extends StatelessWidget {
                               onPressed: () {
                                 Navigator.pushNamed(context, 'paginaProducto');
                               },
-                              icon: Icon(Icons.edit),
+                              icon: const Icon(Icons.edit),
                               color: Colors.redAccent,
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 15,
                             ),
                             IconButton(
                               onPressed: (){},
-                              icon: Icon(Icons.delete),
+                              icon: const Icon(Icons.delete),
                               color: Colors.redAccent,
                             ),
                           ],
@@ -103,7 +105,7 @@ class ProductosSamples extends StatelessWidget {
   DataTable tabla() {
     return DataTable(
       border: TableBorder.all(),
-      columns: [
+      columns: const [
         DataColumn(
           label: SizedBox(
             width: 38,
@@ -191,7 +193,7 @@ class ProductosSamples extends StatelessWidget {
       DataCell(
         CircleAvatar(backgroundColor: miColor),
       ),
-      DataCell(Column(
+      const DataCell(Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -204,43 +206,43 @@ class ProductosSamples extends StatelessWidget {
           ),
         ],
       )),
-      DataCell(Column(
+      const DataCell(Column(
         children: [
           Text('5'),
           Text('\$890.0'),
         ],
       )),
-      DataCell(Column(
+      const DataCell(Column(
         children: [
           Text('5'),
           Text('\$890.0'),
         ],
       )),
-      DataCell(Column(
+      const DataCell(Column(
         children: [
           Text('5'),
           Text('\$890.0'),
         ],
       )),
-      DataCell(Column(
+      const DataCell(Column(
         children: [
           Text('5'),
           Text('\$890.0'),
         ],
       )),
-      DataCell(Column(
+      const DataCell(Column(
         children: [
           Text('5'),
           Text('\$890.0'),
         ],
       )),
-      DataCell(Column(
+      const DataCell(Column(
         children: [
           Text('5'),
           Text('\$890.0'),
         ],
       )),
-      DataCell(Column(
+      const DataCell(Column(
         children: [
           Text('5'),
           Text('\$890.0'),

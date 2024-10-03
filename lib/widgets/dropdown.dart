@@ -8,34 +8,34 @@ class CrearDropdown extends StatefulWidget {
 }
 
 class _CrearDropdownState extends State<CrearDropdown> {
-  List<String> _opcionesMoneda = ['U\$S', 'UYU'];
+  final List<String> _opcionesMoneda = ['U\$S', 'UYU'];
   String _opcionSeleccionada = 'UYU';
 
   List<DropdownMenuItem<String>> getOpcionesDropdown(){
 
     List<DropdownMenuItem<String>> lista = [];
 
-    _opcionesMoneda.forEach((moneda){
+    for (var moneda in _opcionesMoneda) {
       lista.add(DropdownMenuItem(
-        child: Text(moneda),
         value: moneda,
+        child: Text(moneda),
       ));
-    });
+    }
     return lista;
   }
-  List<String> _opcionesTipo = ['Contado','Credito', 'Remito'];
+  final List<String> _opcionesTipo = ['Contado','Credito', 'Remito'];
   String _opcionTipo = 'Contado';
 
   List<DropdownMenuItem<String>> getOpcionesDropdownTipo(){
 
     List<DropdownMenuItem<String>> lista = [];
 
-    _opcionesTipo.forEach((tipo){
+    for (var tipo in _opcionesTipo) {
       lista.add(DropdownMenuItem(
-        child: Text(tipo),
         value: tipo,
+        child: Text(tipo),
       ));
-    });
+    }
     return lista;
   }
   @override
@@ -44,9 +44,9 @@ class _CrearDropdownState extends State<CrearDropdown> {
       children: [
         Row(
           children: [
-            Text('Moneda:',
+            const Text('Moneda:',
                     style: TextStyle(fontSize: 24)),
-            SizedBox(width: 30,),
+            const SizedBox(width: 30,),
             DropdownButton(
               value: _opcionSeleccionada,
               items: getOpcionesDropdown(), 
@@ -56,10 +56,10 @@ class _CrearDropdownState extends State<CrearDropdown> {
                 });
               }
             ),
-            SizedBox(width: 50,),
-            Text('Tipo:',
+            const SizedBox(width: 50,),
+            const Text('Tipo:',
                     style: TextStyle(fontSize: 24)),
-            SizedBox(width: 30,),
+            const SizedBox(width: 30,),
             DropdownButton(
               value: _opcionTipo,
               items: getOpcionesDropdownTipo(), 
