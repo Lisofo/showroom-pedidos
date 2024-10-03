@@ -299,8 +299,7 @@ class _LoginNewState extends State<LoginNew> {
                 TextButton(onPressed: (){
                   // appRouter.pop();
                   // appRouter.push('/product_add');
-      
-                  },
+                },
                 child: const Text('Continuar sin Conexion'))            
               ],
             );

@@ -213,18 +213,11 @@ void initState() {
                 }, 
                 child: const Text('Ir a Dashboard')
               ),
-              
-                
-      
             ],
           )
         ),
       ),
     );
-
-
-
-
   }
 
   void logout() {
@@ -242,9 +235,8 @@ void initState() {
                   child: const Text('Cancelar')),
               TextButton(
                   onPressed: () {
-                    Provider.of<ItemProvider>(context, listen: false)
-                        .setToken('');
-                    appRouter.pushReplacement('/');
+                    Provider.of<ItemProvider>(context, listen: false).setToken('');
+                    appRouter.pushReplacement('/login');
                   },
                   child: const Text(
                     'Cerrar Sesion',

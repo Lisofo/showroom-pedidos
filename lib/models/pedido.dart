@@ -26,17 +26,17 @@ class Pedido {
   late String comentarioCliente;
   late String comentarioTrabajo;
   late String estado;
-  late dynamic presupuestoIdPlantilla;
-  late dynamic numeroPresupuesto;
-  late dynamic descripcionPresupuesto;
-  late dynamic totalPresupuesto;
+  late int presupuestoIdPlantilla;
+  late String numeroPresupuesto;
+  late String descripcionPresupuesto;
+  late double totalPresupuesto;
   late DateTime? fechaVencimiento;
   late DateTime? fechaEntrega;
   late bool plantilla;
   late int unidadId;
-  late dynamic km;
+  late int? km;
   late String servicio;
-  late dynamic central;
+  late String central;
   late bool credito;
 
   Pedido({
@@ -90,16 +90,16 @@ class Pedido {
     comentarioTrabajo: json["comentarioTrabajo"] as String? ?? '',
     estado: json["estado"] as String? ?? '',
     presupuestoIdPlantilla: json["presupuestoIdPlantilla"] as int? ?? 0,
-    numeroPresupuesto: json["numeroPresupuesto"],
-    descripcionPresupuesto: json["descripcionPresupuesto"],
-    totalPresupuesto: json["totalPresupuesto"],
+    numeroPresupuesto: json["numeroPresupuesto"] as String? ?? '',
+    descripcionPresupuesto: json["descripcionPresupuesto"] as String? ?? '',
+    totalPresupuesto: json["totalPresupuesto"] as double? ?? 0.0,
     fechaVencimiento: json["fechaVencimiento"] != null ? DateTime.parse(json["fechaVencimiento"]) : null,
     fechaEntrega: json["fechaEntrega"] != null ? DateTime.parse(json["fechaEntrega"]) : null,
     plantilla: json["plantilla"],
     unidadId: json["unidadId"] as int? ?? 0,
     km: json["km"],
     servicio: json["servicio"] as String? ?? '',
-    central: json["central"],
+    central: json["central"] as String? ?? '',
     credito: json["credito"],
   );
 
@@ -153,17 +153,17 @@ class Pedido {
     comentarioCliente = '';
     comentarioTrabajo = '';
     estado = '';
-    presupuestoIdPlantilla;
-    numeroPresupuesto;
-    descripcionPresupuesto;
-    totalPresupuesto;
+    presupuestoIdPlantilla = 0;
+    numeroPresupuesto = '';
+    descripcionPresupuesto = '';
+    totalPresupuesto = 0.0;
     fechaVencimiento = null;
     fechaEntrega = null;
     plantilla = false;
     unidadId = 0;
-    km;
+    km = null;
     servicio = '';
-    central;
+    central = '';
     credito = false;
   }
 }

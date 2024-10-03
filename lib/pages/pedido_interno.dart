@@ -128,7 +128,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
                                 
                               ],
                             ),
-                            Spacer(),
+                            const Spacer(),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,

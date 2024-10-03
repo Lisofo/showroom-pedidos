@@ -16,8 +16,8 @@ class Linea {
   late DateTime? fechaOrdenTrabajo;
   late String estado;
   late int itemId;
-  late dynamic raizEstricta;
-  late dynamic raizCantidad;
+  late String raizEstricta;
+  late int raizCantidad;
   late String codItem;
   late String raiz;
   late String descripcion;
@@ -99,8 +99,8 @@ class Linea {
     fechaOrdenTrabajo: json["fechaOrdenTrabajo"] != null ? DateTime.parse(json["fechaOrdenTrabajo"]) : null,
     estado: json["estado"] as String? ?? '',
     itemId: json["itemId"] as int? ?? 0,
-    raizEstricta: json["raizEstricta"],
-    raizCantidad: json["raizCantidad"],
+    raizEstricta: json["raizEstricta"] as String? ?? '',
+    raizCantidad: json["raizCantidad"] as int? ?? 0,
     codItem: json["codItem"] as String? ?? '',
     raiz: json["raiz"] as String? ?? '',
     descripcion: json["descripcion"] as String? ?? '',
@@ -184,7 +184,7 @@ class Linea {
     estado = '';
     itemId = 0;
     raizEstricta = '';
-    raizCantidad = '';
+    raizCantidad = 0;
     codItem = '';
     raiz = '';
     descripcion = '';
