@@ -1,13 +1,3 @@
-// To parse this JSON data, do
-//
-//     final linea = lineaFromJson(jsonString);
-
-import 'dart:convert';
-
-List<Linea> lineaFromJson(String str) => List<Linea>.from(json.decode(str).map((x) => Linea.fromJson(x)));
-
-String lineaToJson(List<Linea> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
-
 class Linea {
   late int lineaId;
   late int ordenTrabajoId;
@@ -16,8 +6,8 @@ class Linea {
   late DateTime? fechaOrdenTrabajo;
   late String estado;
   late int itemId;
-  late String raizEstricta;
-  late int raizCantidad;
+  late String? raizEstricta;
+  late int? raizCantidad;
   late String codItem;
   late String raiz;
   late String descripcion;
@@ -48,6 +38,14 @@ class Linea {
   late int brutoFac;
   late int brutoRem;
   late int cantEPend;
+  late String fotoURL;
+  late String codColor;
+  late String color;
+  late String colorHexCode;
+  late int R;
+  late int G;
+  late int B;
+  late String talle;
 
   Linea({
     required this.lineaId,
@@ -57,8 +55,8 @@ class Linea {
     required this.fechaOrdenTrabajo,
     required this.estado,
     required this.itemId,
-    required this.raizEstricta,
-    required this.raizCantidad,
+    this.raizEstricta,
+    this.raizCantidad,
     required this.codItem,
     required this.raiz,
     required this.descripcion,
@@ -89,6 +87,14 @@ class Linea {
     required this.brutoFac,
     required this.brutoRem,
     required this.cantEPend,
+    required this.fotoURL,
+    required this.codColor,
+    required this.color,
+    required this.colorHexCode,
+    required this.R,
+    required this.G,
+    required this.B,
+    required this.talle,
   });
 
   factory Linea.fromJson(Map<String, dynamic> json) => Linea(
@@ -99,8 +105,8 @@ class Linea {
     fechaOrdenTrabajo: json["fechaOrdenTrabajo"] != null ? DateTime.parse(json["fechaOrdenTrabajo"]) : null,
     estado: json["estado"] as String? ?? '',
     itemId: json["itemId"] as int? ?? 0,
-    raizEstricta: json["raizEstricta"] as String? ?? '',
-    raizCantidad: json["raizCantidad"] as int? ?? 0,
+    raizEstricta: json["raizEstricta"] as String?,
+    raizCantidad: json["raizCantidad"] as int?,
     codItem: json["codItem"] as String? ?? '',
     raiz: json["raiz"] as String? ?? '',
     descripcion: json["descripcion"] as String? ?? '',
@@ -131,6 +137,14 @@ class Linea {
     brutoFac: json["brutoFac"] as int? ?? 0,
     brutoRem: json["brutoRem"] as int? ?? 0,
     cantEPend: json["cantEPend"] as int? ?? 0,
+    fotoURL: json["fotoURL"] as String? ?? '',
+    codColor: json["codColor"] as String? ?? '',
+    color: json["color"] as String? ?? '',
+    colorHexCode: json["colorHexCode"] as String? ?? '',
+    R: json["R"] as int? ?? 0,
+    G: json["G"] as int? ?? 0,
+    B: json["B"] as int? ?? 0,
+    talle: json["talle"] as String? ?? '',
   );
 
   Map<String, dynamic> toJson() => {
@@ -173,9 +187,17 @@ class Linea {
     "brutoFac": brutoFac,
     "brutoRem": brutoRem,
     "cantEPend": cantEPend,
+    "fotoURL": fotoURL,
+    "codColor": codColor,
+    "color": color,
+    "colorHexCode": colorHexCode,
+    "R": R,
+    "G": G,
+    "B": B,
+    "talle": talle,
   };
 
-  Linea.empty (){
+   Linea.empty() {
     lineaId = 0;
     ordenTrabajoId = 0;
     numeroOrdenTrabajo = '';
@@ -183,8 +205,8 @@ class Linea {
     fechaOrdenTrabajo = null;
     estado = '';
     itemId = 0;
-    raizEstricta = '';
-    raizCantidad = 0;
+    raizEstricta = null;
+    raizCantidad = null;
     codItem = '';
     raiz = '';
     descripcion = '';
@@ -198,7 +220,7 @@ class Linea {
     descuento2 = 0;
     descuento3 = 0;
     precioVenta = 0;
-    comentario;
+    comentario = '';
     ivaId = 0;
     iva = '';
     valor = 0;
@@ -215,5 +237,13 @@ class Linea {
     brutoFac = 0;
     brutoRem = 0;
     cantEPend = 0;
+    fotoURL = '';
+    codColor = '';
+    color = '';
+    colorHexCode = '';
+    R = 0;
+    G = 0;
+    B = 0;
+    talle = '';
   }
 }
