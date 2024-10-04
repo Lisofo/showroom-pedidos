@@ -95,11 +95,11 @@ class _LoginNewState extends State<LoginNew> {
 
     
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SingleChildScrollView(
-            child: Container(
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
               alignment: Alignment.center,
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -251,8 +251,8 @@ class _LoginNewState extends State<LoginNew> {
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
