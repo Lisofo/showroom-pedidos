@@ -46,6 +46,7 @@ class Linea {
   late int G;
   late int B;
   late String talle;
+  late bool isExpanded;
 
   Linea({
     required this.lineaId,
@@ -95,6 +96,7 @@ class Linea {
     required this.G,
     required this.B,
     required this.talle,
+    this.isExpanded = false,
   });
 
   factory Linea.fromJson(Map<String, dynamic> json) => Linea(
@@ -245,5 +247,6 @@ class Linea {
     G = 0;
     B = 0;
     talle = '';
+    isExpanded = false;
   }
 }

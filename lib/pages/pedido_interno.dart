@@ -89,86 +89,84 @@ class _PedidoInternoState extends State<PedidoInterno> {
                   itemBuilder: (context, i) {
                     String raiz = raices[i];
                     int precioTotalVariante = 0;
+                    int cantidadTotalVariante = 0;
                     String url = '';
                     var listaVariantes = obtenerListaRaiz(raiz);
-                    for (var variante in listaVariantes){
+                    for(var variante in listaVariantes){
                       precioTotalVariante += variante.costoUnitario;
-                      url = Uri.encodeFull(variante.fotoURL);
+                      cantidadTotalVariante += variante.cantidad;
                     }
-                    return Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.4,
-                              width: MediaQuery.of(context).size.width * 0.3,
-                              child: Image.network(
-                                url,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Placeholder(
-                                    child: Text('No Image'),
-                                  );
-                                },
+                    for (var variante in listaVariantes){
+                      url = Uri.encodeFull(variante.fotoURL);
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: MediaQuery.of(context).size.width * 0.09, //ToDo mediaquery isMobile agregar
+                                width: MediaQuery.of(context).size.width * 0.1,
+                                child: Image.network( 
+                                  url,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Placeholder(
+                                      child: Text('No Image'),
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Row(
-                                //   mainAxisAlignment: MainAxisAlignment.center,
-                                //   children: [
-                                //     Text(raiz),
-                                //     const SizedBox(width: 10,),
-                                //     Text(listaVariantes[0].descripcion)
-                                //   ],
-                                // ),
-                                // const SizedBox(height: 20,),
-                                SizedBox(
-                                  height: MediaQuery.of(context).size.height * 0.57,
-                                  width: MediaQuery.of(context).size.width * 0.53,
-                                  child: ExpansionTile(
-                                    title: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.83,
+                                child: ExpansionTile(
+                                  title: RichText(
+                                    text: TextSpan(
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                      ),
                                       children: [
-                                        Text(raiz),
-                                        const SizedBox(width: 10),
-                                        Text(listaVariantes[0].descripcion),
-                                      ],
+                                        TextSpan(
+                                          text: variante.raiz,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20
+                                          )
+                                        ),
+                                        const TextSpan(
+                                          text: '  '
+                                        ),
+                                        TextSpan(
+                                          text: variante.descripcion,
+                                          style: const TextStyle(fontSize: 16)
+                                        ),
+                                      ]
                                     ),
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          for (var variante in listaVariantes) ...[
-                                            Row(
-                                              children: [
-                                                Text(variante.codItem),
-                                                const SizedBox(width: 10),
-                                                Text('Precio unitario: ${variante.costoUnitario.toString()}'),
-                                              ],
-                                            ),
-                                          ],
-                                        ],
+                                      Text('Cantidad: ${cantidadTotalVariante.toString()}', 
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                      ),
+                                      Text('Total: ${pedidoSeleccionado.signo} ${precioTotalVariante.toString()}', 
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                       ),
                                     ],
                                   ),
-                                )
-                              ],
-                            ),
-                            const Spacer(),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text('Total: ${precioTotalVariante.toString()}')
-                              ],
-                            )
-                          ],
+                                  children: listaVariantes.map((line){
+                                    return ListTile(
+                                      title: Text(line.codItem),
+                                      subtitle: Text('Cantidad: ${line.cantidad.toString()} Color: ${line.color} Talle: ${line.talle}'),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
+                    return null;
                   },
                 ),
               )
@@ -178,4 +176,5 @@ class _PedidoInternoState extends State<PedidoInterno> {
       ),
     );
   }
+  
 }
