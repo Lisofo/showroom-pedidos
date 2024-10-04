@@ -76,6 +76,16 @@ void initState() {
     
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+              onPressed: () {
+                logout();
+              }, 
+              icon: Icon(Icons.logout_outlined))
+          ],
+        ),
         backgroundColor: Colors.white,
         body: cargando ? const Center(
           child: Column(
@@ -180,39 +190,6 @@ void initState() {
                 ),
               ),
               const SizedBox(height: 10,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: (){
-                      logout();
-                    }, 
-                    child: const Text('Cerrar Sesion')
-                  ),
-                  Column(
-                    children: [
-                      const Text('Sincronizar?'),
-                      Switch(
-                        value: switchValue, 
-                        onChanged:(value) {
-                          setState(() {
-                            switchValue = !switchValue;
-                            
-                          });
-                        },
-                        activeColor: Colors.teal,
-                      ),
-                    ],
-                  )
-                ],
-              ),
-              const SizedBox(height: 20,),
-              TextButton(
-                onPressed: (){
-                  appRouter.push('/dashboard');
-                }, 
-                child: const Text('Ir a Dashboard')
-              ),
             ],
           )
         ),

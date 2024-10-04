@@ -38,6 +38,7 @@ class _PaginaClienteState extends State<PaginaCliente> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        
         elevation: 0,
         backgroundColor: const Color(0xFFFD725A),
         title: const Text('Pedidos del Cliente'),
@@ -53,11 +54,11 @@ class _PaginaClienteState extends State<PaginaCliente> {
                 children: [
                   Text(
                     clienteSeleccionado.nombre,
-                    style: const TextStyle(fontSize: 50, fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
                   ),
                   Text(clienteSeleccionado.codCliente,
                     style: TextStyle(
-                      fontSize: 25,
+                      fontSize: 20,
                       fontWeight: FontWeight.w200,
                       color: Colors.black54.withOpacity(0.6)
                     )
@@ -65,7 +66,7 @@ class _PaginaClienteState extends State<PaginaCliente> {
                 ],
               ),
             ),
-            const Divider(thickness: 15.0),
+            const Divider(thickness: 2.0),
             Expanded(
               child: ListView.builder(
                 itemCount: listaPedidos.length,
@@ -90,27 +91,6 @@ class _PaginaClienteState extends State<PaginaCliente> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  InkWell(
-                    onTap: () {
-                      appRouter.pop();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFD725A),
-                        borderRadius: BorderRadius.circular(30)
-                      ),
-                      child: Text(
-                        'Atras',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1,
-                          color: Colors.white.withOpacity(0.9)
-                        ),
-                      ),
-                    ),
-                  ),
                   const Spacer(),
                   InkWell(
                     onTap: () {

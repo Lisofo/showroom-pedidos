@@ -57,14 +57,6 @@ class _BuscadorClienteState extends State<BuscadorCliente> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(border: Border.all()),
-                child: const TextField(
-                  decoration: InputDecoration(
-                      border: InputBorder.none, prefixIcon: Icon(Icons.search)),
-                ),
-              ),
               const SizedBox(
                 height: 10,
               ),
@@ -90,31 +82,6 @@ class _BuscadorClienteState extends State<BuscadorCliente> {
                     );
                   },
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      appRouter.go('/login');
-                    },
-                    child: Container(
-                      padding:
-                          const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
-                      decoration: BoxDecoration(
-                          color: const Color(0xFFFD725A),
-                          borderRadius: BorderRadius.circular(30)),
-                      child: Text(
-                        'Cerrar Sesion',
-                        style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1,
-                            color: Colors.white.withOpacity(0.9)),
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
