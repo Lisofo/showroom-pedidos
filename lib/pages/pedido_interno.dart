@@ -139,6 +139,15 @@ class _PedidoInternoState extends State<PedidoInterno> {
                                           text: variante.descripcion,
                                           style: const TextStyle(fontSize: 16)
                                         ),
+                                        const TextSpan(
+                                          text: '     '
+                                        ),
+                                        TextSpan(
+                                          text: 'Precio: ${pedidoSeleccionado.signo} ${variante.costoUnitario.toString()}',
+                                          style: const TextStyle(
+                                            fontSize: 16
+                                          )
+                                        ),
                                       ]
                                     ),
                                   ),
@@ -156,7 +165,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
                                   children: listaVariantes.map((line){
                                     return ListTile(
                                       title: Text(line.codItem),
-                                      subtitle: Text('Cantidad: ${line.cantidad.toString()} Color: ${line.color} Talle: ${line.talle}'),
+                                      subtitle: Text('Color: ${line.color} Talle: ${line.talle} Cantidad: ${line.cantidad.toString()}'),
                                     );
                                   }).toList(),
                                 ),

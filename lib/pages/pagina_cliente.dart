@@ -81,7 +81,7 @@ class _PaginaClienteState extends State<PaginaCliente> {
                     subtitle: Text('Estado: ${pedido.estado}'),
                     trailing: const Icon(
                       Icons.chevron_right,
-                      size: 50,
+                      size: 25,
                     ),
                   );
                 }
