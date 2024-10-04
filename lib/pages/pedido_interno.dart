@@ -93,8 +93,8 @@ class _PedidoInternoState extends State<PedidoInterno> {
                     String url = '';
                     var listaVariantes = obtenerListaRaiz(raiz);
                     for(var variante in listaVariantes){
-                      precioTotalVariante += variante.costoUnitario;
                       cantidadTotalVariante += variante.cantidad;
+                      precioTotalVariante += variante.costoUnitario * variante.cantidad;
                     }
                     for (var variante in listaVariantes){
                       url = Uri.encodeFull(variante.fotoURL);
