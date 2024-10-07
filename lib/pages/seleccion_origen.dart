@@ -29,13 +29,10 @@ class _SeleccionOrigenState extends State<SeleccionOrigen> {
   bool cargando = false;
   
 
-@override
-void initState() {
-  super.initState();
-}
-
-  
-
+  @override
+  void initState() {
+    super.initState();
+  }
 
   cargarDatos() async{
     setState(() {
@@ -50,7 +47,6 @@ void initState() {
       // for (int i = 0; i<productosOffline.length; i++){
       //     _saveProductLocally(productosOffline[i]);
       // }
-  
     }
     setState(() { 
       cargando = false;

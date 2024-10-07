@@ -9,15 +9,16 @@ class ProductServices {
   final _dio = Dio();
   late String apirUrl = Config.APIURL;
   Future<List<Product>> getProductByName(String raiz, String codAlmacen, String token) async {
-    String link =
-        apirUrl += '/api/servicios/itemsRaiz/$raiz?codAlmacen=$codAlmacen';
+    String link = apirUrl += '/api/v1/servicios/itemsRaiz/$raiz?codAlmacen=$codAlmacen&limit=20';
     try {
       var headers = {'Authorization': token};
       var resp = await _dio.request(link,
-          options: Options(
-            method: 'GET',
-            headers: headers,
-          ));
+        options: Options(
+          method: 'GET',
+          headers: headers,
+        )
+      );
+      
       final List<dynamic> productList = resp.data;
       return productList.map((obj) => Product.fromJson(obj)).toList();
     } catch (e) {
@@ -27,8 +28,7 @@ class ProductServices {
   }
 
   Future<List<Product>> getProductByVariant(String raiz, String codAlmacen, String token, String codTipoLista) async {
-    String link = apirUrl +=
-        '/api/servicios/variantesItem/$raiz?codAlmacen=$codAlmacen&mismoColor=n&codTipoLista=$codTipoLista';
+    String link = apirUrl += '/api/v1/servicios/variantesItem/$raiz?codAlmacen=$codAlmacen&mismoColor=n&codTipoLista=$codTipoLista';
 
     try {
       var headers = {'Authorization': token};
@@ -47,7 +47,7 @@ class ProductServices {
 
 
   Future<Product> getSingleProductByRaiz(String raiz, String codAlmacen, String token) async {
-    String link = apirUrl +='/api/servicios/itemsRaiz/$raiz?codAlmacen=$codAlmacen';
+    String link = apirUrl +='/api/v1/servicios/itemsRaiz/$raiz?codAlmacen=$codAlmacen';
 
     try {
       var headers = {'Authorization': token};
@@ -82,8 +82,7 @@ class ProductServices {
   //  }
 
   Future<List<Product>> getAllProducts(String codAlmacen, String token) async {
-    String link =
-        apirUrl += '/api/servicios/itemsRaiz/Todos/?codAlmacen=$codAlmacen';
+    String link = apirUrl += '/api/v1/servicios/itemsRaiz/Todos/?codAlmacen=$codAlmacen';
     try {
       var headers = {'Authorization': token};
       var resp = await _dio.request(link,
