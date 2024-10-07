@@ -11,11 +11,11 @@ import 'package:showroom_maqueta/providers/item_provider.dart';
 class LoginServices {
   int? statusCode;
   late String apiUrl = Config.APIURL;
-  late String apiLink = '$apiUrl/api/auth/login';
+  late String apiLink = '$apiUrl/api/auth/loginPin2';
 
   Future<void> login(String login, password, BuildContext context) async {
     var headers = {'Content-Type': 'application/json'};
-    var data = json.encode({"login": login, "password": password});
+    var data = json.encode({"login": login, "pin2": password});
     var dio = Dio();
     String link = apiLink;
     try {
@@ -33,6 +33,7 @@ class LoginServices {
       if (statusCode == 200) {
         print(response.data['token']);
         Provider.of<ItemProvider>(context, listen: false).setToken(response.data['token']);
+        Provider.of<ItemProvider>(context, listen: false).setVendedorId(response.data['vendedorId']);
       } else { 
         print(response.statusMessage);
       }

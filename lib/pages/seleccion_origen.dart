@@ -110,7 +110,7 @@ class _SeleccionOrigenState extends State<SeleccionOrigen> {
                         onTap: () async {
                           
                           Provider.of<ThemeProvider>(context, listen: false).selectedColor = 1;
-                          Provider.of<ItemProvider>(context, listen: false).setAlmacen('81');
+                          Provider.of<ItemProvider>(context, listen: false).setAlmacen('18');
       
                           almacen = '81';
                           // if(boxProduct.isEmpty){

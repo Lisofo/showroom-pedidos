@@ -8,11 +8,11 @@ class ClientServices {
   late String apirUrl = Config.APIURL;
   late int? statusCode;
 
-  Future getClientes (BuildContext context, String nombre, String ruc, String codCliente, String almacen, String token) async {
-    String link =  '$apirUrl/api/v1/clientes';
-    bool yaTieneFiltro = false;
+  Future getClientes (BuildContext context, String nombre, String ruc, String codCliente, String almacen, int vendedorId, String token) async {
+    String link =  '$apirUrl/api/v1/clientes?vendedorId=$vendedorId';
+    bool yaTieneFiltro = true;
     if (nombre != '') {
-      link += '?nombre=$nombre';
+      link += '&nombre=$nombre';
       yaTieneFiltro = true;
     }
     if (codCliente != '') {

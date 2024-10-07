@@ -11,7 +11,13 @@ class ItemProvider with ChangeNotifier {
   String _query = '';
   String get query => _query;
   
+  int _vendedorId = 0;
+  int get vendedorId => _vendedorId;
 
+  void setVendedorId (int seller) {
+    _vendedorId = seller;
+    notifyListeners();
+  }
 
   void setQuery (String query){
     _query = query;

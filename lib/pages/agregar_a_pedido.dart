@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:showroom_maqueta/models/client.dart';
 import 'package:showroom_maqueta/models/product.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/product_services.dart';
@@ -17,62 +18,111 @@ class AgregarPedido extends StatefulWidget {
 
 class _AgregarPedidoState extends State<AgregarPedido> {
   List<Product> listItems = [];
-  late String codAlmacen = '';
+  late String almacen = '';
   late String token = '';
+  late Client cliente = Client.empty();
+  late int offset = 0;
   final TextEditingController query = TextEditingController();
+  final ScrollController scrollController = ScrollController();
+  bool cargandoMas = false; // Bandera para evitar múltiples llamadas simultáneas
   bool activo = false;
+  late String descripcion = '';
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
     cargarDatos();
+
+    // Añadir un listener al ScrollController para detectar el final de la lista
+    scrollController.addListener(() {
+      if (scrollController.position.pixels == scrollController.position.maxScrollExtent && !cargandoMas) {
+        cargarMasDatos();
+      }
+    });
   }
 
   cargarDatos() async {
-    codAlmacen = context.read<ItemProvider>().almacen;
+    almacen = context.read<ItemProvider>().almacen;
     token = context.read<ItemProvider>().token;
+    cliente = context.read<ItemProvider>().client;
+
     setState(() {});
+  }
+
+  Future<void> cargarMasDatos() async {
+    setState(() {
+      cargandoMas = true; // Indicar que estamos cargando más datos
+    });
+
+    // Llamar al servicio para obtener más productos
+    List<Product> nuevosItems = await ProductServices().getProductByName(
+      query.text, 
+      cliente.codTipoLista, 
+      almacen, 
+      descripcion, // Descripción vacía al cargar más
+      offset.toString(), 
+      token
+    );
+
+    setState(() {
+      listItems.addAll(nuevosItems); // Añadir los nuevos productos a la lista existente
+      offset += 20; // Incrementar el offset para la próxima carga
+      cargandoMas = false; // Indicar que ya no estamos cargando datos
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Buscar Item'),
+        title: const Text('Buscar'),
         elevation: 0,
         backgroundColor: const Color(0xFFFD725A),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(style: BorderStyle.solid),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: TextFormField(
-                  controller: query,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Buscar o escanear item...',
-                    suffixIcon: Icon(Icons.search)
-                  ),
-                  onFieldSubmitted: (value) {
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.55,
+              child: SearchBar(
+                hintText: 'Buscar o escanear item...',
+                controller: query,
+                onSubmitted: (value) async {
+                  if (value.contains('-')) {
                     query.text = value;
-                    ProductServices().getProductByName(query.text, '2', '1', '', '0', token);
-                    setState(() {});
-                  },
-                ),
+                    descripcion = '';
+                  } else {
+                    query.text = '';
+                    descripcion = value;
+                  }
+
+                  // Reiniciar el offset y la lista al buscar un nuevo término
+                  offset = 0;
+                  listItems = await ProductServices().getProductByName(
+                    query.text, 
+                    cliente.codTipoLista, 
+                    almacen, 
+                    descripcion, 
+                    offset.toString(), 
+                    token
+                  );
+                  setState(() {
+                    offset += 20; // Incrementar el offset para la próxima carga
+                  });
+                },
               ),
             ),
-            const Divider(thickness: 2.0,),
-            const SizedBox(height: 10,),
-            Expanded(
-              child: ListView.builder(
+          )
+        ],
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          controller: scrollController, // Controlador del scroll
+          child: Column(
+            children: [
+              ListView.builder(
                 shrinkWrap: true,
                 itemCount: listItems.length,
+                physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, i) {
                   var item = listItems[i];
                   return ListTile(
@@ -90,8 +140,13 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                   );
                 }
               ),
-            ),
-          ],
+              if (cargandoMas)
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(), // Indicador de carga al final
+                ),
+            ],
+          ),
         )
       ),
     );

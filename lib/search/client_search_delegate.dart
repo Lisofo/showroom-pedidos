@@ -45,6 +45,7 @@ class ClientSearchDelegate extends SearchDelegate{
     final clientServices = ClientServices();
     final almacen = context.watch<ItemProvider>().almacen;
     final token = context.watch<ItemProvider>().token;
+    final vendedorId = context.watch<ItemProvider>().vendedorId;
     final List<String> searchParams = query.split(" ");
 
     String codigo = '';
@@ -65,7 +66,7 @@ class ClientSearchDelegate extends SearchDelegate{
     }
 
     return FutureBuilder(
-      future: clientServices.getClientes(context, nombre, ruc, codigo, almacen, token),
+      future: clientServices.getClientes(context, nombre, ruc, codigo, almacen, vendedorId, token),
       builder: (_, AsyncSnapshot snapshot) {
         if (snapshot.hasError) {
           return const ListTile(
