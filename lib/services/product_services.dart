@@ -2,14 +2,35 @@ import 'package:dio/dio.dart';
 import 'package:showroom_maqueta/config/config.dart';
 import 'package:showroom_maqueta/models/producto_variante.dart';
 // import 'package:showroom_maqueta/offline/boxes.dart';
-
+// almancenId 1 = nyp
+// almancenId 18 = ufo
 import '../models/product.dart';
 
 class ProductServices {
   final _dio = Dio();
   late String apirUrl = Config.APIURL;
-  Future<List<Product>> getProductByName(String raiz, String codAlmacen, String token) async {
-    String link = apirUrl += '/api/v1/servicios/itemsRaiz/$raiz?codAlmacen=$codAlmacen&limit=20';
+  Future<List<Product>> getProductByName(String raiz, String codTipoLista, String almacenId, String descripcion, String offset, String token) async {
+    String link = apirUrl += '/api/v1/itemsRaiz/?limit=20&offset=$offset';
+    bool yaTieneFiltro = true;
+    if (raiz != '') {
+      link += '&raiz=$raiz';
+      yaTieneFiltro = true;
+    }
+    if (codTipoLista != '') {
+      yaTieneFiltro ? link += '&' : link += '?';
+      link += 'codTipoLista=$codTipoLista';
+      yaTieneFiltro = true;
+    }
+    if (almacenId != '') {
+      yaTieneFiltro ? link += '&' : link += '?';
+      link += 'almacenId=$almacenId';
+      yaTieneFiltro = true;
+    }
+    if (descripcion != '') {
+      yaTieneFiltro ? link += '&' : link += '?';
+      link += 'descripcion=$descripcion';
+      yaTieneFiltro = true;
+    }
     try {
       var headers = {'Authorization': token};
       var resp = await _dio.request(link,

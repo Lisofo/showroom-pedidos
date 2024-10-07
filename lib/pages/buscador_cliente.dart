@@ -78,7 +78,6 @@ class _BuscadorClienteState extends State<BuscadorCliente> {
                         size: 50,
                       ),
                       title: Text(historial[i].nombre),
-                      subtitle: const Text('Cantidad de pedidos: 4'),
                     );
                   },
                 ),

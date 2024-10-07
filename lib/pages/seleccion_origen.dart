@@ -79,7 +79,7 @@ class _SeleccionOrigenState extends State<SeleccionOrigen> {
               onPressed: () {
                 logout();
               }, 
-              icon: Icon(Icons.logout_outlined))
+              icon: const Icon(Icons.logout_outlined))
           ],
         ),
         backgroundColor: Colors.white,

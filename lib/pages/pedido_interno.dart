@@ -90,13 +90,13 @@ class _PedidoInternoState extends State<PedidoInterno> {
                   itemCount: raices.length,
                   itemBuilder: (context, i) {
                     String raiz = raices[i];
-                    int precioTotalVariante = 0;
+                    double precioTotalVariante = 0;
                     int cantidadTotalVariante = 0;
                     String url = '';
                     var listaVariantes = obtenerListaRaiz(raiz);
                     for(var variante in listaVariantes){
                       cantidadTotalVariante += variante.cantidad;
-                      precioTotalVariante += variante.costoUnitario * variante.cantidad;
+                      precioTotalVariante += (variante.costoUnitario * variante.cantidad);
                     }
                     for (var variante in listaVariantes){
                       url = Uri.encodeFull(variante.fotoURL);

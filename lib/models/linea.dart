@@ -16,7 +16,7 @@ class Linea {
   late String grupoInventario;
   late int ordinal;
   late int cantidad;
-  late int costoUnitario;
+  late double costoUnitario;
   late int descuento1;
   late int descuento2;
   late int descuento3;
@@ -29,14 +29,14 @@ class Linea {
   late String codGruInv;
   late int cantFacturada;
   late int cantDevuelta;
-  late int totNetoFacturada;
-  late int totBrutoFacturada;
+  late double totNetoFacturada;
+  late double totBrutoFacturada;
   late int cantFac;
   late int cantRem;
-  late int netoFac;
-  late int netoRem;
-  late int brutoFac;
-  late int brutoRem;
+  late double netoFac;
+  late double netoRem;
+  late double brutoFac;
+  late double brutoRem;
   late int cantEPend;
   late String fotoURL;
   late String codColor;
@@ -117,7 +117,7 @@ class Linea {
     grupoInventario: json["grupoInventario"] as String? ?? '',
     ordinal: json["ordinal"] as int? ?? 0,
     cantidad: json["cantidad"] as int? ?? 0,
-    costoUnitario: json["costoUnitario"] as int? ?? 0,
+    costoUnitario: json["costoUnitario"].toDouble(),
     descuento1: json["descuento1"] as int? ?? 0,
     descuento2: json["descuento2"] as int? ?? 0,
     descuento3: json["descuento3"] as int? ?? 0,
@@ -130,14 +130,14 @@ class Linea {
     codGruInv: json["codGruInv"] as String? ?? '',
     cantFacturada: json["cantFacturada"] as int? ?? 0,
     cantDevuelta: json["cantDevuelta"] as int? ?? 0,
-    totNetoFacturada: json["totNetoFacturada"] as int? ?? 0,
-    totBrutoFacturada: json["totBrutoFacturada"] as int? ?? 0,
+    totNetoFacturada: json["totNetoFacturada"].toDouble(),
+    totBrutoFacturada: json["totBrutoFacturada"].toDouble(),
     cantFac: json["cantFac"] as int? ?? 0,
     cantRem: json["cantRem"] as int? ?? 0,
-    netoFac: json["netoFac"] as int? ?? 0,
-    netoRem: json["netoRem"] as int? ?? 0,
-    brutoFac: json["brutoFac"] as int? ?? 0,
-    brutoRem: json["brutoRem"] as int? ?? 0,
+    netoFac: json["netoFac"].toDouble(),
+    netoRem: json["netoRem"].toDouble(),
+    brutoFac: json["brutoFac"].toDouble(),
+    brutoRem: json["brutoRem"].toDouble(),
     cantEPend: json["cantEPend"] as int? ?? 0,
     fotoURL: json["fotoURL"] as String? ?? '',
     codColor: json["codColor"] as String? ?? '',

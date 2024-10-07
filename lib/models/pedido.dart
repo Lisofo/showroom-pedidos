@@ -95,12 +95,12 @@ class Pedido {
     totalPresupuesto: json["totalPresupuesto"] as double? ?? 0.0,
     fechaVencimiento: json["fechaVencimiento"] != null ? DateTime.parse(json["fechaVencimiento"]) : null,
     fechaEntrega: json["fechaEntrega"] != null ? DateTime.parse(json["fechaEntrega"]) : null,
-    plantilla: json["plantilla"],
+    plantilla: json["plantilla"] as bool? ?? false,
     unidadId: json["unidadId"] as int? ?? 0,
     km: json["km"],
     servicio: json["servicio"] as String? ?? '',
     central: json["central"] as String? ?? '',
-    credito: json["credito"],
+    credito: json["credito"] as bool? ?? false,
   );
 
   Map<String, dynamic> toJson() => {

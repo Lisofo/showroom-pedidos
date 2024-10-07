@@ -263,72 +263,21 @@ class _LoginNewState extends State<LoginNew> {
     );
   }
 
-  Future<void> intentoLogin(BuildContext context) async {
-    hayConexion = await _checkConnectivity();
-      print(hayConexion);
-      if(!hayConexion){
+  Future<void> intentoLogin(BuildContext context) async { 
+    esValidoLogin = await login(context);
+    if (esValidoLogin){
+      tokenActual = context.read<ItemProvider>().token;
+      guardarToken(tokenActual);
+      print('Token:');
+      print(tokenActual);
       
-        DateTime fechaComparar = DateTime.parse(await obtenerFecha());
+      currentDate = DateTime.now().toIso8601String();
+      guardarFecha(currentDate);
+      print('Fecha:');
+      print(currentDate);
       
-        print(fechaComparar);
-      
-        if(mas24Horas(DateTime.now(),fechaComparar)){
-          
-          showDialog(context: context, builder: (context){
-            return  AlertDialog(
-              title: const Center(child: Text('El token expiro')),
-              content: const Text('Intente logear nuevamente cuando tenga conexion'),
-              actions: [
-                TextButton(
-                  onPressed: (){
-                    appRouter.pop();
-                  },
-                  child: const Text('Ok.')
-                ),            
-              ],
-            );
-          });
-        }else{
-          Provider.of<ItemProvider>(context, listen: false).setToken(await obtenerToken());
-          showDialog(context: context, builder: (context){
-            return  AlertDialog(
-              title: const Center(child: Text('Esta entrando sin conexion')),
-              content: const Text('Seguro que quiere entrar sin conexion?, sera conectado con el ultimo almacen utilizado'),
-              actionsAlignment: MainAxisAlignment.spaceBetween,
-              actions: [
-                TextButton(
-                  onPressed: (){
-                    appRouter.pop();
-                  },
-                  child: const Text('Cancelar', textAlign: TextAlign.start,)
-                ),
-                TextButton(onPressed: (){
-                  // appRouter.pop();
-                  // appRouter.push('/product_add');
-                },
-                child: const Text('Continuar sin Conexion'))            
-              ],
-            );
-          });
-        }
-      }
-      else { 
-        esValidoLogin = await login(context);
-        if (esValidoLogin){
-          tokenActual = context.read<ItemProvider>().token;
-          guardarToken(tokenActual);
-          print('Token:');
-          print(tokenActual);
-          
-          currentDate = DateTime.now().toIso8601String();
-          guardarFecha(currentDate);
-          print('Fecha:');
-          print(currentDate);
-          
-          appRouter.push('/select_origin');
-        }
-       
-      }
+      appRouter.go('/select_origin');
+    }
   }
     
 

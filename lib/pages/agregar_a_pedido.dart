@@ -61,7 +61,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                   ),
                   onFieldSubmitted: (value) {
                     query.text = value;
-                    ProductServices().getProductByName(query.text, codAlmacen, token);
+                    ProductServices().getProductByName(query.text, '2', '1', '', '0', token);
                     setState(() {});
                   },
                 ),
