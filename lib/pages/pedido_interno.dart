@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:showroom_maqueta/config/router/app_router.dart';
 import 'package:showroom_maqueta/models/linea.dart';
 import 'package:showroom_maqueta/models/pedido.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
@@ -19,6 +20,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
   Map<String, List<Linea>> listaDeLista = {};
   late List<String> raices = [];
   late int precio = 0;
+  int buttonIndex = 0;
   
   @override
   void initState() {
@@ -181,7 +183,30 @@ class _PedidoInternoState extends State<PedidoInterno> {
               )
             ],
           ),
-        )
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: buttonIndex,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add_shopping_cart),
+              label: 'Agregar item'
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart),
+              label: 'Carrito'
+            ),
+          ],
+          onTap: (index) async {
+            buttonIndex = index;
+            switch (buttonIndex) {
+              case 0:
+                appRouter.push('/product_add');
+              break;
+              case 1:
+              break;
+            }
+          },
+        ),
       ),
     );
   }
