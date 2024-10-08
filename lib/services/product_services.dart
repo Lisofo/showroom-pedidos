@@ -10,7 +10,7 @@ class ProductServices {
   final _dio = Dio();
   late String apirUrl = Config.APIURL;
   Future<List<Product>> getProductByName(String raiz, String codTipoLista, String almacenId, String descripcion, String offset, String token) async {
-    String link = apirUrl += '/api/v1/itemsRaiz/?limit=20&offset=$offset';
+    String link = apirUrl += '/api/v1/itemsRaiz/?limit=20&offset=$offset&sort=raiz desc';
     bool yaTieneFiltro = true;
     if (raiz != '') {
       link += '&raiz=$raiz';
@@ -54,10 +54,11 @@ class ProductServices {
     try {
       var headers = {'Authorization': token};
       var resp = await _dio.request(link,
-          options: Options(
-            method: 'GET',
-            headers: headers,
-          ));
+        options: Options(
+          method: 'GET',
+          headers: headers,
+        )
+      );
       final List<dynamic> productList = resp.data;
       return productList.map((obj) => Product.fromJson(obj)).toList();
     } catch (e) {

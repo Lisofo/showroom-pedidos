@@ -1,18 +1,16 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
 
-class ProductPage extends StatelessWidget {
-  List talles = [
-    'XS',
-    'S',
-    'M',
-    'L',
-    'XL',
-    '2XL',
-    '3XL',
-  ];
+class ProductPage extends StatefulWidget {
 
-  ProductPage({super.key});
+  const ProductPage({super.key});
+
+  @override
+  State<ProductPage> createState() => _ProductPageState();
+}
+
+class _ProductPageState extends State<ProductPage> {
+  List talles = [];
 
   @override
   Widget build(BuildContext context) {

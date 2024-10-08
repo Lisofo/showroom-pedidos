@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:showroom_maqueta/config/router/app_router.dart';
 import 'package:showroom_maqueta/models/client.dart';
 import 'package:showroom_maqueta/models/product.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
@@ -25,8 +26,11 @@ class _AgregarPedidoState extends State<AgregarPedido> {
   final TextEditingController query = TextEditingController();
   final ScrollController scrollController = ScrollController();
   bool cargandoMas = false; // Bandera para evitar múltiples llamadas simultáneas
+  bool cargando = false;
   bool activo = false;
   late String descripcion = '';
+  late String raiz = '';
+  bool busco = false;
 
   @override
   void initState() {
@@ -54,9 +58,8 @@ class _AgregarPedidoState extends State<AgregarPedido> {
       cargandoMas = true; // Indicar que estamos cargando más datos
     });
 
-    // Llamar al servicio para obtener más productos
     List<Product> nuevosItems = await ProductServices().getProductByName(
-      query.text, 
+      raiz, 
       cliente.codTipoLista, 
       almacen, 
       descripcion, // Descripción vacía al cargar más
@@ -84,21 +87,22 @@ class _AgregarPedidoState extends State<AgregarPedido> {
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.55,
               child: SearchBar(
+                textInputAction: TextInputAction.search,
                 hintText: 'Buscar o escanear item...',
                 controller: query,
                 onSubmitted: (value) async {
+                  cargando = true;
                   if (value.contains('-')) {
                     query.text = value;
+                    raiz = query.text.trim();
                     descripcion = '';
                   } else {
                     query.text = '';
                     descripcion = value;
                   }
-
-                  // Reiniciar el offset y la lista al buscar un nuevo término
                   offset = 0;
                   listItems = await ProductServices().getProductByName(
-                    query.text, 
+                    raiz, 
                     cliente.codTipoLista, 
                     almacen, 
                     descripcion, 
@@ -106,7 +110,9 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                     token
                   );
                   setState(() {
-                    offset += 20; // Incrementar el offset para la próxima carga
+                    busco = true;
+                    cargando = false;
+                    offset += 20;
                   });
                 },
               ),
@@ -114,40 +120,83 @@ class _AgregarPedidoState extends State<AgregarPedido> {
           )
         ],
       ),
-      body: SafeArea(
+      body: !cargando ? SafeArea(
         child: SingleChildScrollView(
           controller: scrollController, // Controlador del scroll
           child: Column(
             children: [
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: listItems.length,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, i) {
-                  var item = listItems[i];
-                  return ListTile(
-                    leading: const Icon(
-                      Icons.image,
-                      size: 50,
-                    ),
-                    onTap: () {},
-                    title: Text(item.descripcion),
-                    subtitle: const Text('Descripcion corta del producto'),
-                    trailing: const Icon(
-                      Icons.chevron_right,
-                      size: 35,
-                    ),
-                  );
-                }
-              ),
+              if(!busco || listItems.isNotEmpty)...[
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: listItems.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, i) {
+                    var item = listItems[i];
+                    var foto = item.imagenes.split(';');
+                    var precio = '';
+                    if(item.precioIvaIncluidoMin != item.precioIvaIncluidoMax){
+                      precio = '${item.precioIvaIncluidoMin} - ${item.precioIvaIncluidoMax}';
+                    } else {
+                      precio = item.precioIvaIncluidoMax.toString();
+                    }
+                    return Row(
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.15,
+                          width: MediaQuery.of(context).size.width * 0.1,
+                          child: Image.network(
+                            foto[0],
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          child: ListTile(
+                            onTap: () {
+                              Provider.of<ItemProvider>(context, listen: false).setProduct;
+                              appRouter.push('/product_page');
+                            },
+                            title: Text(item.raiz),
+                            subtitle: Text('${item.descripcion} \nPrecio: ${item.signo}$precio    Disponibilidad: ${item.disponibleRaiz}'),
+                            trailing: const Icon(
+                              Icons.chevron_right,
+                              size: 35,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                )
+              ] else...[
+                const Text(
+                  'No se encontró su busqueda. Intentelo nuevamente',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w300
+                  )
+                )
+              ],
               if (cargandoMas)
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(), // Indicador de carga al final
-                ),
-            ],
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircularProgressIndicator(),
+              ),
+            ]
           ),
         )
+      ) : const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 10,),
+              Text('Buscando...')
+            ],
+          )
+        ),
       ),
     );
   }
