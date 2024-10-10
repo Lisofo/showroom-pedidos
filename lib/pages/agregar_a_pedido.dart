@@ -97,7 +97,6 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                     raiz = query.text.trim();
                     descripcion = '';
                   } else {
-                    query.text = '';
                     descripcion = value;
                   }
                   offset = 0;

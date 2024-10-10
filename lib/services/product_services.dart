@@ -11,7 +11,7 @@ class ProductServices {
   late String apirUrl = Config.APIURL;
   late String apirUrl2 = Config.APIURL2;
   Future<List<Product>> getProductByName(String raiz, String codTipoLista, String almacenId, String descripcion, String offset, String token) async {
-    String link = apirUrl += '/api/v1/itemsRaiz/?limit=20&offset=$offset&sort=raiz desc';
+    String link = apirUrl += '/api/v1/itemsRaiz/?limit=20&offset=$offset';
     bool yaTieneFiltro = true;
     if (raiz != '') {
       link += '&raiz=$raiz';
