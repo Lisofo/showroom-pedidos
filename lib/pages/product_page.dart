@@ -1,5 +1,14 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:showroom_maqueta/models/client.dart';
+import 'package:showroom_maqueta/models/color.dart';
+import 'package:showroom_maqueta/models/product.dart';
+import 'package:showroom_maqueta/models/producto_variante.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:showroom_maqueta/providers/item_provider.dart';
+import 'package:showroom_maqueta/services/product_services.dart';
+
 
 class ProductPage extends StatefulWidget {
 
@@ -10,514 +19,237 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  List talles = [];
+  late List<ProductoVariante>? _products = [];
+  late String raiz = '';
+  late String almacen = '';
+  late String token = '';
+  late Client cliente = Client.empty();
+  var talles = <String>{};
+  late List<ProductColor> colors;
+  var priceMask = MaskTextInputFormatter(mask: '#######', filter: {"#": RegExp(r'[0-9.]')});
+  var cantMask = MaskTextInputFormatter(mask: '####', filter: {"#": RegExp(r'[0-9]')});
+  late num cantidadTotal = 0;
+  late double montoTotal = 0.0;
+  Map<String, int> cantidadPorTalle = {};
+  Map<String, String> cantidadAnteriorPorTalle = {};
+  Product productoSeleccionado = Product.empty();
+  Product productoNuevo = Product.empty();
+  bool botonColorApretado = false;
+  bool buscando = true;
+  bool colorSeleccionado = false;
+  bool hayConexion = false;
+  List<ProductoVariante> productosFiltrados = [];
+
+  @override
+  void initState() {
+    super.initState();
+    cargarDatos();
+  }
+
+  cargarDatos() async {
+    // raiz = context.read<ItemProvider>().
+    almacen = context.read<ItemProvider>().almacen;
+    token = context.read<ItemProvider>().token;
+    cliente = context.read<ItemProvider>().client;
+    productoSeleccionado = context.read<ItemProvider>().product;
+    productoNuevo = await ProductServices().getSingleProductByRaiz(productoSeleccionado.raiz, almacen, token);
+    List<dynamic> listaTalles = _products!.where((productoVariante) => talles.add(productoVariante.talle)).toList();
+    var models = <ProductColor>{};
+    for (var i = 0; i < _products!.length; i++) {
+      models.add(
+        ProductColor(
+          isSelected: false,
+            nombreColor: _products![i].color,
+            colorHexCode: _products![i].colorHexCode,
+            r: _products![i].r,
+            g: _products![i].g,
+            b: _products![i].b,
+            codColor: _products![i].codColor),
+      );
+    }
+    colors = models.toSet().toList();
+    _products = productoNuevo.variantes;
+    buscando = false;
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: SafeArea(
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(productoSeleccionado.raiz),
+        ),
+        body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const TopBody(),
-              MiddleBody(talles: talles),
-              const SizedBox(
-                height: 5,
-              ),
-              const BottomBody(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
-                        decoration: BoxDecoration(
-                            color: const Color(0xFFFD725A),
-                            borderRadius: BorderRadius.circular(30)),
-                        child: Text(
-                          'Atras',
-                          style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1,
-                              color: Colors.white.withOpacity(0.9)),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).pushNamedAndRemoveUntil('pedidoInterno', ModalRoute.withName('paginaCliente'));
-                      },
-                      child: Container(
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
-                        decoration: BoxDecoration(
-                            color: const Color(0xFFFD725A),
-                            borderRadius: BorderRadius.circular(30)),
-                        child: Text(
-                          'Guardar',
-                          style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1,
-                              color: Colors.white.withOpacity(0.9)),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              )
+              middleBody()
             ],
           ),
         ),
-      ),
+      )
     );
   }
-}
 
-class TopBody extends StatelessWidget {
-  const TopBody({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5), color: Colors.blueGrey[200]),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'AH-5838',
-            style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class MiddleBody extends StatefulWidget {
-  const MiddleBody({
-    super.key,
-    required this.talles,
-  });
-
-  final List talles;
-
-  @override
-  State<MiddleBody> createState() => _MiddleBodyState();
-}
-
-class _MiddleBodyState extends State<MiddleBody> {
-  int _contador = 4;
-  void _incrementarContador() {
-    setState(() {
-      _contador++;
-    });
-  }
-
-  void _bajarContador() {
-    setState(() {
-      _contador--;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 10, right: 10, top: 25),
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            color: Colors.blueGrey[200]),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Image(
-              height: 370,
-              image: AssetImage(
-                'images/AH-5838.jpeg',
-              )),
-          const SizedBox(
-            width: 10,
-          ),
-          Container(
-            margin: const EdgeInsets.only(top: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                    width: MediaQuery.of(context).size.width / 1.5,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width / 2,
-                          child: const Text(
-                              'Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,', style: TextStyle(fontSize: 24),),
-                        )
-                      ],
-                    )),
-                const SizedBox(
-                  height: 30,
+  middleBody() {
+    final colores = Theme.of(context).colorScheme;
+    
+    List<dynamic> listaTalles = _products!.where((talle) => talles.add(talle.talle)).toList();
+    late String? talleSeleccionado; 
+    return buscando ?  const Center(
+        child: CircularProgressIndicator(),
+      ) : _products!.isEmpty || _products == null ?
+          const Center(child: Text('El Producto no existe', style: TextStyle(fontSize: 24))) 
+          :  Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
+            child: Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  ), //Colors.blueGrey[200]),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: Text(
+                          productoSeleccionado.descripcion,
+                          style: const TextStyle(fontSize: 35),
+                        ),
+                      ),
+                    ),
+                    showColorButtons(),
+                    const SizedBox(height: 15,),
+                    if (productosFiltrados.isNotEmpty) ...[
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          for (var producto in productosFiltrados) ...[
+                            InkWell(
+                              onTap: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Center(child: Text('Variante Seleccionada: ${producto.codItem}')),
+                                    duration: const Duration(seconds: 2),
+                                    backgroundColor: colores.primary,
+                                    
+                                  ),
+                                );
+                                
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black),
+                                  borderRadius: BorderRadius.circular(7)
+                                ),
+                                alignment: Alignment.center,
+                                height: 80,
+                                width: 70,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                  
+                                    Text(
+                                      producto.talle,
+                                      style: const TextStyle(fontSize: 20),
+                                    ),
+                                    const SizedBox(height: 5,),
+                                    const Divider(height: 2, thickness: 2,),
+                                    const SizedBox(height: 5,),
+                                    Text(
+                                      producto.disponible.toString(),
+                                      style: const TextStyle(fontSize: 20),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      
+                      ),
+                      const SizedBox(height: 20,),
+                    ],
+                    Center(
+                      child: Text(
+                        productoSeleccionado.memo,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 25),
+                      ),
+                    ),
+                    const SizedBox(height: 50,),
+                  ]
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: tabla(),
-                ),
-              ],
             ),
-          )
-        ]),
-      ),
-    );
+          );         
   }
 
-DataTable tabla() {
-    return DataTable(
-        border: TableBorder.all(),
-        dataRowMaxHeight: 122,
-        columns: const [
-          DataColumn(label: SizedBox(width: 38,),),
-          DataColumn(label: Text('Talles'),),
-          DataColumn(label: CircleAvatar(
-            backgroundColor: Colors.grey,
-            child: Center(child: Text('XS',style: TextStyle(color: Colors.black),)),
-          )),
-          DataColumn(label: CircleAvatar(
-            backgroundColor: Colors.grey,
-            child: Center(
-              child: Text(
-                "S",style: TextStyle(color: Colors.black),)),
-          )),
-          DataColumn(label: CircleAvatar(
-            backgroundColor: Colors.grey,
-            child: Center(
-              child: Text(
-                "M",style: TextStyle(color: Colors.black),)),
-          )),
-          DataColumn(label: CircleAvatar(
-            backgroundColor: Colors.grey,
-            child: Center(
-              child: Text(
-                "L",style: TextStyle(color: Colors.black),)),
-          )),
-          DataColumn(label: CircleAvatar(
-            backgroundColor: Colors.grey,
-            child: Center(
-              child: Text(
-                "XL",style: TextStyle(color: Colors.black),)),
-          )),
-          DataColumn(label: CircleAvatar(
-            backgroundColor: Colors.grey,
-            child: Center(
-              child: Text(
-                "2XL",style: TextStyle(color: Colors.black),)),
-          )),
-          DataColumn(label: CircleAvatar(
-            backgroundColor: Colors.grey,
-            child: Center(
-              child: Text(
-                "3XL",style: TextStyle(color: Colors.black),)),
-          )),
-        ], 
-        rows: [
-          ultimaFila(Colors.red),
-          ultimaFila(Colors.blue),
-          ultimaFila(Colors.green),
-          ultimaFila(Colors.purple),
-          ultimaFila(Colors.lime),
-        ],
-      );
-  }
-  ultimaFila(miColor){
-    return DataRow(cells: [
-              DataCell(CircleAvatar(backgroundColor: miColor)),
-              const DataCell(Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Disp:',style: TextStyle(fontSize: 16),),
-                  SizedBox(height: 18,),
-                  Text('Cant:',style: TextStyle(fontSize: 16),),
-                  SizedBox(height: 18,),
-                  Text('Precio:',style: TextStyle(fontSize: 16),),
-                ],
-              )),
-              DataCell(Column(
-                children: [
-                  const Text('100'),
-                  cantidad2(),
-                  precio(),
-                ],
-              )),
-              DataCell(Column(
-                children: [
-                  const Text('100'),
-                  cantidad2(),
-                  precio(),
-                ],
-              )),
-              DataCell(Column(
-                children: [
-                  const Text('100'),
-                  cantidad(),
-                  precio(),
-                ],
-              )),
-              DataCell(Column(
-                children: [
-                  const Text('100'),
-                  cantidad(),
-                  precio(),
-                ],
-              )),
-              DataCell(Column(
-                children: [
-                  const Text('100'),
-                  cantidad(),
-                  precio(),
-                ],
-              )),
-              DataCell(Column(
-                children: [
-                  const Text('100'),
-                  cantidad(),
-                  precio(),
-                ],
-              )),
-              DataCell(Column(
-                children: [
-                  const Text('100'),
-                  cantidad2(),
-                  precio(),
-                ],
-              )),
-            ]);
+  Color getTextColor(Color backgroundColor) {
+    var luminance = 0.2126 * backgroundColor.red +
+        0.7152 * backgroundColor.green +
+        0.0722 * backgroundColor.blue;
+    // Decide si el texto debería ser oscuro o claro en función de la luminosidad
+    return luminance > 128 ? Colors.black : Colors.white;
   }
 
-  TextFormField precio() => TextFormField(initialValue: '890.0',textAlign: TextAlign.right,);
-
-  cantidad() {
-    return SizedBox(
-      height: 30,
-      width: 60,
-      child: TextField(
-        enabled: false,
-        maxLength: 3,
-        textAlign: TextAlign.right,
-        decoration: InputDecoration(
-          hintText: "",
-          counterText: "",
-          fillColor: Colors.grey[300],
-          filled: true,
-          border: InputBorder.none,
-        ),),
-    );
-  }
-cantidad2() {
-    return SizedBox(
-      height: 30,
-      width: 60,
-      child: TextField(
-        
-        maxLength: 3,
-        textAlign: TextAlign.right,
-        decoration: InputDecoration(
-          hintText: "",
-          counterText: "",
-          fillColor: Colors.grey[300],
-          filled: true,
-          border: InputBorder.none,
-        ),),
-    );
+  bool anyColorIsSelected(List<ProductColor> colors) {
+    for (var color in colors){
+      if (color.isSelected){
+        return true;
+      }
+    }
+    return false;
   }
 
-
-  Row precioYMas() {
-    return Row(
+  Wrap showColorButtons() {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 10,
       children: [
-        InkWell(
-          onTap: _bajarContador,
-          child: const Icon(
-            Icons.remove,
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-              // border: Border.all(),
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4)),
-          child: TextFormField(
-            textAlign: TextAlign.center,
-            initialValue: '$_contador',
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-                constraints: BoxConstraints(
-                    maxWidth: 40, maxHeight: 44, minWidth: 20, minHeight: 22)),
-          ),
-        ),
-        InkWell(
-          onTap: _incrementarContador,
-          child: const Icon(
-            Icons.add,
-          ),
-        ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Disponibles:',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black),
+        for (var color in colors)
+          ElevatedButton.icon(
+            icon: color.isSelected ? Icon(Icons.check, color: getTextColor(
+                    Color.fromARGB(255, color.r, color.g, color.b)),) : SizedBox(),
+            onPressed: () {
+              setState(() {
+                for (var c in colors) {
+                  c.isSelected = false; // Deselect all colors
+                }
+                mostrarTalles2(color);
+                color.isSelected = true; // Select the current color
+              });
+            },
+            style: ButtonStyle(
+              backgroundColor: MaterialStatePropertyAll(
+                  Color.fromARGB(255, color.r, color.g, color.b)),
+            ),
+            label: Text(
+              '${color.nombreColor} ${color.codColor}',
+              style: TextStyle(
+                fontSize: 25,
+                color: getTextColor(
+                    Color.fromARGB(255, color.r, color.g, color.b)),
               ),
-              Text(
-                '20',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black),
-              )
-            ],
+            ),
           ),
-        ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Pedidos:',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black),
-              ),
-              Text(
-                '10',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black),
-              )
-            ],
-          ),
-        ),
-        const Text(
-          'Precio: UYU',
-          style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black),
-        ),
-        const SizedBox(
-          width: 10,
-        ),
-        Container(
-          decoration: BoxDecoration(
-              // border: Border.all(),
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4)),
-          child: TextFormField(
-            keyboardType: TextInputType.number,
-            textAlign: TextAlign.center,
-            initialValue: '237.5',
-            decoration: const InputDecoration(
-                constraints: BoxConstraints(
-                    maxWidth: 50, maxHeight: 39, minWidth: 30, minHeight: 22)),
-          ),
-        ),
       ],
     );
   }
-}
 
-class BottomBody extends StatelessWidget {
-  const BottomBody({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            color: Colors.blueGrey[200]),
-        child: const Column(
-          children: [
-            // SizedBox(
-            //   height: 180,
-            // ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    'Cantidad de Items:',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black),
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  Text(
-                    '4',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 10, right: 20, bottom: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    'Precio Total:',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black),
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  Text(
-                    '\$900.54',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  mostrarTalles2(ProductColor color) {
+    for (String talle in talles) {
+      productosFiltrados = _products!
+          .where((product) => product.color == color.nombreColor)
+          .toList();
+    }
   }
+
 }
+

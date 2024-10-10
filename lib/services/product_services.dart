@@ -9,6 +9,7 @@ import '../models/product.dart';
 class ProductServices {
   final _dio = Dio();
   late String apirUrl = Config.APIURL;
+  late String apirUrl2 = Config.APIURL2;
   Future<List<Product>> getProductByName(String raiz, String codTipoLista, String almacenId, String descripcion, String offset, String token) async {
     String link = apirUrl += '/api/v1/itemsRaiz/?limit=20&offset=$offset&sort=raiz desc';
     bool yaTieneFiltro = true;
@@ -69,15 +70,17 @@ class ProductServices {
 
 
   Future<Product> getSingleProductByRaiz(String raiz, String codAlmacen, String token) async {
-    String link = apirUrl +='/api/v1/servicios/itemsRaiz/$raiz?codAlmacen=$codAlmacen';
+    String link = apirUrl +='/api/servicios/itemsRaiz/$raiz?codAlmacen=$codAlmacen';
 
     try {
       var headers = {'Authorization': token};
-      var resp = await _dio.request(link,
-          options: Options(
-            method: 'GET',
-            headers: headers,
-          ));
+      var resp = await _dio.request(
+        link,
+        options: Options(
+          method: 'GET',
+          headers: headers,
+          
+        ));
       final Product product = Product.fromJson(resp.data);
       return product;
     } catch (e) {

@@ -152,7 +152,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                           width: MediaQuery.of(context).size.width * 0.9,
                           child: ListTile(
                             onTap: () {
-                              Provider.of<ItemProvider>(context, listen: false).setProduct;
+                              Provider.of<ItemProvider>(context, listen: false).setProduct(item);
                               appRouter.push('/product_page');
                             },
                             title: Text(item.raiz),

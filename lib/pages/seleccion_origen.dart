@@ -112,7 +112,7 @@ class _SeleccionOrigenState extends State<SeleccionOrigen> {
                           Provider.of<ThemeProvider>(context, listen: false).selectedColor = 1;
                           Provider.of<ItemProvider>(context, listen: false).setAlmacen('18');
       
-                          almacen = '81';
+                          almacen = '18';
                           // if(boxProduct.isEmpty){
                           //   await cargarDatos();
                           // }else{
@@ -194,31 +194,31 @@ class _SeleccionOrigenState extends State<SeleccionOrigen> {
   }
 
   void logout() {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Cerrar sesion'),
-            content: const Text('Esta seguro de querer cerrar sesion?'),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    appRouter.pop();
-                  },
-                  child: const Text('Cancelar')),
-              TextButton(
-                  onPressed: () {
-                    Provider.of<ItemProvider>(context, listen: false).setToken('');
-                    appRouter.pushReplacement('/login');
-                  },
-                  child: const Text(
-                    'Cerrar Sesion',
-                    style: TextStyle(color: Colors.red),
-                  )),
-            ],
-          );
-        },
-      );
-    }
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Cerrar sesion'),
+          content: const Text('Esta seguro de querer cerrar sesion?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                appRouter.pop();
+              },
+              child: const Text('Cancelar')),
+            TextButton(
+              onPressed: () {
+                Provider.of<ItemProvider>(context, listen: false).setToken('');
+                appRouter.pushReplacement('/login');
+              },
+              child: const Text(
+                'Cerrar Sesion',
+                style: TextStyle(color: Colors.red),
+              )),
+          ],
+        );
+      },
+    );
+  }
 }
 

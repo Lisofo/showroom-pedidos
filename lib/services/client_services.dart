@@ -9,7 +9,7 @@ class ClientServices {
   late int? statusCode;
 
   Future getClientes (BuildContext context, String nombre, String ruc, String codCliente, String almacen, int vendedorId, String token) async {
-    String link =  '$apirUrl/api/v1/clientes?vendedorId=$vendedorId';
+    String link =  '$apirUrl/api/v1/clientes?vendedorId=$vendedorId&almacenId=$almacen';
     bool yaTieneFiltro = true;
     if (nombre != '') {
       link += '&nombre=$nombre';

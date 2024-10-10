@@ -17,7 +17,7 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/product_page',
-      builder: (context, state) => ProductPage()
+      builder: (context, state) => const ProductPage()
     ),
     GoRoute(
       path: '/product_add',

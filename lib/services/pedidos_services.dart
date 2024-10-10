@@ -8,8 +8,8 @@ class PedidosServices {
   late String apirUrl = Config.APIURL;
   late int? statusCode;
 
-  Future getPedidosCliente (BuildContext context, int clienteId, token) async {
-    String link =  '$apirUrl/api/v1/pedidos?clienteId=$clienteId';
+  Future getPedidosCliente (BuildContext context, int clienteId, String almacen, String token) async {
+    String link = '$apirUrl/api/v1/pedidos?clienteId=$clienteId&almacenId=$almacen';
     try {
       var headers = {'Authorization': token};
       var resp = await _dio.request(

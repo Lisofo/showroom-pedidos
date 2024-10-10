@@ -20,6 +20,7 @@ class _PaginaClienteState extends State<PaginaCliente> {
   List<Pedido> listaPedidos = [];
   late Client clienteSeleccionado = Client.empty();
   late String token = '';
+  late String alamcenId = '';
 
   @override
   void initState() {
@@ -29,8 +30,9 @@ class _PaginaClienteState extends State<PaginaCliente> {
 
   cargarDatos() async {
     token = context.read<ItemProvider>().token;
+    alamcenId = context.read<ItemProvider>().almacen;
     clienteSeleccionado = context.read<ItemProvider>().client;
-    listaPedidos = await PedidosServices().getPedidosCliente(context, clienteSeleccionado.clienteId, token);
+    listaPedidos = await PedidosServices().getPedidosCliente(context, clienteSeleccionado.clienteId, alamcenId, token);
     setState(() {});
   }
 
