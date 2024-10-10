@@ -53,6 +53,7 @@ class _ProductPageState extends State<ProductPage> {
     cliente = context.read<ItemProvider>().client;
     productoSeleccionado = context.read<ItemProvider>().product;
     productoNuevo = await ProductServices().getSingleProductByRaiz(productoSeleccionado.raiz, almacen, token);
+    _products = productoNuevo.variantes;
     List<dynamic> listaTalles = _products!.where((productoVariante) => talles.add(productoVariante.talle)).toList();
     var models = <ProductColor>{};
     for (var i = 0; i < _products!.length; i++) {
@@ -68,7 +69,6 @@ class _ProductPageState extends State<ProductPage> {
       );
     }
     colors = models.toSet().toList();
-    _products = productoNuevo.variantes;
     buscando = false;
     setState(() {});
   }
@@ -117,18 +117,18 @@ class _ProductPageState extends State<ProductPage> {
                         fit: BoxFit.contain,
                         child: Text(
                           productoSeleccionado.descripcion,
-                          style: const TextStyle(fontSize: 35),
+                          style: const TextStyle(fontSize: 24),
                         ),
                       ),
                     ),
                     showColorButtons(),
-                    const SizedBox(height: 15,),
+                    const SizedBox(height: 10,),
                     if (productosFiltrados.isNotEmpty) ...[
                       Wrap(
                         alignment: WrapAlignment.center,
                         crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        runSpacing: 10,
+                        spacing: 5,
+                        runSpacing: 5,
                         children: [
                           for (var producto in productosFiltrados) ...[
                             InkWell(
@@ -215,27 +215,24 @@ class _ProductPageState extends State<ProductPage> {
       children: [
         for (var color in colors)
           ElevatedButton.icon(
-            icon: color.isSelected ? Icon(Icons.check, color: getTextColor(
-                    Color.fromARGB(255, color.r, color.g, color.b)),) : SizedBox(),
+            icon: color.isSelected ? Icon(Icons.check, color: getTextColor(Color.fromARGB(255, color.r, color.g, color.b)),) : const SizedBox(),
             onPressed: () {
               setState(() {
                 for (var c in colors) {
-                  c.isSelected = false; // Deselect all colors
+                  c.isSelected = false;
                 }
                 mostrarTalles2(color);
-                color.isSelected = true; // Select the current color
+                color.isSelected = true;
               });
             },
             style: ButtonStyle(
-              backgroundColor: MaterialStatePropertyAll(
-                  Color.fromARGB(255, color.r, color.g, color.b)),
+              backgroundColor: WidgetStatePropertyAll(Color.fromARGB(255, color.r, color.g, color.b)),
             ),
             label: Text(
               '${color.nombreColor} ${color.codColor}',
               style: TextStyle(
                 fontSize: 25,
-                color: getTextColor(
-                    Color.fromARGB(255, color.r, color.g, color.b)),
+                color: getTextColor(Color.fromARGB(255, color.r, color.g, color.b)),
               ),
             ),
           ),
@@ -245,9 +242,7 @@ class _ProductPageState extends State<ProductPage> {
 
   mostrarTalles2(ProductColor color) {
     for (String talle in talles) {
-      productosFiltrados = _products!
-          .where((product) => product.color == color.nombreColor)
-          .toList();
+      productosFiltrados = _products!.where((product) => product.color == color.nombreColor).toList();
     }
   }
 

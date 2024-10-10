@@ -70,7 +70,7 @@ class ProductServices {
 
 
   Future<Product> getSingleProductByRaiz(String raiz, String codAlmacen, String token) async {
-    String link = apirUrl +='/api/servicios/itemsRaiz/$raiz?codAlmacen=$codAlmacen';
+    String link = apirUrl +='/api/v1/itemsRaiz/$raiz?codAlmacen=$codAlmacen';
 
     try {
       var headers = {'Authorization': token};

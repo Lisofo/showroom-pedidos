@@ -132,7 +132,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, i) {
                     var item = listItems[i];
-                    var foto = item.imagenes.split(';');
+                    var foto = item.imagenes[0];
                     var precio = '';
                     if(item.precioIvaIncluidoMin != item.precioIvaIncluidoMax){
                       precio = '${item.precioIvaIncluidoMin} - ${item.precioIvaIncluidoMax}';
@@ -145,7 +145,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                           height: MediaQuery.of(context).size.height * 0.15,
                           width: MediaQuery.of(context).size.width * 0.1,
                           child: Image.network(
-                            foto[0],
+                            foto,
                           ),
                         ),
                         SizedBox(

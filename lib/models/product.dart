@@ -9,16 +9,18 @@ class Product {
   late int monedaId;
   late String memo;
   late String signo;
-  late double precioVentaActualMin;
-  late double precioVentaActualMax;
-  late double precioIvaIncluidoMin;
-  late double precioIvaIncluidoMax;
+  late double? precioVentaActualMin;
+  late double? precioVentaActualMax;
+  late double? precioVentaActual;
+  late double? precioIvaIncluidoMin;
+  late double? precioIvaIncluidoMax;
+  late double? precioIvaIncluido;
   late int ivaId;
   late int valor;
   late int disponibleRaiz;
   late int existenciaRaiz;
   late List<ProductoVariante>? variantes;
-  late String imagenes;
+  late List<dynamic> imagenes;
 
   Product({
     required this.almacenId,
@@ -29,8 +31,10 @@ class Product {
     required this.signo,
     required this.precioVentaActualMin,
     required this.precioVentaActualMax,
+    required this.precioVentaActual,
     required this.precioIvaIncluidoMin,
     required this.precioIvaIncluidoMax,
+    required this.precioIvaIncluido,
     required this.ivaId,
     required this.valor,
     required this.disponibleRaiz,
@@ -49,14 +53,16 @@ class Product {
       signo: json['signo'] as String? ?? '',
       precioVentaActualMin: json['precioVentaActualMin'] == null ? null : json['precioVentaActualMin'].toDouble(),
       precioVentaActualMax: json['precioVentaActualMax'] == null ? null : json['precioVentaActualMax'].toDouble(),
+      precioVentaActual: json['precioVentaActual'] == null ? null : json['precioVentaActual'].toDouble(),
       precioIvaIncluidoMin: json['precioIvaIncluidoMin'] == null ? null : json['precioIvaIncluidoMin'].toDouble(),
       precioIvaIncluidoMax: json['precioIvaIncluidoMax'] == null ? null : json['precioIvaIncluidoMax'].toDouble(),
+      precioIvaIncluido: json['precioIvaIncluido'] == null ? null : json['precioIvaIncluido'].toDouble(),
       ivaId: json['ivaId'] as int? ?? 0,
       valor: json['valor'] as int? ?? 0,
       disponibleRaiz: json['disponibleRaiz'] as int? ?? 0,
       existenciaRaiz: json['existenciaRaiz'] as int? ?? 0,
       variantes: json["variantes"] != null ? List<ProductoVariante>.from(json["variantes"].map((x)=> ProductoVariante.fromJson(x))).toList() : null,
-      imagenes: json['fotosUrl'] as String? ?? '',
+      imagenes: json['fotosUrl'] as List<dynamic>,
     );
   }
 
@@ -76,7 +82,7 @@ class Product {
     disponibleRaiz = 0;
     existenciaRaiz = 0;
     variantes = [];
-    imagenes = '';
+    imagenes = [];
   }
 
   @override
