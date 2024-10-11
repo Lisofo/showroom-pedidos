@@ -78,14 +78,13 @@ class _AgregarPedidoState extends State<AgregarPedido> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Buscar'),
         elevation: 0,
         backgroundColor: const Color(0xFFFD725A),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.55,
+              width: MediaQuery.of(context).size.width * 0.9,
               child: SearchBar(
                 textInputAction: TextInputAction.search,
                 hintText: 'Buscar o escanear item...',
@@ -116,7 +115,8 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                 },
               ),
             ),
-          )
+          ),
+          IconButton(onPressed: (){}, icon: Icon(Icons.camera_alt))
         ],
       ),
       body: !cargando ? SafeArea(

@@ -64,12 +64,13 @@ class _ProductPageState extends State<ProductPage> {
       models.add(
         ProductColor(
           isSelected: false,
-            nombreColor: _products![i].color,
-            colorHexCode: _products![i].colorHexCode,
-            r: _products![i].r,
-            g: _products![i].g,
-            b: _products![i].b,
-            codColor: _products![i].codColor),
+          nombreColor: _products![i].color,
+          colorHexCode: _products![i].colorHexCode,
+          r: _products![i].r,
+          g: _products![i].g,
+          b: _products![i].b,
+          codColor: _products![i].codColor
+        ),
       );
     }
     colors = models.toSet().toList();
@@ -138,9 +139,18 @@ class _ProductPageState extends State<ProductPage> {
                           IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {
-                              setState(() {
-                                _isEditing[i] = !_isEditing[i]; // Cambiar el modo de edición
-                              });
+                              if(item.disponible <= 0){
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Center(child: Text('No hay disponibles de esa variante')),
+                                    duration: Duration(seconds: 2),                                    
+                                  ),
+                                );
+                              } else{
+                                setState(() {
+                                  _isEditing[i] = !_isEditing[i]; // Cambiar el modo de edición
+                                });
+                              }
                             },
                           ),
                           IconButton(
@@ -157,7 +167,7 @@ class _ProductPageState extends State<ProductPage> {
                     );
                   },
                   separatorBuilder: (BuildContext context, int index) {
-                    return Divider();
+                    return const Divider();
                   },
                 ),
               ),
@@ -172,10 +182,9 @@ class _ProductPageState extends State<ProductPage> {
 
   middleBody() {
     List<dynamic> listaTalles = _products!.where((talle) => talles.add(talle.talle)).toList();
-    late String? talleSeleccionado; 
-    return buscando ?  const Center(
-        child: CircularProgressIndicator(),
-      ) : _products!.isEmpty || _products == null ?
+    late String? talleSeleccionado;
+    final colores = Theme.of(context).colorScheme; 
+    return buscando ?  const Center(child: CircularProgressIndicator(),) : _products!.isEmpty || _products == null ?
           const Center(child: Text('El Producto no existe', style: TextStyle(fontSize: 24))) 
           :  Padding(
             padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
@@ -207,58 +216,74 @@ class _ProductPageState extends State<ProductPage> {
                         for (var producto in productosFiltrados) ...[
                           InkWell(
                             onTap: () {
-                              ProductoVariante? productoExistente = productosAgregados.firstWhere(
-                                (item) => item.codItem == producto.codItem,
-                                orElse: () => ProductoVariante.empty(), // Devolver ProductoVariante vacío si no se encuentra
-                              );
-                            
-                              int indexProducto;
-                            
-                              if (productoExistente.codItem == producto.codItem) {
-                                // Si el producto ya existe, aumentar la cantidad
-                                setState(() {
-                                  productoExistente.cantidad += 1;
-                                });
-                                indexProducto = productosAgregados.indexOf(productoExistente); // Índice del producto existente
-                              } else {
-                                // Agregar nuevo producto a productosAgregados
-                                productosAgregados.add(
-                                  ProductoVariante(
-                                    itemId: producto.itemId,
-                                    codItem: producto.codItem,
-                                    monedaId: producto.monedaId,
-                                    signo: producto.signo,
-                                    precioVentaActual: producto.precioVentaActual,
-                                    precioIvaIncluido: producto.precioIvaIncluido,
-                                    existenciaActual: producto.existenciaActual,
-                                    existenciaTotal: producto.existenciaTotal,
-                                    ivaId: producto.ivaId,
-                                    valor: producto.valor,
-                                    codColor: producto.codColor,
-                                    color: producto.color,
-                                    talle: producto.talle,
-                                    disponible: producto.disponible,
-                                    colorHexCode: producto.colorHexCode,
-                                    r: producto.r,
-                                    g: producto.g,
-                                    b: producto.b,
-                                    imagenes: producto.imagenes,
-                                    cantidad: 1, // Cantidad inicial
+                              if(producto.disponible <= 0){
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Center(child: Text('No hay disponibles de esa variante')),
+                                    duration: Duration(seconds: 2),                                    
                                   ),
                                 );
-                                // Asegúrate de agregar un valor en _isEditing también
-                                _isEditing.add(false); // Indica que el nuevo producto no está en modo edición
-                                indexProducto = productosAgregados.length - 1; // Índice del nuevo producto
+                              } else {
+                                ProductoVariante? productoExistente = productosAgregados.firstWhere(
+                                  (item) => item.codItem == producto.codItem,
+                                  orElse: () => ProductoVariante.empty(), // Devolver ProductoVariante vacío si no se encuentra
+                                );
+                                int indexProducto;
+                                if (productoExistente.codItem == producto.codItem) {
+                                  // Si el producto ya existe, aumentar la cantidad
+                                  if(productoExistente.cantidad < producto.disponible){
+                                    setState(() {
+                                      productoExistente.cantidad += 1;
+                                    });
+                                    
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Center(child: Text('No hay más disponibles de la variante ${producto.codItem}')),
+                                        duration: const Duration(seconds: 2),
+                                        backgroundColor: colores.primary,
+                                      ),
+                                    );
+                                  }
+                                  indexProducto = productosAgregados.indexOf(productoExistente); // Índice del producto existente
+                                } else {
+                                  // Agregar nuevo producto a productosAgregados
+                                  productosAgregados.add(
+                                    ProductoVariante(
+                                      itemId: producto.itemId,
+                                      codItem: producto.codItem,
+                                      monedaId: producto.monedaId,
+                                      signo: producto.signo,
+                                      precioVentaActual: producto.precioVentaActual,
+                                      precioIvaIncluido: producto.precioIvaIncluido,
+                                      existenciaActual: producto.existenciaActual,
+                                      existenciaTotal: producto.existenciaTotal,
+                                      ivaId: producto.ivaId,
+                                      valor: producto.valor,
+                                      codColor: producto.codColor,
+                                      color: producto.color,
+                                      talle: producto.talle,
+                                      disponible: producto.disponible,
+                                      colorHexCode: producto.colorHexCode,
+                                      r: producto.r,
+                                      g: producto.g,
+                                      b: producto.b,
+                                      imagenes: producto.imagenes,
+                                      cantidad: 1, // Cantidad inicial
+                                    ),
+                                  );
+                                  // Asegúrate de agregar un valor en _isEditing también
+                                  _isEditing.add(false); // Indica que el nuevo producto no está en modo edición
+                                  indexProducto = productosAgregados.length - 1; // Índice del nuevo producto
+                                }
+                                // Desplazar hacia el producto existente o nuevo
+                                listController.animateTo(
+                                  indexProducto * 70.0, // Ajusta 80.0 dependiendo de la altura del ítem
+                                  duration: const Duration(milliseconds: 500),
+                                  curve: Curves.easeInOut,
+                                );
+                                setState(() {});
                               }
-                            
-                              // Desplazar hacia el producto existente o nuevo
-                              listController.animateTo(
-                                indexProducto * 70.0, // Ajusta 80.0 dependiendo de la altura del ítem
-                                duration: const Duration(milliseconds: 500),
-                                curve: Curves.easeInOut,
-                              );
-                            
-                              setState(() {});
                             },
                             child: Container(
                               decoration: BoxDecoration(

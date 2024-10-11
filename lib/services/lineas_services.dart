@@ -25,6 +25,6 @@ class LineasServices {
       return lineasList.map((obj) => Linea.fromJson(obj)).toList();
     } catch (e) {
       return e;
-    }
+    } 
   }
 }
