@@ -81,9 +81,13 @@ class _PaginaClienteState extends State<PaginaCliente> {
                     },
                     title: Text(pedido.numeroOrdenTrabajo),
                     subtitle: Text('Estado: ${pedido.estado}'),
-                    trailing: const Icon(
-                      Icons.chevron_right,
-                      size: 25,
+                    trailing: IconButton(
+                      onPressed: (){
+                        Provider.of<ItemProvider>(context, listen: false).setPedido(pedido);
+                        appRouter.push('/nuevoPedido');
+                      },
+                      icon: const Icon(Icons.edit,size: 25,),
+                      
                     ),
                   );
                 }
@@ -96,6 +100,7 @@ class _PaginaClienteState extends State<PaginaCliente> {
                   const Spacer(),
                   InkWell(
                     onTap: () {
+                      Provider.of<ItemProvider>(context, listen: false).setPedido(Pedido.empty());
                       appRouter.push('/nuevoPedido');
                     },
                     child: Container(

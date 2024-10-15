@@ -1,12 +1,15 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, unused_local_variable
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:showroom_maqueta/models/client.dart';
 import 'package:showroom_maqueta/models/color.dart';
+import 'package:showroom_maqueta/models/linea.dart';
+import 'package:showroom_maqueta/models/pedido.dart';
 import 'package:showroom_maqueta/models/product.dart';
 import 'package:showroom_maqueta/models/producto_variante.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
+import 'package:showroom_maqueta/services/pedidos_services.dart';
 import 'package:showroom_maqueta/services/product_services.dart';
 
 
@@ -42,6 +45,8 @@ class _ProductPageState extends State<ProductPage> {
   List<ProductoVariante> productosAgregados = [];
   final ScrollController listController = ScrollController();
   List<bool> _isEditing = []; // Lista para controlar el estado de edición de cada producto
+  int buttonIndex = 0;
+  late Pedido pedido = Pedido.empty();
 
   @override
   void initState() {
@@ -55,6 +60,7 @@ class _ProductPageState extends State<ProductPage> {
     almacen = context.read<ItemProvider>().almacen;
     token = context.read<ItemProvider>().token;
     cliente = context.read<ItemProvider>().client;
+    pedido = context.read<ItemProvider>().pedido;
     productoSeleccionado = context.read<ItemProvider>().product;
     productoNuevo = await ProductServices().getSingleProductByRaiz(productoSeleccionado.raiz, almacen, token);
     _products = productoNuevo.variantes;
@@ -173,6 +179,31 @@ class _ProductPageState extends State<ProductPage> {
               ),
             ],
           ),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: buttonIndex,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.save),
+              label: 'Guardar'
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.do_not_disturb),
+              label: 'NO TOCAR'
+            ),
+          ],
+          onTap: (value) async {
+            buttonIndex = value;
+            switch (buttonIndex) {
+              case 0:
+                var listaDeLineas = convertirProductosALineas(productosAgregados);
+                await PedidosServices().putPedido(context, pedido, listaDeLineas, token);
+              break;
+              case 1:
+                null;
+              break;
+            }
+          },
         ),
       ),
     );
@@ -315,9 +346,7 @@ class _ProductPageState extends State<ProductPage> {
                         ],
                       ],
                     ),
-                    const SizedBox(height: 20,),
                   ],
-                  const SizedBox(height: 50,),
                 ]
               ),
             ),
@@ -376,5 +405,60 @@ class _ProductPageState extends State<ProductPage> {
       productosFiltrados = _products!.where((product) => product.color == color.nombreColor).toList();
     }
   }
+
+  List<Linea> convertirProductosALineas(List<ProductoVariante> productosAgregados) {
+    return productosAgregados.map((producto) {
+      return Linea(
+        lineaId: 0, // Asigna un valor apropiado si lo tienes
+        ordenTrabajoId: 0, // Asigna un valor apropiado si lo tienes
+        numeroOrdenTrabajo: '', // Asigna un valor apropiado si lo tienes
+        monedaId: producto.monedaId,
+        fechaOrdenTrabajo: DateTime.now(), // O cualquier fecha que corresponda
+        estado: 'Pendiente', // Puedes ajustar este valor según el estado de tu aplicación
+        itemId: producto.itemId,
+        codItem: producto.codItem,
+        raiz: '', // Si tienes un valor para "raiz", úsalo
+        descripcion: '${producto.color} - ${producto.talle}',
+        macroFamilia: '', // Puedes asignar un valor aquí
+        familia: '', // Puedes asignar un valor aquí
+        grupoInventario: '', // Puedes asignar un valor aquí
+        ordinal: 0, // Puedes definir el ordinal si es necesario
+        cantidad: producto.cantidad,
+        costoUnitario: 0.0, // Asigna el costo unitario si lo tienes disponible
+        descuento1: 0, // Asigna los descuentos si los tienes
+        descuento2: 0,
+        descuento3: 0,
+        precioVenta: producto.precioVentaActual.toInt(),
+        comentario: '', // Asigna comentarios si los hay
+        ivaId: producto.ivaId,
+        iva: '21%', // Puedes ajustar este valor
+        valor: producto.valor,
+        gruInvId: 0, // Puedes asignar el id del grupo de inventario
+        codGruInv: '', // Código del grupo de inventario si aplica
+        cantFacturada: 0, // Puedes modificar este valor si tienes datos
+        cantDevuelta: 0,
+        totNetoFacturada: 0.0, // Asigna valores si los tienes
+        totBrutoFacturada: 0.0,
+        cantFac: 0,
+        cantRem: 0,
+        netoFac: 0.0,
+        netoRem: 0.0,
+        brutoFac: 0.0,
+        brutoRem: 0.0,
+        cantEPend: 0,
+        fotoURL: producto.imagenes.isNotEmpty ? producto.imagenes[0] : '',
+        codColor: producto.codColor,
+        color: producto.color,
+        colorHexCode: producto.colorHexCode.toString(),
+        R: producto.r,
+        G: producto.g,
+        B: producto.b,
+        talle: producto.talle,
+        isExpanded: false, // Para el estado de expansión si es necesario
+        metodo: '', // Puedes ajustar el método según tu lógica
+      );
+    }).toList();
+  }
+
 
 }

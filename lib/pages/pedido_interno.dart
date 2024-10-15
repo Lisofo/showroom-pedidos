@@ -93,7 +93,8 @@ class _PedidoInternoState extends State<PedidoInterno> {
                     double precioTotalVariante = 0;
                     int cantidadTotalVariante = 0;
                     String url = '';
-                    var listaVariantes = obtenerListaRaiz(raiz);
+                    List<Linea> listaVariantes = obtenerListaRaiz(raiz);
+                    print(listaVariantes);
                     for(var variante in listaVariantes){
                       cantidadTotalVariante += variante.cantidad;
                       precioTotalVariante += (variante.costoUnitario * variante.cantidad);
@@ -200,6 +201,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
             buttonIndex = index;
             switch (buttonIndex) {
               case 0:
+                // Provider.of<ItemProvider>(context, listen: false).setLineas();
                 appRouter.push('/product_add');
               break;
               case 1:

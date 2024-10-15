@@ -116,7 +116,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
               ),
             ),
           ),
-          IconButton(onPressed: (){}, icon: Icon(Icons.camera_alt))
+          IconButton(onPressed: (){}, icon: const Icon(Icons.camera_alt))
         ],
       ),
       body: !cargando ? SafeArea(

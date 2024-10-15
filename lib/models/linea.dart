@@ -47,6 +47,7 @@ class Linea {
   late int B;
   late String talle;
   late bool isExpanded;
+  late String metodo;
 
   Linea({
     required this.lineaId,
@@ -97,6 +98,7 @@ class Linea {
     required this.B,
     required this.talle,
     this.isExpanded = false,
+    required this.metodo,
   });
 
   factory Linea.fromJson(Map<String, dynamic> json) => Linea(
@@ -147,6 +149,7 @@ class Linea {
     G: json["G"] as int? ?? 0,
     B: json["B"] as int? ?? 0,
     talle: json["talle"] as String? ?? '',
+    metodo: ''
   );
 
   Map<String, dynamic> toJson() => {
@@ -248,5 +251,11 @@ class Linea {
     B = 0;
     talle = '';
     isExpanded = false;
+    metodo = '';
+  }
+
+  @override
+  String toString() {
+    return raiz;
   }
 }
