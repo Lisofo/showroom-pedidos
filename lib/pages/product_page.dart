@@ -431,7 +431,7 @@ class _ProductPageState extends State<ProductPage> {
         precioVenta: producto.precioVentaActual.toInt(),
         comentario: '', // Asigna comentarios si los hay
         ivaId: producto.ivaId,
-        iva: '21%', // Puedes ajustar este valor
+        iva: '', // Puedes ajustar este valor
         valor: producto.valor,
         gruInvId: 0, // Puedes asignar el id del grupo de inventario
         codGruInv: '', // Código del grupo de inventario si aplica
