@@ -7,7 +7,6 @@ import 'package:showroom_maqueta/models/linea.dart';
 import 'package:showroom_maqueta/models/pedido.dart';
 import 'package:showroom_maqueta/models/product.dart';
 import 'package:showroom_maqueta/models/producto_variante.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/pedidos_services.dart';
 import 'package:showroom_maqueta/services/product_services.dart';
@@ -30,8 +29,7 @@ class _ProductPageState extends State<ProductPage> {
   late Client cliente = Client.empty();
   var talles = <String>{};
   late List<ProductColor> colors;
-  var priceMask = MaskTextInputFormatter(mask: '#######', filter: {"#": RegExp(r'[0-9.]')});
-  var cantMask = MaskTextInputFormatter(mask: '####', filter: {"#": RegExp(r'[0-9]')});
+
   late num cantidadTotal = 0;
   late double montoTotal = 0.0;
   Map<String, int> cantidadPorTalle = {};

@@ -22,6 +22,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
   late List<String> raices = [];
   late int precio = 0;
   int buttonIndex = 0;
+  bool isMobile = false;
   
   @override
   void initState() {
@@ -36,6 +37,8 @@ class _PedidoInternoState extends State<PedidoInterno> {
     cargarListas();
     listaDeLista;
     raices = cargarRaices();
+    var shortestSide = MediaQuery.of(context).size.shortestSide;
+    isMobile = shortestSide < 600;
     setState(() {});
   }
 
@@ -108,8 +111,8 @@ class _PedidoInternoState extends State<PedidoInterno> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               SizedBox(
-                                height: MediaQuery.of(context).size.width * 0.09, //ToDo mediaquery isMobile agregar
-                                width: MediaQuery.of(context).size.width * 0.1,
+                                height: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.09, //ToDo mediaquery isMobile agregar
+                                width: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.1,
                                 child: Image.network( 
                                   url,
                                   errorBuilder: (context, error, stackTrace) {
@@ -120,7 +123,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
                                 ),
                               ),
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.83,
+                                width: isMobile ? MediaQuery.of(context).size.width * 0.6 : MediaQuery.of(context).size.width * 0.83,
                                 child: ExpansionTile(
                                   title: RichText(
                                     text: TextSpan(
@@ -155,8 +158,11 @@ class _PedidoInternoState extends State<PedidoInterno> {
                                     ),
                                   ),
                                   subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    crossAxisAlignment: isMobile ? CrossAxisAlignment.start : CrossAxisAlignment.end,
                                     children: [
+                                      if (isMobile) ... [
+                                        SizedBox(height: 10,)
+                                      ],
                                       Text('Cantidad: ${cantidadTotalVariante.toString()}', 
                                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                       ),
