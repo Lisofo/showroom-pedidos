@@ -11,6 +11,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/pedidos_services.dart';
 import 'package:showroom_maqueta/services/product_services.dart';
+import 'package:showroom_maqueta/widgets/variante_items.dart';
 
 
 class ProductPage extends StatefulWidget {
@@ -159,6 +160,7 @@ class _ProductPageState extends State<ProductPage> {
                                           onFieldSubmitted: (newValue) {
                                             setState(() {
                                               item.cantidad = int.parse(newValue);
+                                              actualizarLineaConVariante(item); // Actualiza la línea al editar
                                               _isEditing[i] = false; 
                                             });
                                           },
@@ -172,6 +174,7 @@ class _ProductPageState extends State<ProductPage> {
                                           onFieldSubmitted: (newValue) {
                                             setState(() {
                                               item.precioIvaIncluido = double.parse(newValue);
+                                              actualizarLineaConVariante(item); // Actualiza la línea al editar
                                               _isEditing[i] = false;
                                             });
                                           },
@@ -209,7 +212,7 @@ class _ProductPageState extends State<ProductPage> {
                             icon: const Icon(Icons.delete),
                             onPressed: () {
                               setState(() {
-                                productosAgregados.removeAt(i); 
+                                eliminarVariante(item); // Elimina el producto y actualiza líneas
                                 _isEditing.removeAt(i); 
                               });
                             },
@@ -242,8 +245,7 @@ class _ProductPageState extends State<ProductPage> {
             buttonIndex = value;
             switch (buttonIndex) {
               case 0:
-                var listaDeLineas = convertirProductosALineas(productosAgregados);
-                await PedidosServices().putPedido(context, pedido, listaDeLineas, token);
+                await PedidosServices().putPedido(context, pedido, lineasProvider, token);
               break;
               case 1:
                 null;
@@ -260,143 +262,57 @@ class _ProductPageState extends State<ProductPage> {
   middleBody() {
     List<dynamic> listaTalles = _products!.where((talle) => talles.add(talle.talle)).toList();
     late String? talleSeleccionado;
-    final colores = Theme.of(context).colorScheme; 
-    return buscando ?  const Center(child: CircularProgressIndicator(),) : _products!.isEmpty || _products == null ?
-          const Center(child: Text('El Producto no existe', style: TextStyle(fontSize: 24))) 
-          :  Padding(
-            padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
-            child: Container(
-              alignment: Alignment.center,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),), //Colors.blueGrey[200]),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Center(
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: Text(
-                        raiz == "" ? productoSeleccionado.descripcion : productoNuevo.descripcion,
-                        style: const TextStyle(fontSize: 24),
+    final colores = Theme.of(context).colorScheme;
+
+    return buscando
+      ? const Center(child: CircularProgressIndicator())
+      : _products!.isEmpty || _products == null
+          ? const Center(
+              child: Text('El Producto no existe', style: TextStyle(fontSize: 24)),
+            )
+          : Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: Text(
+                          raiz == "" ? productoSeleccionado.descripcion : productoNuevo.descripcion,
+                          style: const TextStyle(fontSize: 24),
+                        ),
                       ),
                     ),
-                  ),
-                  showColorButtons(),
-                  const SizedBox(height: 10,),
-                  if (productosFiltrados.isNotEmpty) ...[
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 5,
-                      runSpacing: 5,
-                      children: [
-                        for (var producto in productosFiltrados) ...[
-                          InkWell(
-                            onTap: () {
-                              if(producto.disponible <= 0){
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Center(child: Text('No hay disponibles de esa variante')),
-                                    duration: Duration(seconds: 2),                                    
-                                  ),
-                                );
-                              } else {
-                                ProductoVariante? productoExistente = productosAgregados.firstWhere(
-                                  (item) => item.codItem == producto.codItem,
-                                  orElse: () => ProductoVariante.empty(), // Devolver ProductoVariante vacío si no se encuentra
-                                );
-                                int indexProducto;
-                                if (productoExistente.codItem == producto.codItem) {
-                                  // Si el producto ya existe, aumentar la cantidad
-                                  if(productoExistente.cantidad < producto.disponible){
-                                    setState(() {
-                                      productoExistente.cantidad += 1;
-                                    });
-                                    
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Center(child: Text('No hay más disponibles de la variante ${producto.codItem}')),
-                                        duration: const Duration(seconds: 2),
-                                        backgroundColor: colores.primary,
-                                      ),
-                                    );
-                                  }
-                                  indexProducto = productosAgregados.indexOf(productoExistente); // Índice del producto existente
-                                } else {
-                                  // Agregar nuevo producto a productosAgregados
-                                  productosAgregados.add(
-                                    ProductoVariante(
-                                      itemId: producto.itemId,
-                                      codItem: producto.codItem,
-                                      monedaId: producto.monedaId,
-                                      signo: producto.signo,
-                                      precioVentaActual: producto.precioVentaActual,
-                                      precioIvaIncluido: producto.precioIvaIncluido,
-                                      existenciaActual: producto.existenciaActual,
-                                      existenciaTotal: producto.existenciaTotal,
-                                      ivaId: producto.ivaId,
-                                      valor: producto.valor,
-                                      codColor: producto.codColor,
-                                      color: producto.color,
-                                      talle: producto.talle,
-                                      disponible: producto.disponible,
-                                      colorHexCode: producto.colorHexCode,
-                                      r: producto.r,
-                                      g: producto.g,
-                                      b: producto.b,
-                                      imagenes: producto.imagenes,
-                                      cantidad: 1, // Cantidad inicial
-                                    ),
-                                  );
-                                  // Asegúrate de agregar un valor en _isEditing también
-                                  _isEditing.add(false); // Indica que el nuevo producto no está en modo edición
-                                  indexProducto = productosAgregados.length - 1; // Índice del nuevo producto
-                                }
-                                // Desplazar hacia el producto existente o nuevo
-                                listController.animateTo(
-                                  indexProducto * 70.0, // Ajusta 80.0 dependiendo de la altura del ítem
-                                  duration: const Duration(milliseconds: 500),
-                                  curve: Curves.easeInOut,
-                                );
-                                setState(() {});
-                              }
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black),
-                                borderRadius: BorderRadius.circular(7)
-                              ),
-                              alignment: Alignment.center,
-                              height: 80,
-                              width: 70,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    producto.talle,
-                                    style: const TextStyle(fontSize: 20),
-                                  ),
-                                  const SizedBox(height: 5,),
-                                  const Divider(height: 2, thickness: 2,),
-                                  const SizedBox(height: 5,),
-                                  Text(
-                                    producto.disponible.toString(),
-                                    style: const TextStyle(fontSize: 20),
-                                  ),
-                                ],
-                              ),
+                    showColorButtons(),
+                    const SizedBox(height: 10),
+                    if (productosFiltrados.isNotEmpty) ...[
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 5,
+                        runSpacing: 5,
+                        children: [
+                          for (var producto in productosFiltrados) ...[
+                            VarianteItem(
+                              producto: producto,
+                              colores: colores,
+                              onAgregar: () => _agregarOActualizarVariante(producto),
                             ),
-                          ),
+                          ],
                         ],
-                      ],
-                    ),
+                      ),
+                    ],
                   ],
-                ]
+                ),
               ),
-            ),
-          );         
+            );
   }
 
   Color getTextColor(Color backgroundColor) {
@@ -506,25 +422,301 @@ class _ProductPageState extends State<ProductPage> {
     }).toList();
   }
 
-  List<Linea> actualizarLineas(List<ProductoVariante> productosAgregados) {
-    for(var variante in productosAgregados) {
-      var editar = lineasProvider.firstWhere((linea) => linea.itemId == variante.itemId);
-      editar.costoUnitario = variante.precioIvaIncluido;
-      editar.cantidad = variante.cantidad;
-      editar.metodo = editar.lineaId != 0 ? 'PUT' : 'POST';
-      
-    }
-    return lineasProvider;
+  void actualizarLineas() {
+    // Actualiza las líneas en base a las variantes agregadas
+    productosAgregados.forEach((variante) {
+      // Verificar si la variante ya existe en la lista de lineas
+      int indexLinea = lineasProvider.indexWhere((linea) => linea.itemId == variante.itemId);
+
+      if (indexLinea == -1) {
+        // Si no existe, agregar una nueva línea con método POST
+        lineasProvider.add(Linea(
+          lineaId: 0, // Asigna un valor apropiado si lo tienes
+          ordenTrabajoId: 0, // Asigna un valor apropiado si lo tienes
+          numeroOrdenTrabajo: '', // Asigna un valor apropiado si lo tienes
+          monedaId: variante.monedaId,
+          fechaOrdenTrabajo: DateTime.now(), // O cualquier fecha que corresponda
+          estado: 'Pendiente', // Puedes ajustar este valor según el estado de tu aplicación
+          itemId: variante.itemId,
+          codItem: variante.codItem,
+          raiz: '', // Si tienes un valor para "raiz", úsalo
+          descripcion: '${variante.color} - ${variante.talle}',
+          macroFamilia: '', // Puedes asignar un valor aquí
+          familia: '', // Puedes asignar un valor aquí
+          grupoInventario: '', // Puedes asignar un valor aquí
+          ordinal: 0, // Puedes definir el ordinal si es necesario
+          cantidad: variante.cantidad,
+          costoUnitario: variante.precioIvaIncluido, // Asigna el costo unitario si lo tienes disponible
+          descuento1: 0, // Asigna los descuentos si los tienes
+          descuento2: 0,
+          descuento3: 0,
+          precioVenta: 0,
+          comentario: '', // Asigna comentarios si los hay
+          ivaId: variante.ivaId,
+          iva: '', // Puedes ajustar este valor
+          valor: variante.valor,
+          gruInvId: 0, // Puedes asignar el id del grupo de inventario
+          codGruInv: '', // Código del grupo de inventario si aplica
+          cantFacturada: 0, // Puedes modificar este valor si tienes datos
+          cantDevuelta: 0,
+          totNetoFacturada: 0.0, // Asigna valores si los tienes
+          totBrutoFacturada: 0.0,
+          cantFac: 0,
+          cantRem: 0,
+          netoFac: 0.0,
+          netoRem: 0.0,
+          brutoFac: 0.0,
+          brutoRem: 0.0,
+          cantEPend: 0,
+          fotoURL: variante.imagenes.isNotEmpty ? variante.imagenes[0] : '',
+          codColor: variante.codColor,
+          color: variante.color,
+          colorHexCode: variante.colorHexCode.toString(),
+          R: variante.r,
+          G: variante.g,
+          B: variante.b,
+          talle: variante.talle,
+          isExpanded: false, // Para el estado de expansión si es necesario
+          metodo: 'POST', // Puedes ajustar el método según tu lógica
+        ));
+      } else {
+        // Si existe, actualizar los valores y cambiar el método a PUT
+        lineasProvider[indexLinea].cantidad = variante.cantidad;
+        lineasProvider[indexLinea].costoUnitario = variante.precioIvaIncluido;
+        lineasProvider[indexLinea].metodo = 'PUT';  // Registro existente, el método es PUT
+      }
+    });
   }
 
-  existe (int itemId) {
-    bool existe = false;
-    for(var linea in lineasProvider){
-      existe = lineasProvider.contains((Linea element) => element.itemId == itemId);
+  void eliminarVariante(ProductoVariante varianteAEliminar) {
+    // Eliminar variante de productosAgregados
+    productosAgregados.removeWhere((variante) => variante.itemId == varianteAEliminar.itemId);
+  
+    // Buscar la línea correspondiente en lineasProvider
+    int indexLinea = lineasProvider.indexWhere((linea) => linea.itemId == varianteAEliminar.itemId);
+  
+    if (indexLinea != -1) {
+      // Si existe en lineasProvider, cambiar el método a DELETE
+      lineasProvider[indexLinea].metodo = 'DELETE';
     }
-    return existe;
   }
 
-  //siempre al agregar un nuevo ProductoVariante revisar si el itemId existe en la lista lineasProvider para saber si hago post, put o delete
+  void agregarVariante(ProductoVariante nuevaVariante) {
+    // Agregar variante a productosAgregados
+    productosAgregados.add(nuevaVariante);
+  
+    // Verificar si la variante ya existe en lineasProvider
+    int indexLinea = lineasProvider.indexWhere((linea) => linea.itemId == nuevaVariante.itemId);
+  
+    if (indexLinea == -1) {
+      // Si no existe, agregar nueva línea con método POST
+      lineasProvider.add(Linea(
+          lineaId: 0, // Asigna un valor apropiado si lo tienes
+          ordenTrabajoId: 0, // Asigna un valor apropiado si lo tienes
+          numeroOrdenTrabajo: '', // Asigna un valor apropiado si lo tienes
+          monedaId: nuevaVariante.monedaId,
+          fechaOrdenTrabajo: DateTime.now(), // O cualquier fecha que corresponda
+          estado: 'Pendiente', // Puedes ajustar este valor según el estado de tu aplicación
+          itemId: nuevaVariante.itemId,
+          codItem: nuevaVariante.codItem,
+          raiz: '', // Si tienes un valor para "raiz", úsalo
+          descripcion: '${nuevaVariante.color} - ${nuevaVariante.talle}',
+          macroFamilia: '', // Puedes asignar un valor aquí
+          familia: '', // Puedes asignar un valor aquí
+          grupoInventario: '', // Puedes asignar un valor aquí
+          ordinal: 0, // Puedes definir el ordinal si es necesario
+          cantidad: nuevaVariante.cantidad,
+          costoUnitario: nuevaVariante.precioIvaIncluido, // Asigna el costo unitario si lo tienes disponible
+          descuento1: 0, // Asigna los descuentos si los tienes
+          descuento2: 0,
+          descuento3: 0,
+          precioVenta: 0,
+          comentario: '', // Asigna comentarios si los hay
+          ivaId: nuevaVariante.ivaId,
+          iva: '', // Puedes ajustar este valor
+          valor: nuevaVariante.valor,
+          gruInvId: 0, // Puedes asignar el id del grupo de inventario
+          codGruInv: '', // Código del grupo de inventario si aplica
+          cantFacturada: 0, // Puedes modificar este valor si tienes datos
+          cantDevuelta: 0,
+          totNetoFacturada: 0.0, // Asigna valores si los tienes
+          totBrutoFacturada: 0.0,
+          cantFac: 0,
+          cantRem: 0,
+          netoFac: 0.0,
+          netoRem: 0.0,
+          brutoFac: 0.0,
+          brutoRem: 0.0,
+          cantEPend: 0,
+          fotoURL: nuevaVariante.imagenes.isNotEmpty ? nuevaVariante.imagenes[0] : '',
+          codColor: nuevaVariante.codColor,
+          color: nuevaVariante.color,
+          colorHexCode: nuevaVariante.colorHexCode.toString(),
+          R: nuevaVariante.r,
+          G: nuevaVariante.g,
+          B: nuevaVariante.b,
+          talle: nuevaVariante.talle,
+          isExpanded: false, // Para el estado de expansión si es necesario
+          metodo: 'POST', // Puedes ajustar el método según tu lógica
+        ));
+    }
+  }
+  
+  void editarVariante(ProductoVariante varianteEditada) {
+    // Buscar variante en productosAgregados
+    int indexVariante = productosAgregados.indexWhere((variante) => variante.itemId == varianteEditada.itemId);
+  
+    if (indexVariante != -1) {
+      // Actualizar variante en productosAgregados
+      productosAgregados[indexVariante] = varianteEditada;
+  
+      // Verificar si la variante existe en lineasProvider
+      int indexLinea = lineasProvider.indexWhere((linea) => linea.itemId == varianteEditada.itemId);
+  
+      if (indexLinea != -1) {
+        // Actualizar la línea correspondiente y cambiar método a PUT
+        lineasProvider[indexLinea].cantidad = varianteEditada.cantidad;
+        lineasProvider[indexLinea].costoUnitario = varianteEditada.precioIvaIncluido;
+        lineasProvider[indexLinea].metodo = 'PUT';
+      }
+    }
+  }
+
+  // Método para manejar la actualización de variantes
+  void actualizarLineaConVariante(ProductoVariante variante) {
+    var lineaExistente = lineasProvider.firstWhere(
+      (linea) => linea.itemId == variante.itemId, 
+      orElse: () => Linea.empty(),
+    );
+
+    if (lineaExistente.itemId == variante.itemId) {
+      setState(() {
+        lineaExistente.cantidad = variante.cantidad;
+        lineaExistente.costoUnitario = variante.precioIvaIncluido;
+        lineaExistente.metodo = 'PUT';
+      });
+    } else {
+      setState(() {
+        lineasProvider.add(Linea(
+          lineaId: 0, // Asigna un valor apropiado si lo tienes
+          ordenTrabajoId: 0, // Asigna un valor apropiado si lo tienes
+          numeroOrdenTrabajo: '', // Asigna un valor apropiado si lo tienes
+          monedaId: variante.monedaId,
+          fechaOrdenTrabajo: DateTime.now(), // O cualquier fecha que corresponda
+          estado: 'Pendiente', // Puedes ajustar este valor según el estado de tu aplicación
+          itemId: variante.itemId,
+          codItem: variante.codItem,
+          raiz: '', // Si tienes un valor para "raiz", úsalo
+          descripcion: '${variante.color} - ${variante.talle}',
+          macroFamilia: '', // Puedes asignar un valor aquí
+          familia: '', // Puedes asignar un valor aquí
+          grupoInventario: '', // Puedes asignar un valor aquí
+          ordinal: 0, // Puedes definir el ordinal si es necesario
+          cantidad: variante.cantidad,
+          costoUnitario: variante.precioIvaIncluido, // Asigna el costo unitario si lo tienes disponible
+          descuento1: 0, // Asigna los descuentos si los tienes
+          descuento2: 0,
+          descuento3: 0,
+          precioVenta: 0,
+          comentario: '', // Asigna comentarios si los hay
+          ivaId: variante.ivaId,
+          iva: '', // Puedes ajustar este valor
+          valor: variante.valor,
+          gruInvId: 0, // Puedes asignar el id del grupo de inventario
+          codGruInv: '', // Código del grupo de inventario si aplica
+          cantFacturada: 0, // Puedes modificar este valor si tienes datos
+          cantDevuelta: 0,
+          totNetoFacturada: 0.0, // Asigna valores si los tienes
+          totBrutoFacturada: 0.0,
+          cantFac: 0,
+          cantRem: 0,
+          netoFac: 0.0,
+          netoRem: 0.0,
+          brutoFac: 0.0,
+          brutoRem: 0.0,
+          cantEPend: 0,
+          fotoURL: variante.imagenes.isNotEmpty ? variante.imagenes[0] : '',
+          codColor: variante.codColor,
+          color: variante.color,
+          colorHexCode: variante.colorHexCode.toString(),
+          R: variante.r,
+          G: variante.g,
+          B: variante.b,
+          talle: variante.talle,
+          isExpanded: false, // Para el estado de expansión si es necesario
+          metodo: 'POST', // Puedes ajustar el método según tu lógica
+        ));
+      });
+    }
+  }
+
+  void _agregarOActualizarVariante(producto) {
+    ProductoVariante? productoExistente = productosAgregados.firstWhere(
+      (item) => item.codItem == producto.codItem,
+      orElse: () => ProductoVariante.empty(),
+    );
+  
+    int indexProducto;
+    if (productoExistente.codItem == producto.codItem) {
+      // Si el producto ya existe, aumentar la cantidad
+      if (productoExistente.cantidad < producto.disponible) {
+        setState(() {
+          productoExistente.cantidad += 1;
+        });
+      } else {
+        _mostrarSnackBar('No hay más disponibles de la variante ${producto.codItem}');
+      }
+      indexProducto = productosAgregados.indexOf(productoExistente);
+    } else {
+      // Agregar nuevo producto a productosAgregados
+      productosAgregados.add(
+        ProductoVariante(
+          itemId: producto.itemId,
+          codItem: producto.codItem,
+          monedaId: producto.monedaId,
+          signo: producto.signo,
+          precioVentaActual: producto.precioVentaActual,
+          precioIvaIncluido: producto.precioIvaIncluido,
+          existenciaActual: producto.existenciaActual,
+          existenciaTotal: producto.existenciaTotal,
+          ivaId: producto.ivaId,
+          valor: producto.valor,
+          codColor: producto.codColor,
+          color: producto.color,
+          talle: producto.talle,
+          disponible: producto.disponible,
+          colorHexCode: producto.colorHexCode,
+          r: producto.r,
+          g: producto.g,
+          b: producto.b,
+          imagenes: producto.imagenes,
+          cantidad: 1,
+        ),
+      );
+      _isEditing.add(false);
+      indexProducto = productosAgregados.length - 1;
+    }
+  
+    // Desplazar hacia el producto agregado o actualizado
+    _scrollToProducto(indexProducto);
+  }
+  
+  void _scrollToProducto(int indexProducto) {
+    listController.animateTo(
+      indexProducto * 70.0, // Ajusta según la altura del ítem
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+  
+  void _mostrarSnackBar(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Center(child: Text(mensaje)),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      ),
+    );
+  }
 
 }

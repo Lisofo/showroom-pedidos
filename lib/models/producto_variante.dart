@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_null_aware_operators
 
+import 'package:showroom_maqueta/models/linea.dart';
+
 class ProductoVariante {
 
   late int itemId;
@@ -94,6 +96,8 @@ class ProductoVariante {
     imagenes = [];
     cantidad = 0;
   }
+
+  map(Linea Function(dynamic producto) param0) {}
 
 }
 
