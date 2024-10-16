@@ -422,7 +422,7 @@ class _ProductPageState extends State<ProductPage> {
 
   void actualizarLineas() {
     // Actualiza las líneas en base a las variantes agregadas
-    productosAgregados.forEach((variante) {
+    for (var variante in productosAgregados) {
       // Verificar si la variante ya existe en la lista de lineas
       int indexLinea = lineasProvider.indexWhere((linea) => linea.itemId == variante.itemId);
 
@@ -483,7 +483,7 @@ class _ProductPageState extends State<ProductPage> {
         lineasProvider[indexLinea].costoUnitario = variante.precioIvaIncluido;
         lineasProvider[indexLinea].metodo = 'PUT';  // Registro existente, el método es PUT
       }
-    });
+    }
   }
 
   void eliminarVariante(ProductoVariante varianteAEliminar) {
