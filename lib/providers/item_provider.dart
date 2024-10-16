@@ -39,13 +39,20 @@ class ItemProvider with ChangeNotifier {
   List<Linea> _lineas = [];
   List<Linea> get lineas => _lineas;
 
+  String _raiz = '';
+  String get raiz => _raiz;
+
   // Métodos para actualizar las variables y notificar cambios
 
+  void setRaiz(String raiz) {
+    _raiz = raiz;
+    notifyListeners();
+  }
+  
   void setLineas(List<Linea> lines) {
     _lineas = lines;
     notifyListeners();
   }
-
 
   void setVendedorId(int seller) {
     _vendedorId = seller;

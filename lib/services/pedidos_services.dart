@@ -136,6 +136,16 @@ class PedidosServices {
       statusCode = 1;
       if(resp.statusCode == 200){
         // pedido.ordenTrabajoId = resp.data['ordenTrabajoId'];
+        // if (resp.statusCode == 201) {
+          // for(int i = 0; i < acciones.length; i++){
+            // if(acciones[i].otPuntoInspeccionId == 0){
+              // if(resp.data[i]["status"] == 201){
+                // acciones[i].otPuntoInspeccionId = resp.data[i]["content"]["otPuntoInspeccionId"];
+                // print(acciones[i].otPuntoInspeccionId);
+              // }
+            // }
+          // }
+        // }
       }
     } catch (e) {
       return e;

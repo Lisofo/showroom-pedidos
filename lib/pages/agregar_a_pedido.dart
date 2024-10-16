@@ -91,6 +91,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                 controller: query,
                 onSubmitted: (value) async {
                   cargando = true;
+                  setState((){});
                   if (value.contains('-')) {
                     query.text = value;
                     raiz = query.text.trim();

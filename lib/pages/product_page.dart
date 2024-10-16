@@ -47,6 +47,7 @@ class _ProductPageState extends State<ProductPage> {
   List<bool> _isEditing = []; // Lista para controlar el estado de edición de cada producto
   int buttonIndex = 0;
   late Pedido pedido = Pedido.empty();
+  late List<Linea> lineasProvider = [];
 
   @override
   void initState() {
@@ -56,13 +57,17 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   cargarDatos() async {
-    // raiz = context.read<ItemProvider>().
     almacen = context.read<ItemProvider>().almacen;
     token = context.read<ItemProvider>().token;
     cliente = context.read<ItemProvider>().client;
     pedido = context.read<ItemProvider>().pedido;
-    productoSeleccionado = context.read<ItemProvider>().product;
-    productoNuevo = await ProductServices().getSingleProductByRaiz(productoSeleccionado.raiz, almacen, token);
+    lineasProvider = context.read<ItemProvider>().lineas;
+    if(lineasProvider.isNotEmpty) {
+      raiz = context.read<ItemProvider>().raiz;
+    } else {
+      productoSeleccionado = context.read<ItemProvider>().product;
+    }
+    productoNuevo = raiz == '' ? await ProductServices().getSingleProductByRaiz(productoSeleccionado.raiz, almacen, token) : await ProductServices().getSingleProductByRaiz(raiz, almacen, token);
     _products = productoNuevo.variantes;
     List<dynamic> listaTalles = _products!.where((productoVariante) => talles.add(productoVariante.talle)).toList();
     var models = <ProductColor>{};
@@ -80,6 +85,16 @@ class _ProductPageState extends State<ProductPage> {
       );
     }
     colors = models.toSet().toList();
+    if(_products!.isNotEmpty){
+      for(var linea in lineasProvider) {
+        var agregar = _products!.firstWhere((prod) => prod.itemId == linea.itemId);
+        agregar.cantidad = linea.cantidad;
+        agregar.precioIvaIncluido = linea.costoUnitario;
+        productosAgregados.add(agregar);
+        _isEditing.add(false);
+      }
+    }
+
     buscando = false;
     setState(() {});
   }
@@ -91,13 +106,22 @@ class _ProductPageState extends State<ProductPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(productoSeleccionado.raiz),
+          title: Text(raiz == '' ? productoSeleccionado.raiz : raiz),
           backgroundColor: colores.primary,
         ),
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Center(
+                // child: SizedBox(
+                  // width: 100,
+                  // height: MediaQuery.of(context).size.height * 0.5,
+                  // child: Image.network(
+                    // raiz == '' ? productoSeleccionado.imagenes[0] : productoNuevo.imagenes[0]
+                  // ),
+                // ),
+              // ),
               middleBody(),
               SizedBox(
                 height: 300,
@@ -108,36 +132,67 @@ class _ProductPageState extends State<ProductPage> {
                     var item = productosAgregados[i];
                     return ListTile(
                       title: Text(item.codItem),
-                      subtitle: Align(
-                        alignment: Alignment.centerLeft,
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          transitionBuilder: (Widget child, Animation<double> animation) {
-                            return SlideTransition(
-                              position: Tween<Offset>(
-                                begin: const Offset(1, 0), // Desde la derecha
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            );
-                          },
-                          child: _isEditing[i]
-                            ? TextFormField(
-                                key: ValueKey('textFormField_$i'), // Clave única para cada `TextFormField`
-                                initialValue: item.cantidad.toString(),
-                                keyboardType: TextInputType.number,
-                                onFieldSubmitted: (newValue) {
-                                  setState(() {
-                                    item.cantidad = int.parse(newValue);
-                                    _isEditing[i] = false; // Salir del modo de edición
-                                  });
-                                },
-                              )
-                            : Text(
-                                'cantidad: ${item.cantidad.toString()}',
-                                key: ValueKey('text_$i'), // Clave única para el texto
-                              ),
-                        ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              transitionBuilder: (Widget child, Animation<double> animation) {
+                                return SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: const Offset(1, 0),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: child,
+                                );
+                              },
+                              child: _isEditing[i]
+                                  ? Column(
+                                      children: [
+                                        // Campo para editar la cantidad
+                                        TextFormField(
+                                          key: ValueKey('textFormField_$i'), 
+                                          initialValue: item.cantidad.toString(),
+                                          keyboardType: TextInputType.number,
+                                          onFieldSubmitted: (newValue) {
+                                            setState(() {
+                                              item.cantidad = int.parse(newValue);
+                                              _isEditing[i] = false; 
+                                            });
+                                          },
+                                        ),
+                                        const SizedBox(height: 10),
+                                        // Campo para editar el precioIvaIncluido
+                                        TextFormField(
+                                          key: ValueKey('precioIvaIncluido_$i'),
+                                          initialValue: item.precioIvaIncluido.toString(),
+                                          keyboardType: TextInputType.number,
+                                          onFieldSubmitted: (newValue) {
+                                            setState(() {
+                                              item.precioIvaIncluido = double.parse(newValue);
+                                              _isEditing[i] = false;
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    )
+                                  : Column(
+                                      children: [
+                                        Text(
+                                          'Cantidad: ${item.cantidad.toString()}',
+                                          key: ValueKey('cantidad_$i'),
+                                        ),
+                                        Text(
+                                          'Precio: \$${item.precioIvaIncluido.toStringAsFixed(2)}',
+                                          key: ValueKey('precioIva_$i'),
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                          ),
+                        ],
                       ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -145,26 +200,17 @@ class _ProductPageState extends State<ProductPage> {
                           IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {
-                              if(item.disponible <= 0){
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Center(child: Text('No hay disponibles de esa variante')),
-                                    duration: Duration(seconds: 2),                                    
-                                  ),
-                                );
-                              } else{
-                                setState(() {
-                                  _isEditing[i] = !_isEditing[i]; // Cambiar el modo de edición
-                                });
-                              }
+                              setState(() {
+                                _isEditing[i] = !_isEditing[i]; 
+                              });
                             },
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () {
                               setState(() {
-                                productosAgregados.removeAt(i); // Eliminar el producto
-                                _isEditing.removeAt(i); // También eliminar el estado de edición correspondiente
+                                productosAgregados.removeAt(i); 
+                                _isEditing.removeAt(i); 
                               });
                             },
                           ),
@@ -230,7 +276,7 @@ class _ProductPageState extends State<ProductPage> {
                     child: FittedBox(
                       fit: BoxFit.contain,
                       child: Text(
-                        productoSeleccionado.descripcion,
+                        raiz == "" ? productoSeleccionado.descripcion : productoNuevo.descripcion,
                         style: const TextStyle(fontSize: 24),
                       ),
                     ),
@@ -424,11 +470,11 @@ class _ProductPageState extends State<ProductPage> {
         grupoInventario: '', // Puedes asignar un valor aquí
         ordinal: 0, // Puedes definir el ordinal si es necesario
         cantidad: producto.cantidad,
-        costoUnitario: 0.0, // Asigna el costo unitario si lo tienes disponible
+        costoUnitario: producto.precioIvaIncluido, // Asigna el costo unitario si lo tienes disponible
         descuento1: 0, // Asigna los descuentos si los tienes
         descuento2: 0,
         descuento3: 0,
-        precioVenta: producto.precioVentaActual.toInt(),
+        precioVenta: 0,
         comentario: '', // Asigna comentarios si los hay
         ivaId: producto.ivaId,
         iva: '', // Puedes ajustar este valor
@@ -455,10 +501,30 @@ class _ProductPageState extends State<ProductPage> {
         B: producto.b,
         talle: producto.talle,
         isExpanded: false, // Para el estado de expansión si es necesario
-        metodo: '', // Puedes ajustar el método según tu lógica
+        metodo: 'POST', // Puedes ajustar el método según tu lógica
       );
     }).toList();
   }
 
+  List<Linea> actualizarLineas(List<ProductoVariante> productosAgregados) {
+    for(var variante in productosAgregados) {
+      var editar = lineasProvider.firstWhere((linea) => linea.itemId == variante.itemId);
+      editar.costoUnitario = variante.precioIvaIncluido;
+      editar.cantidad = variante.cantidad;
+      editar.metodo = editar.lineaId != 0 ? 'PUT' : 'POST';
+      
+    }
+    return lineasProvider;
+  }
+
+  existe (int itemId) {
+    bool existe = false;
+    for(var linea in lineasProvider){
+      existe = lineasProvider.contains((Linea element) => element.itemId == itemId);
+    }
+    return existe;
+  }
+
+  //siempre al agregar un nuevo ProductoVariante revisar si el itemId existe en la lista lineasProvider para saber si hago post, put o delete
 
 }

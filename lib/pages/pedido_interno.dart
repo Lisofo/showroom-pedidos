@@ -5,6 +5,7 @@ import 'package:showroom_maqueta/models/linea.dart';
 import 'package:showroom_maqueta/models/pedido.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/lineas_services.dart';
+import 'package:showroom_maqueta/services/pedidos_services.dart';
 
 class PedidoInterno extends StatefulWidget {
   const PedidoInterno({super.key});
@@ -105,7 +106,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               SizedBox(
                                 height: MediaQuery.of(context).size.width * 0.09, //ToDo mediaquery isMobile agregar
@@ -173,6 +174,29 @@ class _PedidoInternoState extends State<PedidoInterno> {
                                   }).toList(),
                                 ),
                               ),
+                              Column(
+                                children: [
+                                  IconButton(
+                                    onPressed: (){
+                                      Provider.of<ItemProvider>(context, listen: false).setLineas(listaVariantes);
+                                      Provider.of<ItemProvider>(context, listen: false).setRaiz(raiz);
+                                      appRouter.push('/product_page');
+                                    }, 
+                                    icon: const Icon(Icons.edit)
+                                  ),
+                                  IconButton(
+                                    onPressed: () async {
+                                      for(var i = 0; i < listaVariantes.length; i++){
+                                        listaVariantes[i].metodo = 'DELETE';
+                                      }
+                                      await PedidosServices().putPedido(context, pedidoSeleccionado, listaVariantes, token);
+                                      lineas = [];
+                                      cargarDatos();
+                                    },
+                                    icon: const Icon(Icons.delete)
+                                  ),
+                                ],
+                              )
                             ],
                           ),
                         ),
