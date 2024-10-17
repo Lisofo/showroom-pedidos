@@ -2,6 +2,5 @@
 
 class Config {
   static const String APIURL = String.fromEnvironment("APIURL");
-  static const String APIURL2 = String.fromEnvironment("APIRURL2");
   static const String MODO = String.fromEnvironment('MODO');
 }

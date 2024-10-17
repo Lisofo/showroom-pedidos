@@ -23,6 +23,8 @@ class _PedidoInternoState extends State<PedidoInterno> {
   late int precio = 0;
   int buttonIndex = 0;
   bool isMobile = false;
+  bool recargando = false;
+  final GlobalKey<RefreshIndicatorState> _refreshKey = GlobalKey<RefreshIndicatorState>();
   
   @override
   void initState() {
@@ -67,6 +69,14 @@ class _PedidoInternoState extends State<PedidoInterno> {
     return listaDeLista[raiz] ?? [];
   }
 
+  Future<void> _refreshData() async {
+    lineas = [];
+    listaDeLista = {};
+    raices = [];
+    setState(() {});
+    await cargarDatos();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -92,126 +102,130 @@ class _PedidoInternoState extends State<PedidoInterno> {
           child: Column(
             children: [
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.9,
-                child: ListView.builder(
-                  itemCount: raices.length,
-                  itemBuilder: (context, i) {
-                    String raiz = raices[i];
-                    double precioTotalVariante = 0;
-                    int cantidadTotalVariante = 0;
-                    String url = '';
-                    List<Linea> listaVariantes = obtenerListaRaiz(raiz);
-                    for(var variante in listaVariantes){
-                      cantidadTotalVariante += variante.cantidad;
-                      precioTotalVariante += (variante.costoUnitario * variante.cantidad);
-                    }
-                    for (var variante in listaVariantes){
-                      url = Uri.encodeFull(variante.fotoURL);
-                      return Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.09, //ToDo mediaquery isMobile agregar
-                                width: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.1,
-                                child: Image.network( 
-                                  url,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Placeholder(
-                                      child: Text('No Image'),
-                                    );
-                                  },
-                                ),
-                              ),
-                              SizedBox(
-                                width: isMobile ? MediaQuery.of(context).size.width * 0.6 : MediaQuery.of(context).size.width * 0.83,
-                                child: ExpansionTile(
-                                  title: RichText(
-                                    text: TextSpan(
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text: variante.raiz,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20
-                                          )
-                                        ),
-                                        const TextSpan(
-                                          text: '  '
-                                        ),
-                                        TextSpan(
-                                          text: variante.descripcion,
-                                          style: const TextStyle(fontSize: 16)
-                                        ),
-                                        const TextSpan(
-                                          text: '     '
-                                        ),
-                                        TextSpan(
-                                          text: 'Precio: ${pedidoSeleccionado.signo} ${variante.costoUnitario.toString()}',
-                                          style: const TextStyle(
-                                            fontSize: 16
-                                          )
-                                        ),
-                                      ]
-                                    ),
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment: isMobile ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-                                    children: [
-                                      if (isMobile) ... [
-                                        const SizedBox(height: 10,)
-                                      ],
-                                      Text('Cantidad: ${cantidadTotalVariante.toString()}', 
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                      ),
-                                      Text('Total: ${pedidoSeleccionado.signo} ${precioTotalVariante.toString()}', 
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                      ),
-                                    ],
-                                  ),
-                                  children: listaVariantes.map((line){
-                                    return ListTile(
-                                      title: Text(line.codItem),
-                                      subtitle: Text('Color: ${line.color} Talle: ${line.talle} Cantidad: ${line.cantidad.toString()}'),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                              Column(
-                                children: [
-                                  IconButton(
-                                    onPressed: (){
-                                      Provider.of<ItemProvider>(context, listen: false).setLineas(listaVariantes);
-                                      Provider.of<ItemProvider>(context, listen: false).setRaiz(raiz);
-                                      appRouter.push('/product_page');
-                                    }, 
-                                    icon: const Icon(Icons.edit)
-                                  ),
-                                  IconButton(
-                                    onPressed: () async {
-                                      for(var i = 0; i < listaVariantes.length; i++){
-                                        listaVariantes[i].metodo = 'DELETE';
-                                      }
-                                      await PedidosServices().putPedido(context, pedidoSeleccionado, listaVariantes, token);
-                                      lineas = [];
-                                      cargarDatos();
+                height: MediaQuery.of(context).size.height * 0.8,
+                child: RefreshIndicator(
+                  key: _refreshKey,
+                  onRefresh: _refreshData,
+                  child: ListView.builder(
+                    itemCount: raices.length,
+                    itemBuilder: (context, i) {
+                      String raiz = raices[i];
+                      double precioTotalVariante = 0;
+                      int cantidadTotalVariante = 0;
+                      String url = '';
+                      List<Linea> listaVariantes = obtenerListaRaiz(raiz);
+                      for(var variante in listaVariantes){
+                        cantidadTotalVariante += variante.cantidad;
+                        precioTotalVariante += (variante.costoUnitario * variante.cantidad);
+                      }
+                      for (var variante in listaVariantes){
+                        url = Uri.encodeFull(variante.fotoURL);
+                        return Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.09, //ToDo mediaquery isMobile agregar
+                                  width: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.1,
+                                  child: Image.network( 
+                                    url,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Placeholder(
+                                        child: Text('No Image'),
+                                      );
                                     },
-                                    icon: const Icon(Icons.delete)
                                   ),
-                                ],
-                              )
-                            ],
+                                ),
+                                SizedBox(
+                                  width: isMobile ? MediaQuery.of(context).size.width * 0.6 : MediaQuery.of(context).size.width * 0.83,
+                                  child: ExpansionTile(
+                                    title: RichText(
+                                      text: TextSpan(
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                        ),
+                                        children: [
+                                          TextSpan(
+                                            text: variante.raiz,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20
+                                            )
+                                          ),
+                                          const TextSpan(
+                                            text: '  '
+                                          ),
+                                          TextSpan(
+                                            text: variante.descripcion,
+                                            style: const TextStyle(fontSize: 16)
+                                          ),
+                                          const TextSpan(
+                                            text: '     '
+                                          ),
+                                          TextSpan(
+                                            text: 'Precio: ${pedidoSeleccionado.signo} ${variante.costoUnitario.toString()}',
+                                            style: const TextStyle(
+                                              fontSize: 16
+                                            )
+                                          ),
+                                        ]
+                                      ),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment: isMobile ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                                      children: [
+                                        if (isMobile) ... [
+                                          const SizedBox(height: 10,)
+                                        ],
+                                        Text('Cantidad: ${cantidadTotalVariante.toString()}', 
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                        ),
+                                        Text('Total: ${pedidoSeleccionado.signo} ${precioTotalVariante.toString()}', 
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                    children: listaVariantes.map((line){
+                                      return ListTile(
+                                        title: Text(line.codItem),
+                                        subtitle: Text('Color: ${line.color} Talle: ${line.talle} Cantidad: ${line.cantidad.toString()}'),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                                Column(
+                                  children: [
+                                    IconButton(
+                                      onPressed: (){
+                                        Provider.of<ItemProvider>(context, listen: false).setLineas(listaVariantes);
+                                        Provider.of<ItemProvider>(context, listen: false).setRaiz(raiz);
+                                        appRouter.push('/product_page');
+                                      }, 
+                                      icon: const Icon(Icons.edit)
+                                    ),
+                                    IconButton(
+                                      onPressed: () async {
+                                        for(var i = 0; i < listaVariantes.length; i++){
+                                          listaVariantes[i].metodo = 'DELETE';
+                                        }
+                                        await PedidosServices().putPedido(context, pedidoSeleccionado, listaVariantes, token);
+                                        lineas = [];
+                                        cargarDatos();
+                                      },
+                                      icon: const Icon(Icons.delete)
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }
-                    return null;
-                  },
+                        );
+                      }
+                      return null;
+                    },
+                  ),
                 ),
               )
             ],

@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable, unused_local_variable
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:showroom_maqueta/config/router/app_router.dart';
 import 'package:showroom_maqueta/models/client.dart';
 import 'package:showroom_maqueta/models/color.dart';
 import 'package:showroom_maqueta/models/linea.dart';
@@ -249,8 +250,8 @@ class _ProductPageState extends State<ProductPage> {
               label: 'Guardar'
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.do_not_disturb),
-              label: 'NO TOCAR'
+              icon: Icon(Icons.format_align_left),
+              label: 'Totales'
             ),
           ],
           onTap: (value) async {
@@ -267,7 +268,37 @@ class _ProductPageState extends State<ProductPage> {
 
               break;
               case 1:
-                null;
+                var cantidad = 0;
+                var costoTotal = 0.0;
+                for(var linea in lineasProvider){
+                  cantidad += linea.cantidad;
+                  costoTotal += linea.costoUnitario * linea.cantidad;
+                }
+                await showDialog(
+                  context: context, 
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Totales'),
+                      content: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Cantidad total: $cantidad'),
+                          const SizedBox(height: 10,),
+                          Text('Costo total: ${pedido.signo} $costoTotal')
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            appRouter.pop();
+                          },
+                          child: const Text('Cerrar')
+                        )
+                      ],
+                    );
+                  }
+                );
               break;
             }
           },
@@ -387,126 +418,6 @@ class _ProductPageState extends State<ProductPage> {
     }
   }
 
-  List<Linea> convertirProductosALineas(List<ProductoVariante> productosAgregados) {
-    return productosAgregados.map((producto) {
-      return Linea(
-        lineaId: 0, // Asigna un valor apropiado si lo tienes
-        ordenTrabajoId: 0, // Asigna un valor apropiado si lo tienes
-        numeroOrdenTrabajo: '', // Asigna un valor apropiado si lo tienes
-        monedaId: producto.monedaId,
-        fechaOrdenTrabajo: DateTime.now(), // O cualquier fecha que corresponda
-        estado: 'Pendiente', // Puedes ajustar este valor según el estado de tu aplicación
-        itemId: producto.itemId,
-        codItem: producto.codItem,
-        raiz: '', // Si tienes un valor para "raiz", úsalo
-        descripcion: '${producto.color} - ${producto.talle}',
-        macroFamilia: '', // Puedes asignar un valor aquí
-        familia: '', // Puedes asignar un valor aquí
-        grupoInventario: '', // Puedes asignar un valor aquí
-        ordinal: 0, // Puedes definir el ordinal si es necesario
-        cantidad: producto.cantidad,
-        costoUnitario: producto.precioIvaIncluido, // Asigna el costo unitario si lo tienes disponible
-        descuento1: 0, // Asigna los descuentos si los tienes
-        descuento2: 0,
-        descuento3: 0,
-        precioVenta: 0,
-        comentario: '', // Asigna comentarios si los hay
-        ivaId: producto.ivaId,
-        iva: '', // Puedes ajustar este valor
-        valor: producto.valor,
-        gruInvId: 0, // Puedes asignar el id del grupo de inventario
-        codGruInv: '', // Código del grupo de inventario si aplica
-        cantFacturada: 0, // Puedes modificar este valor si tienes datos
-        cantDevuelta: 0,
-        totNetoFacturada: 0.0, // Asigna valores si los tienes
-        totBrutoFacturada: 0.0,
-        cantFac: 0,
-        cantRem: 0,
-        netoFac: 0.0,
-        netoRem: 0.0,
-        brutoFac: 0.0,
-        brutoRem: 0.0,
-        cantEPend: 0,
-        fotoURL: producto.imagenes.isNotEmpty ? producto.imagenes[0] : '',
-        codColor: producto.codColor,
-        color: producto.color,
-        colorHexCode: producto.colorHexCode.toString(),
-        R: producto.r,
-        G: producto.g,
-        B: producto.b,
-        talle: producto.talle,
-        isExpanded: false, // Para el estado de expansión si es necesario
-        metodo: 'POST', // Puedes ajustar el método según tu lógica
-      );
-    }).toList();
-  }
-
-  void actualizarLineas() {
-    // Actualiza las líneas en base a las variantes agregadas
-    for (var variante in productosAgregados) {
-      // Verificar si la variante ya existe en la lista de lineas
-      int indexLinea = lineasProvider.indexWhere((linea) => linea.itemId == variante.itemId);
-
-      if (indexLinea == -1) {
-        // Si no existe, agregar una nueva línea con método POST
-        lineasProvider.add(Linea(
-          lineaId: 0, // Asigna un valor apropiado si lo tienes
-          ordenTrabajoId: 0, // Asigna un valor apropiado si lo tienes
-          numeroOrdenTrabajo: '', // Asigna un valor apropiado si lo tienes
-          monedaId: variante.monedaId,
-          fechaOrdenTrabajo: DateTime.now(), // O cualquier fecha que corresponda
-          estado: 'Pendiente', // Puedes ajustar este valor según el estado de tu aplicación
-          itemId: variante.itemId,
-          codItem: variante.codItem,
-          raiz: '', // Si tienes un valor para "raiz", úsalo
-          descripcion: '${variante.color} - ${variante.talle}',
-          macroFamilia: '', // Puedes asignar un valor aquí
-          familia: '', // Puedes asignar un valor aquí
-          grupoInventario: '', // Puedes asignar un valor aquí
-          ordinal: 0, // Puedes definir el ordinal si es necesario
-          cantidad: variante.cantidad,
-          costoUnitario: variante.precioIvaIncluido, // Asigna el costo unitario si lo tienes disponible
-          descuento1: 0, // Asigna los descuentos si los tienes
-          descuento2: 0,
-          descuento3: 0,
-          precioVenta: 0,
-          comentario: '', // Asigna comentarios si los hay
-          ivaId: variante.ivaId,
-          iva: '', // Puedes ajustar este valor
-          valor: variante.valor,
-          gruInvId: 0, // Puedes asignar el id del grupo de inventario
-          codGruInv: '', // Código del grupo de inventario si aplica
-          cantFacturada: 0, // Puedes modificar este valor si tienes datos
-          cantDevuelta: 0,
-          totNetoFacturada: 0.0, // Asigna valores si los tienes
-          totBrutoFacturada: 0.0,
-          cantFac: 0,
-          cantRem: 0,
-          netoFac: 0.0,
-          netoRem: 0.0,
-          brutoFac: 0.0,
-          brutoRem: 0.0,
-          cantEPend: 0,
-          fotoURL: variante.imagenes.isNotEmpty ? variante.imagenes[0] : '',
-          codColor: variante.codColor,
-          color: variante.color,
-          colorHexCode: variante.colorHexCode.toString(),
-          R: variante.r,
-          G: variante.g,
-          B: variante.b,
-          talle: variante.talle,
-          isExpanded: false, // Para el estado de expansión si es necesario
-          metodo: 'POST', // Puedes ajustar el método según tu lógica
-        ));
-      } else {
-        // Si existe, actualizar los valores y cambiar el método a PUT
-        lineasProvider[indexLinea].cantidad = variante.cantidad;
-        lineasProvider[indexLinea].costoUnitario = variante.precioIvaIncluido;
-        lineasProvider[indexLinea].metodo = 'PUT';  // Registro existente, el método es PUT
-      }
-    }
-  }
-
   void eliminarVariante(ProductoVariante varianteAEliminar) {
     // Eliminar variante de productosAgregados
     productosAgregados.removeWhere((variante) => variante.itemId == varianteAEliminar.itemId);
@@ -520,101 +431,25 @@ class _ProductPageState extends State<ProductPage> {
     }
   }
 
-  void agregarVariante(ProductoVariante nuevaVariante) {
-    // Agregar variante a productosAgregados
-    productosAgregados.add(nuevaVariante);
-  
-    // Verificar si la variante ya existe en lineasProvider
-    int indexLinea = lineasProvider.indexWhere((linea) => linea.itemId == nuevaVariante.itemId);
-  
-    if (indexLinea == -1) {
-      // Si no existe, agregar nueva línea con método POST
-      lineasProvider.add(Linea(
-          lineaId: 0, // Asigna un valor apropiado si lo tienes
-          ordenTrabajoId: 0, // Asigna un valor apropiado si lo tienes
-          numeroOrdenTrabajo: '', // Asigna un valor apropiado si lo tienes
-          monedaId: nuevaVariante.monedaId,
-          fechaOrdenTrabajo: DateTime.now(), // O cualquier fecha que corresponda
-          estado: 'Pendiente', // Puedes ajustar este valor según el estado de tu aplicación
-          itemId: nuevaVariante.itemId,
-          codItem: nuevaVariante.codItem,
-          raiz: '', // Si tienes un valor para "raiz", úsalo
-          descripcion: '${nuevaVariante.color} - ${nuevaVariante.talle}',
-          macroFamilia: '', // Puedes asignar un valor aquí
-          familia: '', // Puedes asignar un valor aquí
-          grupoInventario: '', // Puedes asignar un valor aquí
-          ordinal: 0, // Puedes definir el ordinal si es necesario
-          cantidad: nuevaVariante.cantidad,
-          costoUnitario: nuevaVariante.precioIvaIncluido, // Asigna el costo unitario si lo tienes disponible
-          descuento1: 0, // Asigna los descuentos si los tienes
-          descuento2: 0,
-          descuento3: 0,
-          precioVenta: 0,
-          comentario: '', // Asigna comentarios si los hay
-          ivaId: nuevaVariante.ivaId,
-          iva: '', // Puedes ajustar este valor
-          valor: nuevaVariante.valor,
-          gruInvId: 0, // Puedes asignar el id del grupo de inventario
-          codGruInv: '', // Código del grupo de inventario si aplica
-          cantFacturada: 0, // Puedes modificar este valor si tienes datos
-          cantDevuelta: 0,
-          totNetoFacturada: 0.0, // Asigna valores si los tienes
-          totBrutoFacturada: 0.0,
-          cantFac: 0,
-          cantRem: 0,
-          netoFac: 0.0,
-          netoRem: 0.0,
-          brutoFac: 0.0,
-          brutoRem: 0.0,
-          cantEPend: 0,
-          fotoURL: nuevaVariante.imagenes.isNotEmpty ? nuevaVariante.imagenes[0] : '',
-          codColor: nuevaVariante.codColor,
-          color: nuevaVariante.color,
-          colorHexCode: nuevaVariante.colorHexCode.toString(),
-          R: nuevaVariante.r,
-          G: nuevaVariante.g,
-          B: nuevaVariante.b,
-          talle: nuevaVariante.talle,
-          isExpanded: false, // Para el estado de expansión si es necesario
-          metodo: 'POST', // Puedes ajustar el método según tu lógica
-        ));
-    }
-  }
-  
-  void editarVariante(ProductoVariante varianteEditada) {
-    // Buscar variante en productosAgregados
-    int indexVariante = productosAgregados.indexWhere((variante) => variante.itemId == varianteEditada.itemId);
-  
-    if (indexVariante != -1) {
-      // Actualizar variante en productosAgregados
-      productosAgregados[indexVariante] = varianteEditada;
-  
-      // Verificar si la variante existe en lineasProvider
-      int indexLinea = lineasProvider.indexWhere((linea) => linea.itemId == varianteEditada.itemId);
-  
-      if (indexLinea != -1) {
-        // Actualizar la línea correspondiente y cambiar método a PUT
-        lineasProvider[indexLinea].cantidad = varianteEditada.cantidad;
-        lineasProvider[indexLinea].costoUnitario = varianteEditada.precioIvaIncluido;
-        lineasProvider[indexLinea].metodo = 'PUT';
-      }
-    }
-  }
-
   // Método para manejar la actualización de variantes
   void actualizarLineaConVariante(ProductoVariante variante) {
     var lineaExistente = lineasProvider.firstWhere(
       (linea) => linea.itemId == variante.itemId, 
       orElse: () => Linea.empty(),
     );
+    var cantidad = variante.cantidad;
 
-    if (lineaExistente.itemId == variante.itemId) {
+    if(variante.cantidad != lineaExistente.cantidad){
+      cantidad = variante.cantidad; 
+    }
+
+    if (lineaExistente.itemId == variante.itemId && lineaExistente.lineaId != 0) {
       setState(() {
         lineaExistente.cantidad = variante.cantidad;
         lineaExistente.costoUnitario = variante.precioIvaIncluido;
         lineaExistente.metodo = 'PUT';
       });
-    } else {
+    } else if(lineaExistente.lineaId == 0 && lineaExistente.cantidad == 0){
       setState(() {
         lineasProvider.add(Linea(
           lineaId: 0, // Asigna un valor apropiado si lo tienes
@@ -631,7 +466,7 @@ class _ProductPageState extends State<ProductPage> {
           familia: '', // Puedes asignar un valor aquí
           grupoInventario: '', // Puedes asignar un valor aquí
           ordinal: 0, // Puedes definir el ordinal si es necesario
-          cantidad: variante.cantidad,
+          cantidad: cantidad,
           costoUnitario: variante.precioIvaIncluido, // Asigna el costo unitario si lo tienes disponible
           descuento1: 0, // Asigna los descuentos si los tienes
           descuento2: 0,
@@ -666,6 +501,8 @@ class _ProductPageState extends State<ProductPage> {
           metodo: 'POST', // Puedes ajustar el método según tu lógica
         ));
       });
+    } else {
+      lineaExistente.cantidad = cantidad;
     }
   }
 
@@ -674,6 +511,7 @@ class _ProductPageState extends State<ProductPage> {
       (item) => item.codItem == producto.codItem,
       orElse: () => ProductoVariante.empty(),
     );
+
   
     int indexProducto;
     if (productoExistente.codItem == producto.codItem) {
@@ -682,38 +520,41 @@ class _ProductPageState extends State<ProductPage> {
         setState(() {
           productoExistente.cantidad += 1;
         });
+        // actualizarLineaConVariante(productoExistente);
       } else {
         _mostrarSnackBar('No hay más disponibles de la variante ${producto.codItem}');
       }
       indexProducto = productosAgregados.indexOf(productoExistente);
+      actualizarLineaConVariante(productoExistente);
     } else {
       // Agregar nuevo producto a productosAgregados
-      productosAgregados.add(
-        ProductoVariante(
-          itemId: producto.itemId,
-          codItem: producto.codItem,
-          monedaId: producto.monedaId,
-          signo: producto.signo,
-          precioVentaActual: producto.precioVentaActual,
-          precioIvaIncluido: producto.precioIvaIncluido,
-          existenciaActual: producto.existenciaActual,
-          existenciaTotal: producto.existenciaTotal,
-          ivaId: producto.ivaId,
-          valor: producto.valor,
-          codColor: producto.codColor,
-          color: producto.color,
-          talle: producto.talle,
-          disponible: producto.disponible,
-          colorHexCode: producto.colorHexCode,
-          r: producto.r,
-          g: producto.g,
-          b: producto.b,
-          imagenes: producto.imagenes,
-          cantidad: 1,
-        ),
+      ProductoVariante productoAAgregar = ProductoVariante(
+        itemId: producto.itemId,
+        codItem: producto.codItem,
+        monedaId: producto.monedaId,
+        signo: producto.signo,
+        precioVentaActual: producto.precioVentaActual,
+        precioIvaIncluido: producto.precioIvaIncluido,
+        existenciaActual: producto.existenciaActual,
+        existenciaTotal: producto.existenciaTotal,
+        ivaId: producto.ivaId,
+        valor: producto.valor,
+        codColor: producto.codColor,
+        color: producto.color,
+        talle: producto.talle,
+        disponible: producto.disponible,
+        colorHexCode: producto.colorHexCode,
+        r: producto.r,
+        g: producto.g,
+        b: producto.b,
+        imagenes: producto.imagenes,
+        cantidad: 1,
       );
+      productosAgregados.add(productoAAgregar);
       _isEditing.add(false);
       indexProducto = productosAgregados.length - 1;
+      actualizarLineaConVariante(productoAAgregar);
+      
     }
   
     // Desplazar hacia el producto agregado o actualizado
