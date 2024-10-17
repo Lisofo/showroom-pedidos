@@ -165,12 +165,12 @@ class PedidosServices {
     //   "accionId": 3
   // }
 
-  Future patchInforme(BuildContext context, int ordenId, String accion, String token) async {
-    String link = '${apirUrl}api/v1/ordenes';
+  Future patchPedido(BuildContext context, int ordenId, String accionId, String token) async {
+    String link = '${apirUrl}api/v1/ordenes/$ordenId';
 
     try {
       var headers = {'Authorization': token};
-      var data = ({"accionId": accion});
+      var data = ({"accionId": accionId});
       var resp = await _dio.request(
         link,
         options: Options(

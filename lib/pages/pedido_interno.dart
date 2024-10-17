@@ -241,7 +241,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.notes),
-              label: 'Datos de la orden'
+              label: 'Orden'
             ),
           ],
           onTap: (index) async {

@@ -33,6 +33,9 @@ class _NuevoPedidoState extends State<NuevoPedido> {
   late DateTime fechaEntrega = DateTime.now();
   late Client cliente = Client.empty();
   late String token = '';
+  int buttonIndex = 0;
+  final List<String> _opcionesTipo = ['Contado','Credito', 'Remito'];
+  String _opcionTipo = 'Contado';
 
   @override
   void initState() {
@@ -76,6 +79,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
@@ -85,7 +89,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                   ),
                   Container(
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
-                    width: MediaQuery.of(context).size.width / 10,
+                    width: MediaQuery.of(context).size.width * 0.5,
                     child: TextFormField(
                       textAlign: TextAlign.center,
                       controller: numeroOrdenTrabajo,
@@ -105,7 +109,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                       // border: Border.all(),
                       borderRadius: BorderRadius.circular(5)
                     ),
-                    width: MediaQuery.of(context).size.width / 5,
+                    width: MediaQuery.of(context).size.width * 0.5,
                     child: _crearFecha(context)
                   )
                 ],
@@ -122,7 +126,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                       // border: Border.all(),
                       borderRadius: BorderRadius.circular(5)
                     ),
-                    width: MediaQuery.of(context).size.width / 5,
+                    width: MediaQuery.of(context).size.width * 0.5,
                     child: _crearFechaVencimiento(context)
                   )
                 ],
@@ -139,7 +143,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                       // border: Border.all(),
                       borderRadius: BorderRadius.circular(5)
                     ),
-                    width: MediaQuery.of(context).size.width / 5,
+                    width: MediaQuery.of(context).size.width * 0.5,
                     child: _crearFechaEntrega(context)
                   )
                 ],
@@ -157,7 +161,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                       // border: Border.all(),
                       borderRadius: BorderRadius.circular(5)
                     ),
-                    width: MediaQuery.of(context).size.width / 2,
+                    width: MediaQuery.of(context).size.width * 0.5,
                     child: TextFormField(
                       minLines: 1,
                       maxLines: 10,
@@ -173,10 +177,11 @@ class _NuevoPedidoState extends State<NuevoPedido> {
               const SizedBox(height: 20,),
               Row(
                 children: [
-                  const Text('Moneda:',
+                  const Text(
+                    'Moneda:',
                     style: TextStyle(fontSize: 24)
                   ),
-                  const SizedBox(width: 30,),
+                  const SizedBox(width: 20,),
                   DropdownButton(
                     value: _opcionSeleccionada,
                     items: getOpcionesDropdown(), 
@@ -186,11 +191,16 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                       });
                     }
                   ),
-                  const SizedBox(width: 50,),
-                  const Text('Tipo:',
+                ],
+              ),
+              const SizedBox(height: 20,),
+              Row(
+                children: [
+                  const Text(
+                    'Tipo:',
                     style: TextStyle(fontSize: 24)
                   ),
-                  const SizedBox(width: 30,),
+                  const SizedBox(width: 20,),
                   DropdownButton(
                     value: _opcionTipo,
                     items: getOpcionesDropdownTipo(), 
@@ -218,84 +228,87 @@ class _NuevoPedidoState extends State<NuevoPedido> {
               //     )
               //   ],
               // ),
-              const Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  InkWell(
-                    onTap: () async {
-                      if(pedido.ordenTrabajoId == 0){
-                        Pedido nuevoPedido = Pedido(
-                          ordenTrabajoId: 0,
-                          numeroOrdenTrabajo: numeroOrdenTrabajo.text,
-                          fechaOrdenTrabajo: fechaOrden,
-                          descripcion: descripcionController.text,
-                          transaccionId: 17,
-                          clienteId: cliente.clienteId,
-                          codCliente: cliente.codCliente,
-                          ruc: cliente.ruc,
-                          nombre: cliente.nombre,
-                          monedaId: 1,
-                          codMoneda: '1',
-                          descMoneda: '',
-                          signo: '',
-                          totalOrdenTrabajo: 0,
-                          comentarioCliente: 'comentarioCliente',
-                          comentarioTrabajo: 'comentarioTrabajo',
-                          estado: '',
-                          presupuestoIdPlantilla: 0,
-                          numeroPresupuesto: '',
-                          descripcionPresupuesto: '',
-                          totalPresupuesto: 0,
-                          fechaVencimiento: fechaVencimiento,
-                          fechaEntrega: fechaEntrega,
-                          plantilla: false,
-                          unidadId: 0,
-                          km: 0,
-                          servicio: '',
-                          central: '',
-                          credito: false
-                        );
-                        await PedidosServices().postPedido(context, nuevoPedido, token);
-                        Provider.of<ItemProvider>(context, listen: false).setPedido(nuevoPedido);
-                        appRouter.go('/pedidoInterno');
-                      } else {
-                        pedido.fechaOrdenTrabajo = fechaOrden;
-                        pedido.fechaVencimiento = fechaVencimiento;
-                        pedido.fechaEntrega = fechaEntrega;
-                        pedido.descripcion = descripcionController.text;
-                        pedido.transaccionId = 17;
-                        pedido.monedaId = 1;
-                        pedido.comentarioCliente = 'comentarioCliente';
-                        pedido.comentarioTrabajo = 'comentarioTrabajo';
-                        await PedidosServices().putPedido(context, pedido, [], token);
-                        appRouter.go('/client_page');
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFD725A),
-                        borderRadius: BorderRadius.circular(30)
-                      ),
-                      child: Text(
-                        'Confirmar',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1,
-                          color: Colors.white.withOpacity(0.9)
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              )
             ],
           ),
         )
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.play_arrow),
+            label: 'Confirmar'
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.print),
+            label: 'Imprimir'
+          ),
+        ],
+        currentIndex: buttonIndex,
+        onTap: (value) async {
+          buttonIndex = value;
+          switch (buttonIndex) {
+            case 0:
+              await postPutPedido(context);
+            break;
+            case 1:
+              // if(pedido.ordenTrabajoId != 0){
+              //   await PedidosServices().patchPedido(context, pedido.ordenTrabajoId, '1', token);
+              // }
+            break;
+          }
+        },
+      ),
     );
+  }
+
+  Future<void> postPutPedido(BuildContext context) async {
+    if(pedido.ordenTrabajoId == 0){
+      Pedido nuevoPedido = Pedido(
+        ordenTrabajoId: 0,
+        numeroOrdenTrabajo: numeroOrdenTrabajo.text,
+        fechaOrdenTrabajo: fechaOrden,
+        descripcion: descripcionController.text,
+        transaccionId: 17,
+        clienteId: cliente.clienteId,
+        codCliente: cliente.codCliente,
+        ruc: cliente.ruc,
+        nombre: cliente.nombre,
+        monedaId: 1,
+        codMoneda: '1',
+        descMoneda: '',
+        signo: '',
+        totalOrdenTrabajo: 0,
+        comentarioCliente: 'comentarioCliente',
+        comentarioTrabajo: 'comentarioTrabajo',
+        estado: '',
+        presupuestoIdPlantilla: 0,
+        numeroPresupuesto: '',
+        descripcionPresupuesto: '',
+        totalPresupuesto: 0,
+        fechaVencimiento: fechaVencimiento,
+        fechaEntrega: fechaEntrega,
+        plantilla: false,
+        unidadId: 0,
+        km: 0,
+        servicio: '',
+        central: '',
+        credito: false
+      );
+      await PedidosServices().postPedido(context, nuevoPedido, token);
+      Provider.of<ItemProvider>(context, listen: false).setPedido(nuevoPedido);
+      appRouter.go('/pedidoInterno');
+    } else {
+      pedido.fechaOrdenTrabajo = fechaOrden;
+      pedido.fechaVencimiento = fechaVencimiento;
+      pedido.fechaEntrega = fechaEntrega;
+      pedido.descripcion = descripcionController.text;
+      pedido.transaccionId = 17;
+      pedido.monedaId = 1;
+      pedido.comentarioCliente = 'comentarioCliente';
+      pedido.comentarioTrabajo = 'comentarioTrabajo';
+      await PedidosServices().putPedido(context, pedido, [], token);
+      appRouter.go('/client_page');
+    }
   }
 
   Widget _crearFecha(BuildContext context) {
@@ -363,6 +376,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
       });
     }
   }
+
   Widget _crearFechaEntrega(BuildContext context) {
     return TextFormField(
       controller: fechaEntregaController,
@@ -408,8 +422,6 @@ class _NuevoPedidoState extends State<NuevoPedido> {
     }
     return lista;
   }
-  final List<String> _opcionesTipo = ['Contado','Credito', 'Remito'];
-  String _opcionTipo = 'Contado';
 
   List<DropdownMenuItem<String>> getOpcionesDropdownTipo(){
 
