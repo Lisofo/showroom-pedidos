@@ -10,6 +10,7 @@ import 'package:showroom_maqueta/models/producto_variante.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/pedidos_services.dart';
 import 'package:showroom_maqueta/services/product_services.dart';
+import 'package:showroom_maqueta/widgets/confirmacion.dart';
 import 'package:showroom_maqueta/widgets/variante_items.dart';
 
 
@@ -47,6 +48,7 @@ class _ProductPageState extends State<ProductPage> {
   int buttonIndex = 0;
   late Pedido pedido = Pedido.empty();
   late List<Linea> lineasProvider = [];
+  final _pedidosServices = PedidosServices();
 
   @override
   void initState() {
@@ -105,8 +107,16 @@ class _ProductPageState extends State<ProductPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(raiz == '' ? productoSeleccionado.raiz : raiz),
+          title: Text(
+            raiz == '' ? productoSeleccionado.raiz : raiz,
+            style: TextStyle(
+              color: colores.onPrimary
+            ),
+          ),
           backgroundColor: colores.primary,
+          iconTheme: const IconThemeData(
+            color: Colors.white
+          ),
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -122,11 +132,15 @@ class _ProductPageState extends State<ProductPage> {
                 // ),
               // ),
               middleBody(),
+              const SizedBox(
+                height: 20,
+              ),
               SizedBox(
-                height: 300,
+                height: MediaQuery.of(context).size.height * 0.5,
                 child: ListView.separated(
                   controller: listController,
                   itemCount: productosAgregados.length,
+                  physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, i) {
                     var item = productosAgregados[i];
                     return ListTile(
@@ -243,7 +257,14 @@ class _ProductPageState extends State<ProductPage> {
             buttonIndex = value;
             switch (buttonIndex) {
               case 0:
-                await PedidosServices().putPedido(context, pedido, lineasProvider, token);
+                int? statusCode;
+                await _pedidosServices.putPedido(context, pedido, lineasProvider, token);
+                statusCode = await _pedidosServices.getStatusCode();
+                await _pedidosServices.resetStatusCode();
+                if(statusCode == 1) {
+                  Carteles.showDialogs(context, 'Productos actualizados', true, false);
+                }
+
               break;
               case 1:
                 null;
@@ -697,6 +718,7 @@ class _ProductPageState extends State<ProductPage> {
   
     // Desplazar hacia el producto agregado o actualizado
     _scrollToProducto(indexProducto);
+    setState(() {});
   }
   
   void _scrollToProducto(int indexProducto) {

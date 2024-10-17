@@ -80,11 +80,14 @@ class _AgregarPedidoState extends State<AgregarPedido> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: const Color(0xFFFD725A),
+        iconTheme: const IconThemeData(
+          color: Colors.white
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.9,
+              width: MediaQuery.of(context).size.width * 0.7,
               child: SearchBar(
                 textInputAction: TextInputAction.search,
                 hintText: 'Buscar o escanear item...',

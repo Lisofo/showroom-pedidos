@@ -82,6 +82,9 @@ class _PedidoInternoState extends State<PedidoInterno> {
               color: Colors.black
             )
           ),
+          iconTheme: const IconThemeData(
+            color: Colors.white
+          ),
           elevation: 0,
           backgroundColor: const Color(0xFFFD725A),
         ),
@@ -161,7 +164,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
                                     crossAxisAlignment: isMobile ? CrossAxisAlignment.start : CrossAxisAlignment.end,
                                     children: [
                                       if (isMobile) ... [
-                                        SizedBox(height: 10,)
+                                        const SizedBox(height: 10,)
                                       ],
                                       Text('Cantidad: ${cantidadTotalVariante.toString()}', 
                                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

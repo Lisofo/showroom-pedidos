@@ -28,10 +28,11 @@ class LoginServices {
         data: data,
       );
 
-      statusCode = response.statusCode;
+      statusCode = 1;
 
-      if (statusCode == 200) {
+      if (statusCode == 1) {
         print(response.data['token']);
+        print(response.data['vendedorId']);
         Provider.of<ItemProvider>(context, listen: false).setToken(response.data['token']);
         Provider.of<ItemProvider>(context, listen: false).setVendedorId(response.data['vendedorId']);
       } else { 

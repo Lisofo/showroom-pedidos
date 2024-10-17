@@ -43,9 +43,9 @@ class ClientSearchDelegate extends SearchDelegate{
     }
 
     final clientServices = ClientServices();
-    final almacen = context.watch<ItemProvider>().almacen;
-    final token = context.watch<ItemProvider>().token;
-    final vendedorId = context.watch<ItemProvider>().vendedorId;
+    final almacen = context.read<ItemProvider>().almacen;
+    final token = context.read<ItemProvider>().token;
+    final vendedorId = context.read<ItemProvider>().vendedorId;
     final List<String> searchParams = query.split(" ");
 
     String codigo = '';

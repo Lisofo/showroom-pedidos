@@ -28,6 +28,14 @@ class PedidosServices {
     }
   }
 
+  Future<int?> getStatusCode () async {
+    return statusCode;
+  }
+
+  Future<void> resetStatusCode () async {
+    statusCode = null;
+  }
+
   Future postPedido (BuildContext context, Pedido pedido, String token) async {
     String link = '$apirUrl/api/v1/pedidos';
     var data = ({

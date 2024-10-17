@@ -1,0 +1,30 @@
+import 'package:flutter/material.dart';
+class Carteles {
+  
+  static Future<void> showDialogs(BuildContext context, String errorMessage, bool doblePop, bool triplePop) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Mensaje'),
+          content: Text(errorMessage),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (doblePop) {
+                  Navigator.of(context).pop();
+                }
+                if (triplePop) {
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
+}

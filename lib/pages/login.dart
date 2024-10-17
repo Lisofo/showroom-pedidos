@@ -3,12 +3,12 @@
 // import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showroom_maqueta/config/router/app_router.dart';
 import 'package:showroom_maqueta/services/login_services.dart';
 // import 'package:showroom_maqueta/config/router/app_router.dart';
-import 'package:showroom_maqueta/providers/item_provider.dart';
+// import 'package:showroom_maqueta/providers/item_provider.dart';
 // import 'package:showroom_maqueta/services/login_services.dart';
 
 
@@ -129,6 +129,7 @@ class _LoginNewState extends State<LoginNew> {
                           SizedBox(
                             width: MediaQuery.of(context).size.width /1.5,
                             child: TextFormField(
+                              textInputAction: TextInputAction.next,
                               controller: usernameController,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
@@ -163,9 +164,9 @@ class _LoginNewState extends State<LoginNew> {
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
-                                    borderSide: const BorderSide(),
-                                    borderRadius:
-                                        BorderRadius.circular(20)),
+                                  borderSide: const BorderSide(),
+                                  borderRadius: BorderRadius.circular(20)
+                                ),
                                 fillColor: Colors.white,
                                 filled: true,
                                 prefixIcon: const Icon(Icons.lock),
@@ -263,43 +264,36 @@ class _LoginNewState extends State<LoginNew> {
     );
   }
 
-  Future<void> intentoLogin(BuildContext context) async { 
-    esValidoLogin = await login(context);
-    if (esValidoLogin){
-      tokenActual = context.read<ItemProvider>().token;
-      guardarToken(tokenActual);
-      print('Token:');
-      print(tokenActual);
+  // Future<void> intentoLogin(BuildContext context) async { 
+  //   esValidoLogin = await login(context);
+  //   if (esValidoLogin){
+  //     tokenActual = context.read<ItemProvider>().token;
+  //     guardarToken(tokenActual);
+  //     print('Token:');
+  //     print(tokenActual);
       
-      currentDate = DateTime.now().toIso8601String();
-      guardarFecha(currentDate);
-      print('Fecha:');
-      print(currentDate);
+  //     currentDate = DateTime.now().toIso8601String();
+  //     guardarFecha(currentDate);
+  //     print('Fecha:');
+  //     print(currentDate);
       
-      appRouter.go('/select_origin');
-    }
-  }
+  //     appRouter.go('/select_origin');
+  //   }
+  // }
     
 
-  Future<bool> login(BuildContext context) async {
-    bool esValido = false;
-
+  Future<void> login(BuildContext context) async {
     await _loginServices.login(
       usernameController.text,
       passwordController.text,
       context,
     );
-    
 
     if (_formKey.currentState?.validate() == true) {
-      
-      late int? statusCode = 0;
-      statusCode = await _loginServices.getStatusCode();
+      var statusCode = await _loginServices.getStatusCode();
 
-      if (statusCode == 200) {
+      if (statusCode == 1) {
         appRouter.pushReplacement('/select_origin');
-        esValido = true;
-
       } else if (statusCode == 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -310,6 +304,5 @@ class _LoginNewState extends State<LoginNew> {
         print('Credenciales inválidas. Intente nuevamente.');
       }
     }
-    return esValido;
   }
 }

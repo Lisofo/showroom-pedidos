@@ -1,4 +1,6 @@
 # Miscellaneous
+.gitIgnore
+config.json
 *.class
 *.log
 *.pyc
