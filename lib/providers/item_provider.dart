@@ -38,6 +38,9 @@ class ItemProvider with ChangeNotifier {
 
   List<Linea> _lineas = [];
   List<Linea> get lineas => _lineas;
+  
+  List<Linea> _lineasGenericas = [];
+  List<Linea> get lineasGenericas => _lineasGenericas;
 
   String _raiz = '';
   String get raiz => _raiz;
@@ -49,6 +52,11 @@ class ItemProvider with ChangeNotifier {
     notifyListeners();
   }
   
+  void setLineasGenericas(List<Linea> lines) {
+    _lineasGenericas = lines;
+    notifyListeners();
+  }
+
   void setLineas(List<Linea> lines) {
     _lineas = lines;
     notifyListeners();

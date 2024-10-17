@@ -49,6 +49,7 @@ class _ProductPageState extends State<ProductPage> {
   int buttonIndex = 0;
   late Pedido pedido = Pedido.empty();
   late List<Linea> lineasProvider = [];
+  late List<Linea> lineasGenericas = [];
   final _pedidosServices = PedidosServices();
 
   @override
@@ -64,6 +65,7 @@ class _ProductPageState extends State<ProductPage> {
     cliente = context.read<ItemProvider>().client;
     pedido = context.read<ItemProvider>().pedido;
     lineasProvider = context.read<ItemProvider>().lineas;
+    lineasGenericas = context.read<ItemProvider>().lineasGenericas;
     if(lineasProvider.isNotEmpty) {
       raiz = context.read<ItemProvider>().raiz;
     } else {
@@ -87,13 +89,24 @@ class _ProductPageState extends State<ProductPage> {
       );
     }
     colors = models.toSet().toList();
-    if(_products!.isNotEmpty){
+    if(_products!.isNotEmpty && lineasProvider.isNotEmpty){
       for(var linea in lineasProvider) {
         var agregar = _products!.firstWhere((prod) => prod.itemId == linea.itemId);
         agregar.cantidad = linea.cantidad;
         agregar.precioIvaIncluido = linea.costoUnitario;
         productosAgregados.add(agregar);
         _isEditing.add(false);
+      }
+    } else {
+      for (var linea in lineasGenericas) {
+        var agregar = _products!.where((prod) => prod.itemId == linea.itemId).toList();
+
+        if (agregar.isNotEmpty) {
+          agregar.first.cantidad = linea.cantidad;
+          agregar.first.precioIvaIncluido = linea.costoUnitario;
+          productosAgregados.add(agregar.first);
+          _isEditing.add(false);
+        }
       }
     }
 
@@ -163,49 +176,49 @@ class _ProductPageState extends State<ProductPage> {
                                 );
                               },
                               child: _isEditing[i]
-                                  ? Column(
-                                      children: [
-                                        // Campo para editar la cantidad
-                                        TextFormField(
-                                          key: ValueKey('textFormField_$i'), 
-                                          initialValue: item.cantidad.toString(),
-                                          keyboardType: TextInputType.number,
-                                          onFieldSubmitted: (newValue) {
-                                            setState(() {
-                                              item.cantidad = int.parse(newValue);
-                                              actualizarLineaConVariante(item); // Actualiza la línea al editar
-                                              _isEditing[i] = false; 
-                                            });
-                                          },
-                                        ),
-                                        const SizedBox(height: 10),
-                                        // Campo para editar el precioIvaIncluido
-                                        TextFormField(
-                                          key: ValueKey('precioIvaIncluido_$i'),
-                                          initialValue: item.precioIvaIncluido.toString(),
-                                          keyboardType: TextInputType.number,
-                                          onFieldSubmitted: (newValue) {
-                                            setState(() {
-                                              item.precioIvaIncluido = double.parse(newValue);
-                                              actualizarLineaConVariante(item); // Actualiza la línea al editar
-                                              _isEditing[i] = false;
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    )
-                                  : Column(
-                                      children: [
-                                        Text(
-                                          'Cantidad: ${item.cantidad.toString()}',
-                                          key: ValueKey('cantidad_$i'),
-                                        ),
-                                        Text(
-                                          'Precio: \$${item.precioIvaIncluido.toStringAsFixed(2)}',
-                                          key: ValueKey('precioIva_$i'),
-                                        ),
-                                      ],
-                                    ),
+                                ? Column(
+                                    children: [
+                                      // Campo para editar la cantidad
+                                      TextFormField(
+                                        key: ValueKey('textFormField_$i'), 
+                                        initialValue: item.cantidad.toString(),
+                                        keyboardType: TextInputType.number,
+                                        onFieldSubmitted: (newValue) {
+                                          setState(() {
+                                            item.cantidad = int.parse(newValue);
+                                            actualizarLineaConVariante(item); // Actualiza la línea al editar
+                                            _isEditing[i] = false; 
+                                          });
+                                        },
+                                      ),
+                                      const SizedBox(height: 10),
+                                      // Campo para editar el precioIvaIncluido
+                                      TextFormField(
+                                        key: ValueKey('precioIvaIncluido_$i'),
+                                        initialValue: item.precioIvaIncluido.toString(),
+                                        keyboardType: TextInputType.number,
+                                        onFieldSubmitted: (newValue) {
+                                          setState(() {
+                                            item.precioIvaIncluido = double.parse(newValue);
+                                            actualizarLineaConVariante(item); // Actualiza la línea al editar
+                                            _isEditing[i] = false;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  )
+                                : Column(
+                                    children: [
+                                      Text(
+                                        'Cantidad: ${item.cantidad.toString()}',
+                                        key: ValueKey('cantidad_$i'),
+                                      ),
+                                      Text(
+                                        'Precio: \$${item.precioIvaIncluido.toStringAsFixed(2)}',
+                                        key: ValueKey('precioIva_$i'),
+                                      ),
+                                    ],
+                                  ),
                             ),
                           ),
                         ],
@@ -270,9 +283,17 @@ class _ProductPageState extends State<ProductPage> {
               case 1:
                 var cantidad = 0;
                 var costoTotal = 0.0;
-                for(var linea in lineasProvider){
-                  cantidad += linea.cantidad;
-                  costoTotal += linea.costoUnitario * linea.cantidad;
+                if(lineasProvider.isNotEmpty){
+                  for(var linea in lineasProvider){
+                    cantidad += linea.cantidad;
+                    costoTotal += linea.costoUnitario * linea.cantidad;
+                  }
+                } else {
+                  var lineasDeLaRaiz = lineasGenericas.where((linea) => linea.raiz == productoSeleccionado.raiz).toList();
+                  for(var linea in lineasDeLaRaiz) {
+                    cantidad += linea.cantidad;
+                    costoTotal += linea.costoUnitario * linea.cantidad;
+                  }
                 }
                 await showDialog(
                   context: context, 

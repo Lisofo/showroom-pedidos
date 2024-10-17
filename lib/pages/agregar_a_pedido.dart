@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:showroom_maqueta/config/router/app_router.dart';
 import 'package:showroom_maqueta/models/client.dart';
+import 'package:showroom_maqueta/models/linea.dart';
 import 'package:showroom_maqueta/models/product.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/product_services.dart';
@@ -31,6 +32,8 @@ class _AgregarPedidoState extends State<AgregarPedido> {
   late String descripcion = '';
   late String raiz = '';
   bool busco = false;
+  late List<Linea> lineas = [];
+  bool existe = false;
 
   @override
   void initState() {
@@ -49,7 +52,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
     almacen = context.read<ItemProvider>().almacen;
     token = context.read<ItemProvider>().token;
     cliente = context.read<ItemProvider>().client;
-
+    lineas = context.read<ItemProvider>().lineasGenericas;
     setState(() {});
   }
 
@@ -137,11 +140,22 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                     var item = listItems[i];
                     var foto = item.imagenes[0];
                     var precio = '';
+                    existe = false; // Reiniciar la variable 'existe' para cada item
+
+                    // Verificar si el itemId existe en la lista de 'lineas'
+                    for (var linea in lineas) {
+                      if (linea.raiz == item.raiz) {
+                        existe = true; // Si se encuentra el itemId en lineas, marcar 'existe' como true
+                        break; // No es necesario seguir buscando, ya encontramos el itemId
+                      }
+                    }
+
                     if(item.precioIvaIncluidoMin != item.precioIvaIncluidoMax){
                       precio = '${item.precioIvaIncluidoMin} - ${item.precioIvaIncluidoMax}';
                     } else {
                       precio = item.precioIvaIncluidoMax.toString();
                     }
+
                     return Row(
                       children: [
                         SizedBox(
@@ -164,6 +178,8 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                               Icons.chevron_right,
                               size: 35,
                             ),
+                            // Si 'existe' es true, pintar el ListTile de azul claro
+                            tileColor: existe ? Colors.lightBlue[100] : null,
                           ),
                         ),
                       ],

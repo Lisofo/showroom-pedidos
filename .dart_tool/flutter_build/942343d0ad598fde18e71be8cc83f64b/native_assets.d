@@ -1,0 +1,1 @@
+ D:\\Usuario\\Desktop\\New\ folder\\Software\\showroom-pedidos\\.dart_tool\\flutter_build\\942343d0ad598fde18e71be8cc83f64b\\native_assets.yaml: 

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\windows\x64\CMakeFiles\d3652c976b2fd4aebdab967045a22033\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{B98C1EFD-248D-32BF-B2F8-9AF7888D588D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

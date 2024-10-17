@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\windows\flutter\ephemeral\.plugin_symlinks\connectivity_plus\windows\connectivity_plus_plugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\windows\flutter\ephemeral\.plugin_symlinks\connectivity_plus\windows\network_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\windows\flutter\ephemeral\.plugin_symlinks\connectivity_plus\windows\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{264C631A-6BA8-31CC-AA6A-757B19E7590F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

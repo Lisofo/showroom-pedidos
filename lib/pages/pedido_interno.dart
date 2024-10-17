@@ -41,6 +41,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
     raices = cargarRaices();
     var shortestSide = MediaQuery.of(context).size.shortestSide;
     isMobile = shortestSide < 600;
+    Provider.of<ItemProvider>(context, listen: false).setLineasGenericas(lineas);
     setState(() {});
   }
 
@@ -239,8 +240,8 @@ class _PedidoInternoState extends State<PedidoInterno> {
               label: 'Agregar item'
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_cart),
-              label: 'Carrito'
+              icon: Icon(Icons.notes),
+              label: 'Datos de la orden'
             ),
           ],
           onTap: (index) async {
@@ -251,6 +252,8 @@ class _PedidoInternoState extends State<PedidoInterno> {
                 appRouter.push('/product_add');
               break;
               case 1:
+                Provider.of<ItemProvider>(context, listen: false).setPedido(pedidoSeleccionado);
+                appRouter.push('/nuevoPedido');
               break;
             }
           },

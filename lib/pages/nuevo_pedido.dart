@@ -114,7 +114,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
               Row(
                 children: [
                   const Text(
-                    'Fecha de Vencimiento: ',
+                    'Vencimiento: ',
                     style: TextStyle(fontSize: 24),
                   ),
                   Container(
@@ -131,7 +131,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
               Row(
                 children: [
                   const Text(
-                    'Fecha de Entrega: ',
+                    'Entrega: ',
                     style: TextStyle(fontSize: 24),
                   ),
                   Container(
