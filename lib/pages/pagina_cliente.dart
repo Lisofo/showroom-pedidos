@@ -80,7 +80,7 @@ class _PaginaClienteState extends State<PaginaCliente> {
                       appRouter.push('/pedidoInterno');
                     },
                     title: Text(pedido.numeroOrdenTrabajo),
-                    subtitle: Text('Estado: ${pedido.estado}'),
+                    subtitle: Text('Estado: ${pedido.estado}\nFecha: ${_formatDateAndTime(pedido.fechaOrdenTrabajo)}\n${pedido.comentarioCliente}'),
                     trailing: const Icon(Icons.chevron_right,size: 25,),
                   );
                 }
@@ -120,5 +120,9 @@ class _PaginaClienteState extends State<PaginaCliente> {
         )
       )
     );
+  }
+  
+  String _formatDateAndTime(DateTime? date) {
+    return '${date?.day.toString().padLeft(2, '0')}/${date?.month.toString().padLeft(2, '0')}/${date?.year.toString().padLeft(4, '0')}';
   }
 }

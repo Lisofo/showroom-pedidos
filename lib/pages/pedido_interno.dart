@@ -25,11 +25,17 @@ class _PedidoInternoState extends State<PedidoInterno> {
   bool isMobile = false;
   bool recargando = false;
   final GlobalKey<RefreshIndicatorState> _refreshKey = GlobalKey<RefreshIndicatorState>();
+  bool cargando = true;
   
   @override
   void initState() {
     super.initState();
     cargarDatos();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
   
   cargarDatos() async {
@@ -42,6 +48,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
     var shortestSide = MediaQuery.of(context).size.shortestSide;
     isMobile = shortestSide < 600;
     Provider.of<ItemProvider>(context, listen: false).setLineasGenericas(lineas);
+    cargando = false;
     setState(() {});
   }
 
@@ -99,7 +106,16 @@ class _PedidoInternoState extends State<PedidoInterno> {
           elevation: 0,
           backgroundColor: const Color(0xFFFD725A),
         ),
-        body: SingleChildScrollView(
+        body: cargando ? const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 20,),
+              Text('Cargando...')
+            ],
+          ),
+        ) : SingleChildScrollView(
           child: Column(
             children: [
               SizedBox(
@@ -208,12 +224,35 @@ class _PedidoInternoState extends State<PedidoInterno> {
                                     ),
                                     IconButton(
                                       onPressed: () async {
-                                        for(var i = 0; i < listaVariantes.length; i++){
-                                          listaVariantes[i].metodo = 'DELETE';
-                                        }
-                                        await PedidosServices().putPedido(context, pedidoSeleccionado, listaVariantes, token);
-                                        lineas = [];
-                                        cargarDatos();
+                                        showDialog(
+                                          context: context, 
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: const Text('Borrar raíz'),
+                                              content: Text('Esta por borrar la raíz $raiz y todas sus variantes agregadas anteriormente. Desea borrarlas?'),
+                                              actions: [
+                                                TextButton(
+                                                onPressed: () {
+                                                  appRouter.pop();
+                                                },
+                                                child: const Text('Cancelar')
+                                              ),
+                                                TextButton(
+                                                  onPressed: () async {
+                                                    for(var i = 0; i < listaVariantes.length; i++){
+                                                      listaVariantes[i].metodo = 'DELETE';
+                                                    }
+                                                    await PedidosServices().putPedido(context, pedidoSeleccionado, listaVariantes, token);
+                                                    lineas = [];
+                                                    cargarDatos();
+                                                    appRouter.pop();
+                                                  },
+                                                  child: const Text('Confirmar')
+                                                ),
+                                              ],
+                                            );
+                                          }
+                                        );
                                       },
                                       icon: const Icon(Icons.delete)
                                     ),

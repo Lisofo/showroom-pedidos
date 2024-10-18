@@ -66,11 +66,8 @@ class _ProductPageState extends State<ProductPage> {
     pedido = context.read<ItemProvider>().pedido;
     lineasProvider = context.read<ItemProvider>().lineas;
     lineasGenericas = context.read<ItemProvider>().lineasGenericas;
-    if(lineasProvider.isNotEmpty) {
-      raiz = context.read<ItemProvider>().raiz;
-    } else {
-      productoSeleccionado = context.read<ItemProvider>().product;
-    }
+    raiz = context.read<ItemProvider>().raiz;
+    productoSeleccionado = context.read<ItemProvider>().product;
     productoNuevo = raiz == '' ? await ProductServices().getSingleProductByRaiz(productoSeleccionado.raiz, almacen, token) : await ProductServices().getSingleProductByRaiz(raiz, almacen, token);
     _products = productoNuevo.variantes;
     List<dynamic> listaTalles = _products!.where((productoVariante) => talles.add(productoVariante.talle)).toList();
@@ -154,7 +151,6 @@ class _ProductPageState extends State<ProductPage> {
                 child: ListView.separated(
                   controller: listController,
                   itemCount: productosAgregados.length,
-                  physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, i) {
                     var item = productosAgregados[i];
                     return ListTile(
@@ -272,13 +268,18 @@ class _ProductPageState extends State<ProductPage> {
             switch (buttonIndex) {
               case 0:
                 int? statusCode;
-                await _pedidosServices.putPedido(context, pedido, lineasProvider, token);
+                List<Linea> lineasAEnviar = [];
+                if(lineasProvider.isNotEmpty){
+                  lineasAEnviar = lineasProvider;
+                } else {
+                  lineasAEnviar = lineasGenericas.where((linea) => linea.raiz == productoSeleccionado.raiz).toList();
+                }
+                await _pedidosServices.putPedido(context, pedido, lineasAEnviar, token);
                 statusCode = await _pedidosServices.getStatusCode();
                 await _pedidosServices.resetStatusCode();
                 if(statusCode == 1) {
-                  Carteles.showDialogs(context, 'Productos actualizados', true, false);
+                  Carteles.showDialogs(context, 'Productos actualizados', true, false, false);
                 }
-
               break;
               case 1:
                 var cantidad = 0;
@@ -454,10 +455,18 @@ class _ProductPageState extends State<ProductPage> {
 
   // Método para manejar la actualización de variantes
   void actualizarLineaConVariante(ProductoVariante variante) {
-    var lineaExistente = lineasProvider.firstWhere(
-      (linea) => linea.itemId == variante.itemId, 
-      orElse: () => Linea.empty(),
-    );
+    Linea lineaExistente = Linea.empty();
+    if(lineasProvider.isNotEmpty) {
+      lineaExistente = lineasProvider.firstWhere(
+        (linea) => linea.itemId == variante.itemId, 
+        orElse: () => Linea.empty(),
+      );
+    } else {
+      lineaExistente = lineasGenericas.firstWhere(
+        (linea) => linea.itemId == variante.itemId, 
+        orElse: () => Linea.empty(),
+      );
+    }
     var cantidad = variante.cantidad;
 
     if(variante.cantidad != lineaExistente.cantidad){
@@ -481,7 +490,7 @@ class _ProductPageState extends State<ProductPage> {
           estado: 'Pendiente', // Puedes ajustar este valor según el estado de tu aplicación
           itemId: variante.itemId,
           codItem: variante.codItem,
-          raiz: '', // Si tienes un valor para "raiz", úsalo
+          raiz: raiz == '' ? productoSeleccionado.raiz : raiz,
           descripcion: '${variante.color} - ${variante.talle}',
           macroFamilia: '', // Puedes asignar un valor aquí
           familia: '', // Puedes asignar un valor aquí

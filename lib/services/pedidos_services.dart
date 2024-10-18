@@ -41,8 +41,8 @@ class PedidosServices {
     var data = ({
       "numeroOrdenTrabajo": pedido.numeroOrdenTrabajo,
     	"fechaOrdenTrabajo": _formatFechas(pedido.fechaOrdenTrabajo),
-    	"fechaVencimiento": _formatFechas(pedido.fechaVencimiento),
-    	"fechaEntrega": _formatFechas(pedido.fechaEntrega),
+    	"fechaVencimiento": pedido.fechaVencimiento == null ? null : _formatFechas(pedido.fechaVencimiento),
+    	"fechaEntrega": pedido.fechaEntrega == null ? null :  _formatFechas(pedido.fechaEntrega),
     	"descripcion": pedido.descripcion,
     	"esPlantilla": false,
     	"clienteId": pedido.clienteId,
@@ -51,19 +51,7 @@ class PedidosServices {
     	"transaccionId": pedido.transaccionId,
     	"comentarioCliente": pedido.comentarioCliente,
     	"comentarioTrabajo": pedido.comentarioTrabajo,
-      "lineas": [
-        // {
-        //   "metodo": "POST",
-        //   "itemId": 34987,
-        //   "ordinal": 0,
-        //   "cantidad": 5,
-        //   "costoUnitario": 390,
-        //   "descuento1": 0,
-        //   "descuento2": 0,
-        //   "descuento3": 0,
-        //   "comentario": "test"
-        // },
-      ]
+      "lineas": []
     });
     try {
       var headers = {'Authorization': token};
@@ -121,8 +109,8 @@ class PedidosServices {
     }
     var data = ({
     	"fechaOrdenTrabajo": _formatFechas(pedido.fechaOrdenTrabajo),
-    	"fechaVencimiento": _formatFechas(pedido.fechaVencimiento),
-    	"fechaEntrega": _formatFechas(pedido.fechaEntrega),
+    	"fechaVencimiento": pedido.fechaVencimiento == null ? null : _formatFechas(pedido.fechaVencimiento),
+    	"fechaEntrega": pedido.fechaEntrega == null ? null :  _formatFechas(pedido.fechaEntrega),
     	"descripcion": pedido.descripcion,
     	"esPlantilla": false,
     	"monedaId": pedido.monedaId,
@@ -165,8 +153,8 @@ class PedidosServices {
     //   "accionId": 3
   // }
 
-  Future patchPedido(BuildContext context, int ordenId, String accionId, String token) async {
-    String link = '${apirUrl}api/v1/ordenes/$ordenId';
+  Future patchPedido(BuildContext context, int ordenId, int accionId, String token) async {
+    String link = '$apirUrl/api/v1/ordenes/$ordenId';
 
     try {
       var headers = {'Authorization': token};

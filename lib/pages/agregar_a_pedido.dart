@@ -163,6 +163,11 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                           width: MediaQuery.of(context).size.width * 0.1,
                           child: Image.network(
                             foto,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Placeholder(
+                                child: Text('No Image'),
+                              );
+                            },
                           ),
                         ),
                         SizedBox(
@@ -170,6 +175,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                           child: ListTile(
                             onTap: () {
                               Provider.of<ItemProvider>(context, listen: false).setProduct(item);
+                              Provider.of<ItemProvider>(context, listen: false).setRaiz(item.raiz);
                               appRouter.push('/product_page');
                             },
                             title: Text(item.raiz),

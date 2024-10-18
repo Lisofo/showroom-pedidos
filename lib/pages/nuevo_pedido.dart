@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:showroom_maqueta/config/router/app_router.dart';
 import 'package:showroom_maqueta/models/client.dart';
+import 'package:showroom_maqueta/models/linea.dart';
 import 'package:showroom_maqueta/models/pedido.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/pedidos_services.dart';
+import 'package:showroom_maqueta/widgets/confirmacion.dart';
+import 'package:showroom_maqueta/widgets/custom_form_field.dart';
 
 class NuevoPedido extends StatefulWidget {
   const NuevoPedido({super.key});
@@ -25,17 +28,23 @@ class _NuevoPedidoState extends State<NuevoPedido> {
   String _fechaEntrega = '';
   final TextEditingController fechaEntregaController = TextEditingController();
   final TextEditingController descripcionController = TextEditingController();
+  final TextEditingController comClienteController = TextEditingController();
+  final TextEditingController envioController = TextEditingController();
   final List<String> _opcionesMoneda = ['U\$S', 'UYU'];
   String _opcionSeleccionada = 'UYU';
   late Pedido pedido = Pedido.empty();
   late DateTime fechaOrden = DateTime.now();
   late DateTime fechaVencimiento = DateTime.now();
-  late DateTime fechaEntrega = DateTime.now();
+  late DateTime? fechaEntrega = null;
   late Client cliente = Client.empty();
   late String token = '';
   int buttonIndex = 0;
   final List<String> _opcionesTipo = ['Contado','Credito', 'Remito'];
   String _opcionTipo = 'Contado';
+  final _pedidosServices = PedidosServices();
+  late List<Linea> lineasGenericas = [];
+  late int cantidad = 0;
+  late double costoTotal = 0.0;
 
   @override
   void initState() {
@@ -49,6 +58,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
     token = context.read<ItemProvider>().token;
     if (pedido.ordenTrabajoId != 0) {
       numeroOrdenTrabajo.text = pedido.numeroOrdenTrabajo;
+      comClienteController.text = pedido.comentarioCliente;
       fechaOrdenController.text = pedido.fechaOrdenTrabajo == null ? '' : _formatDateAndTime(pedido.fechaOrdenTrabajo);
       fechaVencimientoController.text = pedido.fechaVencimiento == null ? "" : _formatDateAndTime(pedido.fechaVencimiento);
       fechaEntregaController.text = pedido.fechaEntrega == null ? '' : _formatDateAndTime(pedido.fechaEntrega);
@@ -61,6 +71,11 @@ class _NuevoPedidoState extends State<NuevoPedido> {
       if (pedido.fechaEntrega != null) {
         fechaEntrega = pedido.fechaEntrega!;
       }
+      lineasGenericas = context.read<ItemProvider>().lineasGenericas;
+      for(var linea in lineasGenericas) {
+        cantidad += linea.cantidad;
+        costoTotal += linea.costoUnitario * linea.cantidad;
+      }
     }
     setState(() {});
   }
@@ -71,164 +86,183 @@ class _NuevoPedidoState extends State<NuevoPedido> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(pedido.ordenTrabajoId == 0 ? 'Nuevo Pedido' : 'Editar Pedido'),
+        title: Text(pedido.ordenTrabajoId == 0 ? 'Nuevo Pedido' : 'Datos del pedido'),
         elevation: 0,
         backgroundColor: const Color(0xFFFD725A),
       ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Text(
-                    'Pedido: ',
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: TextFormField(
-                      textAlign: TextAlign.center,
-                      controller: numeroOrdenTrabajo,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Text(
+                      'Pedido: ',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: CustomTextFormField(
+                        textAlign: TextAlign.center,
+                        controller: numeroOrdenTrabajo,
+                        maxLines: 1,
+                      )
                     )
-                  )
-                ],
-              ),
-              const SizedBox(height: 20,),
-              Row(
-                children: [
-                  const Text(
-                    'Fecha: ',
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      // border: Border.all(),
-                      borderRadius: BorderRadius.circular(5)
+                  ],
+                ),
+                const SizedBox(height: 20,),
+                Row(
+                  children: [
+                    const Text(
+                      'Fecha: ',
+                      style: TextStyle(fontSize: 18),
                     ),
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: _crearFecha(context)
-                  )
-                ],
-              ),
-              const SizedBox(height: 20,),
-              Row(
-                children: [
-                  const Text(
-                    'Vencimiento: ',
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      // border: Border.all(),
-                      borderRadius: BorderRadius.circular(5)
-                    ),
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: _crearFechaVencimiento(context)
-                  )
-                ],
-              ),
-              const SizedBox(height: 20,),
-              Row(
-                children: [
-                  const Text(
-                    'Entrega: ',
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      // border: Border.all(),
-                      borderRadius: BorderRadius.circular(5)
-                    ),
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: _crearFechaEntrega(context)
-                  )
-                ],
-              ),
-              const SizedBox(height: 20,),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Descripcion: ',
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      // border: Border.all(),
-                      borderRadius: BorderRadius.circular(5)
-                    ),
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: TextFormField(
-                      minLines: 1,
-                      maxLines: 10,
-                      decoration: const InputDecoration(
-                        // border: InputBorder.none,
-                        hintText: 'Ingrese Descripcion'
+                    Container(
+                      decoration: BoxDecoration(
+                        // border: Border.all(),
+                        borderRadius: BorderRadius.circular(5)
                       ),
-                      controller: descripcionController,
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: _crearFecha(context)
                     )
-                  )
-                ],
-              ),
-              const SizedBox(height: 20,),
-              Row(
-                children: [
-                  const Text(
-                    'Moneda:',
-                    style: TextStyle(fontSize: 24)
-                  ),
-                  const SizedBox(width: 20,),
-                  DropdownButton(
-                    value: _opcionSeleccionada,
-                    items: getOpcionesDropdown(), 
-                    onChanged: (opt){
-                      setState(() {
-                        _opcionSeleccionada = opt!;
-                      });
-                    }
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20,),
-              Row(
-                children: [
-                  const Text(
-                    'Tipo:',
-                    style: TextStyle(fontSize: 24)
-                  ),
-                  const SizedBox(width: 20,),
-                  DropdownButton(
-                    value: _opcionTipo,
-                    items: getOpcionesDropdownTipo(), 
-                    onChanged: (opt){
-                      setState(() {
-                        _opcionTipo = opt!;
-                      });
-                    }
-                  ),
-                ],
-              ),
-              // const SizedBox(height: 20,),
-              // Row(
-              //   children: [
-              //     const Text('Descuento: ', style: TextStyle(fontSize: 24)),
-              //     Container(
-              //       width: MediaQuery.of(context).size.width / 5,
-              //       decoration: BoxDecoration(
-              //         // border: Border.all(),
-              //         borderRadius: BorderRadius.circular(5)
-              //       ),
-              //       child: const TextField(
-              //         decoration: InputDecoration(),
-              //       ),
-              //     )
-              //   ],
-              // ),
-            ],
+                  ],
+                ),
+                const SizedBox(height: 20,),
+                Row(
+                  children: [
+                    const Text(
+                      'Vencimiento: ',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        // border: Border.all(),
+                        borderRadius: BorderRadius.circular(5)
+                      ),
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: _crearFechaVencimiento(context)
+                    )
+                  ],
+                ),
+                const SizedBox(height: 20,),
+                Row(
+                  children: [
+                    const Text(
+                      'Entrega: ',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        // border: Border.all(),
+                        borderRadius: BorderRadius.circular(5)
+                      ),
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: _crearFechaEntrega(context)
+                    )
+                  ],
+                ),
+                const SizedBox(height: 20,),
+                CustomTextFormField(
+                  maxLines: 1,
+                  hint: 'Descripción',
+                  controller: descripcionController,
+                ),
+                const SizedBox(height: 20,),
+                Row(
+                  children: [
+                    const Text(
+                      'Moneda:',
+                      style: TextStyle(fontSize: 18)
+                    ),
+                    const SizedBox(width: 20,),
+                    DropdownButton(
+                      value: _opcionSeleccionada,
+                      items: getOpcionesDropdown(), 
+                      onChanged: (opt){
+                        setState(() {
+                          _opcionSeleccionada = opt!;
+                        });
+                      }
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20,),
+                Row(
+                  children: [
+                    const Text(
+                      'Tipo:',
+                      style: TextStyle(fontSize: 18)
+                    ),
+                    const SizedBox(width: 20,),
+                    DropdownButton(
+                      value: _opcionTipo,
+                      items: getOpcionesDropdownTipo(),
+                      onChanged: (opt){
+                        setState(() {
+                          _opcionTipo = opt!;
+                        });
+                      }
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20,),
+                CustomTextFormField(
+                  controller: comClienteController,
+                  hint: 'Detalle',
+                  minLines: 1,
+                  maxLines: 10,
+                ),
+                const SizedBox(height: 20,),
+                CustomTextFormField(
+                  hint: 'Método de envío',
+                  controller: envioController,
+                  minLines: 1,
+                  maxLines: 10,
+                ),
+                // const SizedBox(height: 20,),
+                // Row(
+                //   children: [
+                //     const Text('Descuento: ', style: TextStyle(fontSize: 24)),
+                //     Container(
+                //       width: MediaQuery.of(context).size.width / 5,
+                //       decoration: BoxDecoration(
+                //         // border: Border.all(),
+                //         borderRadius: BorderRadius.circular(5)
+                //       ),
+                //       child: const TextField(
+                //         decoration: InputDecoration(),
+                //       ),
+                //     )
+                //   ],
+                // ),
+                const SizedBox(height: 20,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Cantidad total: $cantidad',
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.end,
+                        ),
+                        Text(
+                          'Costo total: ${pedido.signo} $costoTotal', 
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.end,
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                const SizedBox(height: 20,)
+              ],
+            ),
           ),
         )
       ),
@@ -242,6 +276,10 @@ class _NuevoPedidoState extends State<NuevoPedido> {
             icon: Icon(Icons.print),
             label: 'Imprimir'
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.delete_forever),
+            label: 'Descartar'
+          ),
         ],
         currentIndex: buttonIndex,
         onTap: (value) async {
@@ -251,9 +289,35 @@ class _NuevoPedidoState extends State<NuevoPedido> {
               await postPutPedido(context);
             break;
             case 1:
-              // if(pedido.ordenTrabajoId != 0){
-              //   await PedidosServices().patchPedido(context, pedido.ordenTrabajoId, '1', token);
-              // }
+            break;
+            case 2:
+            await showDialog(
+              context: context, 
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('Descartar'),
+                  content: Text('Esta por descartar el pedido ${pedido.numeroOrdenTrabajo}. Esta seguro de querer descartarlo?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {}, child: const Text('Cancelar')
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        int? statusCode;
+                        if(pedido.ordenTrabajoId != 0){
+                          await _pedidosServices.patchPedido(context, pedido.ordenTrabajoId, 3, token);
+                          statusCode = await _pedidosServices.getStatusCode();
+                          await _pedidosServices.resetStatusCode();
+                          if(statusCode == 1) {
+                            Carteles.showDialogs(context, 'Pedido descartado correctamente', true, true, true);
+                          }
+                        }
+                      }, child: const Text('Confirmar')
+                    ),
+                  ],
+                );
+              }
+            );
             break;
           }
         },
@@ -278,7 +342,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
         descMoneda: '',
         signo: '',
         totalOrdenTrabajo: 0,
-        comentarioCliente: 'comentarioCliente',
+        comentarioCliente: comClienteController.text,
         comentarioTrabajo: 'comentarioTrabajo',
         estado: '',
         presupuestoIdPlantilla: 0,
@@ -294,7 +358,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
         central: '',
         credito: false
       );
-      await PedidosServices().postPedido(context, nuevoPedido, token);
+      await _pedidosServices.postPedido(context, nuevoPedido, token);
       Provider.of<ItemProvider>(context, listen: false).setPedido(nuevoPedido);
       appRouter.go('/pedidoInterno');
     } else {
@@ -304,10 +368,16 @@ class _NuevoPedidoState extends State<NuevoPedido> {
       pedido.descripcion = descripcionController.text;
       pedido.transaccionId = 17;
       pedido.monedaId = 1;
-      pedido.comentarioCliente = 'comentarioCliente';
+      pedido.comentarioCliente = comClienteController.text;
       pedido.comentarioTrabajo = 'comentarioTrabajo';
-      await PedidosServices().putPedido(context, pedido, [], token);
-      appRouter.go('/client_page');
+      await _pedidosServices.putPedido(context, pedido, [], token);
+      int? statusCode;
+      statusCode = await _pedidosServices.getStatusCode();
+      await _pedidosServices.resetStatusCode();
+      if(statusCode == 1) {
+        Carteles.showDialogs(context, "Pedido editado", false, false, false);
+      }
+      // appRouter.go('/client_page');
     }
   }
 
@@ -317,7 +387,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
       enableInteractiveSelection: false,
       decoration: const InputDecoration(
         icon: Icon(Icons.calendar_today),
-        hintText: 'Fecha de Compra',
+        hintText: 'Fecha de pedido',
       ),
       textAlign: TextAlign.center,
       onTap: () {
