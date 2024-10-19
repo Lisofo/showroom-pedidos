@@ -1,4 +1,4 @@
-#Thu Oct 17 17:59:26 UYT 2024
+#Sat Oct 19 15:06:24 UYT 2024
 base.0=D\:\\Usuario\\Desktop\\New folder\\Software\\showroom-pedidos\\build\\app\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
 path.0=classes.dex
 renamed.0=classes.dex

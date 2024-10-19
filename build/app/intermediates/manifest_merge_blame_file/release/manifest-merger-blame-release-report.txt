@@ -2,7 +2,7 @@
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 3    package="com.example.showroom_maqueta"
 4    android:versionCode="1"
-5    android:versionName="2024.10.17" >
+5    android:versionName="2024.10.19" >
 6
 7    <uses-sdk
 8        android:minSdkVersion="21"

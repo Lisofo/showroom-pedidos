@@ -131,27 +131,19 @@ class PedidosServices {
       );
       statusCode = 1;
       if(resp.statusCode == 200){
-        // pedido.ordenTrabajoId = resp.data['ordenTrabajoId'];
-        // if (resp.statusCode == 201) {
-          // for(int i = 0; i < acciones.length; i++){
-            // if(acciones[i].otPuntoInspeccionId == 0){
-              // if(resp.data[i]["status"] == 201){
-                // acciones[i].otPuntoInspeccionId = resp.data[i]["content"]["otPuntoInspeccionId"];
-                // print(acciones[i].otPuntoInspeccionId);
-              // }
-            // }
-          // }
-        // }
+        if (resp.data != null) {
+          for(int i = 0; i < lineas.length; i++){
+            if(lineas[i].lineaId == 0){
+              lineas[i].lineaId = resp.data["lineas"][i]['lineaId'];
+              print('id asignado: ${lineas[i].lineaId}');
+            }
+          }
+        }
       }
     } catch (e) {
       return e;
     }
   }
-
-  // PATCH {{ApiUrl}}/api/v1/ordenes/:ordenTrabajoId
-  // {
-    //   "accionId": 3
-  // }
 
   Future patchPedido(BuildContext context, int ordenId, int accionId, String token) async {
     String link = '$apirUrl/api/v1/ordenes/$ordenId';

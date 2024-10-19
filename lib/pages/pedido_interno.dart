@@ -229,22 +229,32 @@ class _PedidoInternoState extends State<PedidoInterno> {
                                           builder: (context) {
                                             return AlertDialog(
                                               title: const Text('Borrar raíz'),
-                                              content: Text('Esta por borrar la raíz $raiz y todas sus variantes agregadas anteriormente. Desea borrarlas?'),
+                                              content: Text('Está por borrar la raíz $raiz y todas sus variantes agregadas anteriormente. ¿Desea borrarlas?'),
                                               actions: [
                                                 TextButton(
-                                                onPressed: () {
-                                                  appRouter.pop();
-                                                },
-                                                child: const Text('Cancelar')
-                                              ),
+                                                  onPressed: () {
+                                                    appRouter.pop(); // Cerrar el diálogo
+                                                  },
+                                                  child: const Text('Cancelar')
+                                                ),
                                                 TextButton(
                                                   onPressed: () async {
-                                                    for(var i = 0; i < listaVariantes.length; i++){
+                                                    // Actualizamos el método de todas las variantes a 'DELETE'
+                                                    for (var i = 0; i < listaVariantes.length; i++) {
                                                       listaVariantes[i].metodo = 'DELETE';
                                                     }
+                                    
+                                                    // Llamamos a la API para eliminarlas
                                                     await PedidosServices().putPedido(context, pedidoSeleccionado, listaVariantes, token);
-                                                    lineas = [];
-                                                    cargarDatos();
+                                    
+                                                    // Eliminamos las variantes de la lista local
+                                                    setState(() {
+                                                      lineas.removeWhere((linea) => listaVariantes.contains(linea));
+                                                      listaDeLista.remove(raiz); // Eliminamos la raíz de la lista
+                                                      raices.remove(raiz); // Actualizamos la lista de raices
+                                                    });
+                                    
+                                                    // Cerrar el diálogo
                                                     appRouter.pop();
                                                   },
                                                   child: const Text('Confirmar')
@@ -254,7 +264,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
                                           }
                                         );
                                       },
-                                      icon: const Icon(Icons.delete)
+                                      icon: const Icon(Icons.delete),
                                     ),
                                   ],
                                 )

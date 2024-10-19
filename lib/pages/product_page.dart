@@ -48,7 +48,6 @@ class _ProductPageState extends State<ProductPage> {
   List<bool> _isEditing = []; // Lista para controlar el estado de edición de cada producto
   int buttonIndex = 0;
   late Pedido pedido = Pedido.empty();
-  late List<Linea> lineasProvider = [];
   late List<Linea> lineasGenericas = [];
   final _pedidosServices = PedidosServices();
 
@@ -64,7 +63,6 @@ class _ProductPageState extends State<ProductPage> {
     token = context.read<ItemProvider>().token;
     cliente = context.read<ItemProvider>().client;
     pedido = context.read<ItemProvider>().pedido;
-    lineasProvider = context.read<ItemProvider>().lineas;
     lineasGenericas = context.read<ItemProvider>().lineasGenericas;
     raiz = context.read<ItemProvider>().raiz;
     productoSeleccionado = context.read<ItemProvider>().product;
@@ -86,15 +84,7 @@ class _ProductPageState extends State<ProductPage> {
       );
     }
     colors = models.toSet().toList();
-    if(_products!.isNotEmpty && lineasProvider.isNotEmpty){
-      for(var linea in lineasProvider) {
-        var agregar = _products!.firstWhere((prod) => prod.itemId == linea.itemId);
-        agregar.cantidad = linea.cantidad;
-        agregar.precioIvaIncluido = linea.costoUnitario;
-        productosAgregados.add(agregar);
-        _isEditing.add(false);
-      }
-    } else {
+    if(_products!.isNotEmpty && lineasGenericas.isNotEmpty){
       for (var linea in lineasGenericas) {
         var agregar = _products!.where((prod) => prod.itemId == linea.itemId).toList();
 
@@ -105,8 +95,7 @@ class _ProductPageState extends State<ProductPage> {
           _isEditing.add(false);
         }
       }
-    }
-
+    } 
     buscando = false;
     setState(() {});
   }
@@ -269,11 +258,7 @@ class _ProductPageState extends State<ProductPage> {
               case 0:
                 int? statusCode;
                 List<Linea> lineasAEnviar = [];
-                if(lineasProvider.isNotEmpty){
-                  lineasAEnviar = lineasProvider;
-                } else {
-                  lineasAEnviar = lineasGenericas.where((linea) => linea.raiz == productoSeleccionado.raiz).toList();
-                }
+                lineasAEnviar = lineasGenericas.where((linea) => linea.raiz == productoSeleccionado.raiz).toList();
                 await _pedidosServices.putPedido(context, pedido, lineasAEnviar, token);
                 statusCode = await _pedidosServices.getStatusCode();
                 await _pedidosServices.resetStatusCode();
@@ -284,17 +269,10 @@ class _ProductPageState extends State<ProductPage> {
               case 1:
                 var cantidad = 0;
                 var costoTotal = 0.0;
-                if(lineasProvider.isNotEmpty){
-                  for(var linea in lineasProvider){
-                    cantidad += linea.cantidad;
-                    costoTotal += linea.costoUnitario * linea.cantidad;
-                  }
-                } else {
-                  var lineasDeLaRaiz = lineasGenericas.where((linea) => linea.raiz == productoSeleccionado.raiz).toList();
-                  for(var linea in lineasDeLaRaiz) {
-                    cantidad += linea.cantidad;
-                    costoTotal += linea.costoUnitario * linea.cantidad;
-                  }
+                var lineasDeLaRaiz = lineasGenericas.where((linea) => linea.raiz == productoSeleccionado.raiz).toList();
+                for(var linea in lineasDeLaRaiz) {
+                  cantidad += linea.cantidad;
+                  costoTotal += linea.costoUnitario * linea.cantidad;
                 }
                 await showDialog(
                   context: context, 
@@ -445,32 +423,25 @@ class _ProductPageState extends State<ProductPage> {
     productosAgregados.removeWhere((variante) => variante.itemId == varianteAEliminar.itemId);
   
     // Buscar la línea correspondiente en lineasProvider
-    int indexLinea = lineasProvider.indexWhere((linea) => linea.itemId == varianteAEliminar.itemId);
+    int indexLinea = lineasGenericas.indexWhere((linea) => linea.itemId == varianteAEliminar.itemId);
   
     if (indexLinea != -1) {
       // Si existe en lineasProvider, cambiar el método a DELETE
-      lineasProvider[indexLinea].metodo = 'DELETE';
+      lineasGenericas[indexLinea].metodo = 'DELETE';
     }
   }
 
   // Método para manejar la actualización de variantes
   void actualizarLineaConVariante(ProductoVariante variante) {
     Linea lineaExistente = Linea.empty();
-    if(lineasProvider.isNotEmpty) {
-      lineaExistente = lineasProvider.firstWhere(
-        (linea) => linea.itemId == variante.itemId, 
-        orElse: () => Linea.empty(),
-      );
-    } else {
-      lineaExistente = lineasGenericas.firstWhere(
-        (linea) => linea.itemId == variante.itemId, 
-        orElse: () => Linea.empty(),
-      );
-    }
+    lineaExistente = lineasGenericas.firstWhere(
+      (linea) => linea.itemId == variante.itemId, 
+      orElse: () => Linea.empty(),
+    );    
     var cantidad = variante.cantidad;
 
     if(variante.cantidad != lineaExistente.cantidad){
-      cantidad = variante.cantidad; 
+      cantidad = variante.cantidad;
     }
 
     if (lineaExistente.itemId == variante.itemId && lineaExistente.lineaId != 0) {
@@ -481,7 +452,7 @@ class _ProductPageState extends State<ProductPage> {
       });
     } else if(lineaExistente.lineaId == 0 && lineaExistente.cantidad == 0){
       setState(() {
-        lineasProvider.add(Linea(
+        lineasGenericas.add(Linea(
           lineaId: 0, // Asigna un valor apropiado si lo tienes
           ordenTrabajoId: 0, // Asigna un valor apropiado si lo tienes
           numeroOrdenTrabajo: '', // Asigna un valor apropiado si lo tienes
