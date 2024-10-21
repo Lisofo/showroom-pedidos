@@ -88,6 +88,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
   @override
   Widget build(BuildContext context) {
     final colores = Theme.of(context).colorScheme;
+    lineas = context.watch<ItemProvider>().lineasGenericas;
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.blueGrey[100],

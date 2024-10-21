@@ -78,7 +78,7 @@ class PedidosServices {
     String link = '$apirUrl/api/v1/pedidos/${pedido.ordenTrabajoId}';
     var accionesLineas = [];
     for(var linea in lineas){
-      if (linea.metodo == 'POST') {
+      if (linea.metodo == 'POST' && linea.lineaId == 0) {
         accionesLineas.add({
           "metodo": "POST",
           "itemId": linea.itemId,
@@ -90,7 +90,7 @@ class PedidosServices {
           "descuento3": linea.descuento3,
           "comentario": linea.comentario,
         });
-      } else if (linea.metodo == 'PUT') {
+      } else if (linea.metodo == 'PUT' && linea.lineaId != 0) {
         accionesLineas.add({
           "metodo": "PUT",
           "lineaId": linea.lineaId,
