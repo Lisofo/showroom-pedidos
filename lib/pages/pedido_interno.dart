@@ -87,6 +87,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
 
   @override
   Widget build(BuildContext context) {
+    final colores = Theme.of(context).colorScheme;
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.blueGrey[100],
@@ -104,7 +105,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
             color: Colors.white
           ),
           elevation: 0,
-          backgroundColor: const Color(0xFFFD725A),
+          backgroundColor: colores.primary,
         ),
         body: cargando ? const Center(
           child: Column(

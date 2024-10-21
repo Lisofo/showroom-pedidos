@@ -38,11 +38,12 @@ class _PaginaClienteState extends State<PaginaCliente> {
 
   @override
   Widget build(BuildContext context) {
+    final colores = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         
         elevation: 0,
-        backgroundColor: const Color(0xFFFD725A),
+        backgroundColor: colores.primary,
         title: const Text('Pedidos del Cliente'),
       ),
       body: SafeArea(
@@ -99,7 +100,7 @@ class _PaginaClienteState extends State<PaginaCliente> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFD725A),
+                        color: colores.primary,
                         borderRadius: BorderRadius.circular(30)
                       ),
                       child: Text(

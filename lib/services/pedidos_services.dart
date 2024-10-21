@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:showroom_maqueta/config/config.dart';
 import 'package:showroom_maqueta/models/linea.dart';
 import 'package:showroom_maqueta/models/pedido.dart';
+import 'package:showroom_maqueta/providers/item_provider.dart';
 
 class PedidosServices {
   final _dio = Dio();
@@ -136,6 +138,9 @@ class PedidosServices {
             if(lineas[i].lineaId == 0){
               lineas[i].lineaId = resp.data["lineas"][i]['lineaId'];
               print('id asignado: ${lineas[i].lineaId}');
+            }
+            if(lineas[i].metodo == "DELETE") {
+              Provider.of<ItemProvider>(context, listen: false).removeLinea(lineas[i]);
             }
           }
         }

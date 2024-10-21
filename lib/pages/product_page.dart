@@ -463,7 +463,6 @@ class _ProductPageState extends State<ProductPage> {
   void eliminarVariante(ProductoVariante varianteAEliminar) {
     // Eliminar variante de productosAgregados
     productosAgregados.removeWhere((variante) => variante.itemId == varianteAEliminar.itemId);
-    lineasGenericas.removeWhere((linea) => linea.itemId == varianteAEliminar.itemId);
     // Buscar la línea correspondiente en lineasProvider
     int indexLinea = lineasGenericas.indexWhere((linea) => linea.itemId == varianteAEliminar.itemId && linea.lineaId != 0);
   

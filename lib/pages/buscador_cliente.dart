@@ -20,6 +20,7 @@ class _BuscadorClienteState extends State<BuscadorCliente> {
 
   @override
   Widget build(BuildContext context) {
+    final colores = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Buscar Cliente',
@@ -28,7 +29,7 @@ class _BuscadorClienteState extends State<BuscadorCliente> {
           )
         ),
         elevation: 0,
-        backgroundColor: const Color(0xFFFD725A),
+        backgroundColor: colores.primary,
         actions: [
           IconButton(
             icon: const Icon(Icons.search),

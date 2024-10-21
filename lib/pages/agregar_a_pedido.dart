@@ -80,152 +80,166 @@ class _AgregarPedidoState extends State<AgregarPedido> {
   @override
   Widget build(BuildContext context) {
     lineas = context.watch<ItemProvider>().lineasGenericas;
+    final colores = Theme.of(context).colorScheme;
     print('REconstruido');
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: const Color(0xFFFD725A),
-        iconTheme: const IconThemeData(
-          color: Colors.white
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
-              child:  SearchBar(
-                textInputAction: TextInputAction.search,
-                hintText: 'Buscar o escanear item...',
-                controller: query,
-                onSubmitted: (value) async {
-                  cargando = true;
-                  setState((){});
-                  if (value.contains('-')) {
-                    query.text = value;
-                    raiz = query.text.trim();
-                    descripcion = '';
-                    print(raiz);
-                  } else {
-                    raiz = '';
-                    descripcion = value.trim();
-                    print(descripcion);
-                  }
-                  offset = 0;
-                  listItems = await ProductServices().getProductByName(
-                    raiz, 
-                    cliente.codTipoLista, 
-                    almacen, 
-                    descripcion, 
-                    offset.toString(), 
-                    token
-                  );
-                  setState(() {
-                    busco = true;
-                    cargando = false;
-                    offset += 20;
-                  });
-                },
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: colores.primary,
+          iconTheme: const IconThemeData(
+            color: Colors.white
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.7,
+                child:  SearchBar(
+                  textInputAction: TextInputAction.search,
+                  hintText: 'Buscar o escanear item...',
+                  controller: query,
+                  autoFocus: false,
+                  trailing: [
+                    IconButton(
+                      onPressed: () {
+                        query.clear();
+                      }, 
+                      icon: Icon(Icons.clear, color: colores.onSurface,)
+                    )
+                  ],
+                  onSubmitted: (value) async {
+                    cargando = true;
+                    setState((){});
+                    if (value.contains('-')) {
+                      query.text = value;
+                      raiz = query.text.trim();
+                      descripcion = '';
+                      print(raiz);
+                    } else {
+                      raiz = '';
+                      descripcion = value.trim();
+                      print(descripcion);
+                    }
+                    offset = 0;
+                    listItems = await ProductServices().getProductByName(
+                      raiz, 
+                      cliente.codTipoLista, 
+                      almacen, 
+                      descripcion, 
+                      offset.toString(), 
+                      token
+                    );
+                    setState(() {
+                      busco = true;
+                      cargando = false;
+                      offset += 20;
+                    });
+                  },
+                ),
               ),
             ),
-          ),
-          IconButton(onPressed: (){}, icon: const Icon(Icons.camera_alt))
-        ],
-      ),
-      body: !cargando ? SafeArea(
-        child: SingleChildScrollView(
-          controller: scrollController, // Controlador del scroll
-          child: Column(
-            children: [
-              if(!busco || listItems.isNotEmpty)...[
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: listItems.length,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, i) {
-                    var item = listItems[i];
-                    var foto = item.imagenes[0];
-                    var precio = '';
-                    existe = false; // Reiniciar la variable 'existe' para cada item
-
-                    // Verificar si el itemId existe en la lista de 'lineas'
-                    for (var linea in lineas) {
-                      if (linea.raiz == item.raiz) {
-                        existe = true; // Si se encuentra el itemId en lineas, marcar 'existe' como true
-                        break; // No es necesario seguir buscando, ya encontramos el itemId
+            IconButton(onPressed: (){}, icon: const Icon(Icons.camera_alt))
+          ],
+        ),
+        body: !cargando ? SafeArea(
+          child: SingleChildScrollView(
+            controller: scrollController, // Controlador del scroll
+            child: Column(
+              children: [
+                if(!busco || listItems.isNotEmpty)...[
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: listItems.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, i) {
+                      var item = listItems[i];
+                      var foto = item.imagenes[0];
+                      var precio = '';
+                      existe = false; // Reiniciar la variable 'existe' para cada item
+      
+                      // Verificar si el itemId existe en la lista de 'lineas'
+                      for (var linea in lineas) {
+                        if (linea.raiz == item.raiz) {
+                          existe = true; // Si se encuentra el itemId en lineas, marcar 'existe' como true
+                          break; // No es necesario seguir buscando, ya encontramos el itemId
+                        }
                       }
-                    }
-
-                    if(item.precioIvaIncluidoMin != item.precioIvaIncluidoMax){
-                      precio = '${item.precioIvaIncluidoMin} - ${item.precioIvaIncluidoMax}';
-                    } else {
-                      precio = item.precioIvaIncluidoMax.toString();
-                    }
-
-                    return Row(
-                      children: [
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.15,
-                          width: MediaQuery.of(context).size.width * 0.1,
-                          child: Image.network(
-                            foto,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Placeholder(
-                                child: Text('No Image'),
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          child: ListTile(
-                            onTap: () {
-                              Provider.of<ItemProvider>(context, listen: false).setProduct(item);
-                              Provider.of<ItemProvider>(context, listen: false).setRaiz(item.raiz);
-                              appRouter.push('/product_page');
-                            },
-                            title: Text(item.raiz),
-                            subtitle: Text('${item.descripcion} \nPrecio: ${item.signo}$precio    Disponibilidad: ${item.disponibleRaiz}'),
-                            trailing: const Icon(
-                              Icons.chevron_right,
-                              size: 35,
+      
+                      if(item.precioIvaIncluidoMin != item.precioIvaIncluidoMax){
+                        precio = '${item.precioIvaIncluidoMin} - ${item.precioIvaIncluidoMax}';
+                      } else {
+                        precio = item.precioIvaIncluidoMax.toString();
+                      }
+      
+                      return Row(
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.15,
+                            width: MediaQuery.of(context).size.width * 0.1,
+                            child: Image.network(
+                              foto,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Placeholder(
+                                  child: Text('No Image'),
+                                );
+                              },
                             ),
-                            // Si 'existe' es true, pintar el ListTile de azul claro
-                            tileColor: existe ? Colors.lightBlue[100] : null,
                           ),
-                        ),
-                      ],
-                    );
-                  }
-                )
-              ] else...[
-                const Text(
-                  'No se encontró su busqueda. Intentelo nuevamente',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w300
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            child: ListTile(
+                              onTap: () {
+                                FocusScope.of(context).unfocus();
+                                Provider.of<ItemProvider>(context, listen: false).setProduct(item);
+                                Provider.of<ItemProvider>(context, listen: false).setRaiz(item.raiz);
+                                appRouter.push('/product_page');
+                              },
+                              title: Text(item.raiz),
+                              subtitle: Text('${item.descripcion} \nPrecio: ${item.signo}$precio    Disponibilidad: ${item.disponibleRaiz}'),
+                              trailing: const Icon(
+                                Icons.chevron_right,
+                                size: 35,
+                              ),
+                              // Si 'existe' es true, pintar el ListTile de azul claro
+                              tileColor: existe ? Colors.lightBlue[100] : null,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
                   )
-                )
-              ],
-              if (cargandoMas)
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: CircularProgressIndicator(),
-              ),
-            ]
-          ),
-        )
-      ) : const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 10,),
-              Text('Buscando...')
-            ],
+                ] else...[
+                  const Text(
+                    'No se encontró su busqueda. Intentelo nuevamente',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w300
+                    )
+                  )
+                ],
+                if (cargandoMas)
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(),
+                ),
+              ]
+            ),
           )
+        ) : const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 10,),
+                Text('Buscando...')
+              ],
+            )
+          ),
         ),
       ),
     );
