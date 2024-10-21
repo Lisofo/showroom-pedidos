@@ -52,7 +52,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
     almacen = context.read<ItemProvider>().almacen;
     token = context.read<ItemProvider>().token;
     cliente = context.read<ItemProvider>().client;
-    lineas = context.read<ItemProvider>().lineasGenericas;
+    
     setState(() {});
   }
 
@@ -79,6 +79,8 @@ class _AgregarPedidoState extends State<AgregarPedido> {
 
   @override
   Widget build(BuildContext context) {
+    lineas = context.watch<ItemProvider>().lineasGenericas;
+    print('REconstruido');
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -91,7 +93,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.7,
-              child: SearchBar(
+              child:  SearchBar(
                 textInputAction: TextInputAction.search,
                 hintText: 'Buscar o escanear item...',
                 controller: query,
@@ -102,8 +104,11 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                     query.text = value;
                     raiz = query.text.trim();
                     descripcion = '';
+                    print(raiz);
                   } else {
-                    descripcion = value;
+                    raiz = '';
+                    descripcion = value.trim();
+                    print(descripcion);
                   }
                   offset = 0;
                   listItems = await ProductServices().getProductByName(

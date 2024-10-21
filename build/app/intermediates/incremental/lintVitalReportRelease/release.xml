@@ -4,10 +4,10 @@
     minSdkVersion="21"
     targetSdkVersion="34"
     shrinking="true"
-    mergedManifest="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\intermediates\merged_manifest\release\AndroidManifest.xml"
-    manifestMergeReport="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\outputs\logs\manifest-merger-release-report.txt"
-    proguardFiles="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\intermediates\default_proguard_files\global\proguard-android.txt-7.3.0;C:\src\flutter\packages\flutter_tools\gradle\flutter_proguard_rules.pro;proguard-rules.pro"
-    partialResultsDir="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\intermediates\lint_vital_partial_results\release\out">
+    mergedManifest="C:\flutter\software\showroom-pedidos\build\app\intermediates\merged_manifest\release\AndroidManifest.xml"
+    manifestMergeReport="C:\flutter\software\showroom-pedidos\build\app\outputs\logs\manifest-merger-release-report.txt"
+    proguardFiles="C:\flutter\software\showroom-pedidos\build\app\intermediates\default_proguard_files\global\proguard-android.txt-7.3.0;C:\flutter\flutter\packages\flutter_tools\gradle\flutter_proguard_rules.pro;proguard-rules.pro"
+    partialResultsDir="C:\flutter\software\showroom-pedidos\build\app\intermediates\lint_vital_partial_results\release\out">
   <buildFeatures
       namespacing="REQUIRED"/>
   <sourceProviders>
@@ -32,9 +32,9 @@
         value="android.app.Application" />
   </manifestPlaceholders>
   <mainArtifact
-      classOutputs="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\intermediates\javac\release\classes;D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\tmp\kotlin-classes\release;D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\kotlinToolingMetadata;D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\intermediates\compile_and_runtime_not_namespaced_r_class_jar\release\R.jar"
+      classOutputs="C:\flutter\software\showroom-pedidos\build\app\intermediates\javac\release\classes;C:\flutter\software\showroom-pedidos\build\app\tmp\kotlin-classes\release;C:\flutter\software\showroom-pedidos\build\app\kotlinToolingMetadata;C:\flutter\software\showroom-pedidos\build\app\intermediates\compile_and_runtime_not_namespaced_r_class_jar\release\R.jar"
       applicationId="com.example.showroom_maqueta"
-      generatedSourceFolders="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\generated\ap_generated_sources\release\out;D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\generated\aidl_source_output_dir\release\out;D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\generated\source\buildConfig\release;D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\generated\renderscript_source_output_dir\release\out"
-      generatedResourceFolders="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\generated\res\rs\release;D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app\generated\res\resValues\release">
+      generatedSourceFolders="C:\flutter\software\showroom-pedidos\build\app\generated\ap_generated_sources\release\out;C:\flutter\software\showroom-pedidos\build\app\generated\aidl_source_output_dir\release\out;C:\flutter\software\showroom-pedidos\build\app\generated\source\buildConfig\release;C:\flutter\software\showroom-pedidos\build\app\generated\renderscript_source_output_dir\release\out"
+      generatedResourceFolders="C:\flutter\software\showroom-pedidos\build\app\generated\res\rs\release;C:\flutter\software\showroom-pedidos\build\app\generated\res\resValues\release">
   </mainArtifact>
 </variant>

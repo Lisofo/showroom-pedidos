@@ -50,12 +50,29 @@ class _ProductPageState extends State<ProductPage> {
   late Pedido pedido = Pedido.empty();
   late List<Linea> lineasGenericas = [];
   final _pedidosServices = PedidosServices();
+  late ScaffoldMessengerState scaffoldMessenger;
+  late String colorYTalleSeleccionado = '';
+
 
   @override
   void initState() {
     super.initState();
     cargarDatos();
     _isEditing = List<bool>.generate(productosAgregados.length, (index) => false); // Lista dinámica
+  }
+
+  @override
+  void dispose() {
+    // Limpiar los SnackBars pendientes usando la referencia guardada
+    scaffoldMessenger.clearSnackBars();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Guardamos una referencia al ScaffoldMessenger
+    scaffoldMessenger = ScaffoldMessenger.of(context);
   }
 
   cargarDatos() async {
@@ -169,11 +186,15 @@ class _ProductPageState extends State<ProductPage> {
                                         initialValue: item.cantidad.toString(),
                                         keyboardType: TextInputType.number,
                                         onFieldSubmitted: (newValue) {
-                                          setState(() {
-                                            item.cantidad = int.parse(newValue);
-                                            actualizarLineaConVariante(item); // Actualiza la línea al editar
-                                            _isEditing[i] = false; 
-                                          });
+                                          if(item.disponible > 0){
+                                            setState(() {
+                                              item.cantidad = int.parse(newValue);
+                                              actualizarLineaConVariante(item); // Actualiza la línea al editar
+                                              _isEditing[i] = false; 
+                                            });
+                                          } else {
+
+                                          }
                                         },
                                       ),
                                       const SizedBox(height: 10),
@@ -193,17 +214,24 @@ class _ProductPageState extends State<ProductPage> {
                                     ],
                                   )
                                 : Column(
-                                    children: [
-                                      Text(
-                                        'Cantidad: ${item.cantidad.toString()}',
-                                        key: ValueKey('cantidad_$i'),
-                                      ),
-                                      Text(
-                                        'Precio: \$${item.precioIvaIncluido.toStringAsFixed(2)}',
-                                        key: ValueKey('precioIva_$i'),
-                                      ),
-                                    ],
-                                  ),
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Cantidad: ${item.cantidad.toString()}',
+                                      key: ValueKey('cantidad_$i'),
+                                    ),
+                                    Text(
+                                      'Precio: \$${item.precioIvaIncluido.toStringAsFixed(2)}',
+                                      key: ValueKey('precioIva_$i'),
+                                    ),
+                                    Text(
+                                      'Color: ${item.color}',
+                                    ),
+                                    Text(
+                                      'Talle: ${item.talle}'
+                                    ),
+                                  ],
+                                ),
                             ),
                           ),
                         ],
@@ -258,7 +286,7 @@ class _ProductPageState extends State<ProductPage> {
               case 0:
                 int? statusCode;
                 List<Linea> lineasAEnviar = [];
-                lineasAEnviar = lineasGenericas.where((linea) => linea.raiz == productoSeleccionado.raiz).toList();
+                lineasAEnviar = lineasGenericas.where((linea) => linea.raiz == productoNuevo.raiz).toList();
                 await _pedidosServices.putPedido(context, pedido, lineasAEnviar, token);
                 statusCode = await _pedidosServices.getStatusCode();
                 await _pedidosServices.resetStatusCode();
@@ -269,7 +297,7 @@ class _ProductPageState extends State<ProductPage> {
               case 1:
                 var cantidad = 0;
                 var costoTotal = 0.0;
-                var lineasDeLaRaiz = lineasGenericas.where((linea) => linea.raiz == productoSeleccionado.raiz).toList();
+                var lineasDeLaRaiz = lineasGenericas.where((linea) => linea.raiz == productoNuevo.raiz && linea.metodo != "DELETE").toList();
                 for(var linea in lineasDeLaRaiz) {
                   cantidad += linea.cantidad;
                   costoTotal += linea.costoUnitario * linea.cantidad;
@@ -342,6 +370,13 @@ class _ProductPageState extends State<ProductPage> {
                     ),
                     showColorButtons(),
                     const SizedBox(height: 10),
+                    Text(
+                      colorYTalleSeleccionado,
+                      style: const TextStyle(
+                        fontSize: 22,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
                     if (productosFiltrados.isNotEmpty) ...[
                       Wrap(
                         alignment: WrapAlignment.center,
@@ -386,44 +421,51 @@ class _ProductPageState extends State<ProductPage> {
       spacing: 10,
       children: [
         for (var color in colors)
-        ElevatedButton.icon(
-          icon: color.isSelected ? Icon(Icons.check, color: getTextColor(Color.fromARGB(255, color.r, color.g, color.b)),) : const SizedBox(),
-          onPressed: () {
+        GestureDetector(
+          onTap: () {
             setState(() {
               for (var c in colors) {
-                c.isSelected = false;
+                if(c != color) {
+                  c.isSelected = false;
+                }
               }
+              color.isSelected = !color.isSelected;
               mostrarTalles2(color);
-              color.isSelected = true;
+              colorYTalleSeleccionado = '${color.nombreColor} ${color.codColor}';
             });
           },
-          style: ButtonStyle(
-            backgroundColor: WidgetStatePropertyAll(Color.fromARGB(255, color.r, color.g, color.b)),
-          ),
-          label: Text(
-            '${color.nombreColor} ${color.codColor}',
-            style: TextStyle(
-              fontSize: 25,
-              color: getTextColor(Color.fromARGB(255, color.r, color.g, color.b)),
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all()
+            ),
+            child: CircleAvatar(
+              backgroundColor: Color.fromARGB(255, color.r, color.g, color.b),
+              child: color.isSelected ? Icon(Icons.check, color: getTextColor(Color.fromARGB(255, color.r, color.g, color.b)),) : const SizedBox(),
             ),
           ),
-        ),
+        )
       ],
     );
   }
 
   mostrarTalles2(ProductColor color) {
-    for (String talle in talles) {
-      productosFiltrados = _products!.where((product) => product.color == color.nombreColor).toList();
+    if(color.isSelected){
+      for (String talle in talles) {
+        productosFiltrados = _products!.where((product) => product.color == color.nombreColor).toList();
+      }
+    } else {
+      productosFiltrados = [];
     }
+    
   }
 
   void eliminarVariante(ProductoVariante varianteAEliminar) {
     // Eliminar variante de productosAgregados
     productosAgregados.removeWhere((variante) => variante.itemId == varianteAEliminar.itemId);
-  
+    lineasGenericas.removeWhere((linea) => linea.itemId == varianteAEliminar.itemId);
     // Buscar la línea correspondiente en lineasProvider
-    int indexLinea = lineasGenericas.indexWhere((linea) => linea.itemId == varianteAEliminar.itemId);
+    int indexLinea = lineasGenericas.indexWhere((linea) => linea.itemId == varianteAEliminar.itemId && linea.lineaId != 0);
   
     if (indexLinea != -1) {
       // Si existe en lineasProvider, cambiar el método a DELETE
@@ -452,7 +494,8 @@ class _ProductPageState extends State<ProductPage> {
       });
     } else if(lineaExistente.lineaId == 0 && lineaExistente.cantidad == 0){
       setState(() {
-        lineasGenericas.add(Linea(
+        Provider.of<ItemProvider>(context, listen: false).addLinea(
+        Linea(
           lineaId: 0, // Asigna un valor apropiado si lo tienes
           ordenTrabajoId: 0, // Asigna un valor apropiado si lo tienes
           numeroOrdenTrabajo: '', // Asigna un valor apropiado si lo tienes
@@ -504,6 +547,7 @@ class _ProductPageState extends State<ProductPage> {
       });
     } else {
       lineaExistente.cantidad = cantidad;
+      lineaExistente.costoUnitario = variante.precioIvaIncluido;
     }
   }
 
@@ -572,13 +616,15 @@ class _ProductPageState extends State<ProductPage> {
   }
   
   void _mostrarSnackBar(String mensaje) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Center(child: Text(mensaje)),
-        duration: const Duration(seconds: 2),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-      ),
-    );
+    if(mounted){
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Center(child: Text(mensaje)),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+      );
+    }
   }
 
 }

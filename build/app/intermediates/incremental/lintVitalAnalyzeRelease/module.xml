@@ -1,12 +1,12 @@
 <lint-module
     format="1"
-    dir="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\android\app"
+    dir="C:\flutter\software\showroom-pedidos\android\app"
     name=":app"
     type="APP"
     maven="android:app:"
     gradle="7.3.0"
-    buildFolder="D:\Usuario\Desktop\New folder\Software\showroom-pedidos\build\app"
-    bootClassPath="C:\Users\Usuario\AppData\Local\Android\sdk\platforms\android-34\android.jar;C:\Users\Usuario\AppData\Local\Android\sdk\build-tools\30.0.3\core-lambda-stubs.jar"
+    buildFolder="C:\flutter\software\showroom-pedidos\build\app"
+    bootClassPath="C:\Users\santi\AppData\Local\Android\sdk\platforms\android-34\android.jar;C:\Users\santi\AppData\Local\Android\sdk\build-tools\30.0.3\core-lambda-stubs.jar"
     javaSourceLevel="1.8"
     compileTarget="android-34">
   <lintOptions

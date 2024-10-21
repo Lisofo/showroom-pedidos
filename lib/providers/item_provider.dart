@@ -57,6 +57,11 @@ class ItemProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void addLinea(Linea line){
+    _lineasGenericas.add(line);
+    notifyListeners();
+  }
+
   void setLineas(List<Linea> lines) {
     _lineas = lines;
     notifyListeners();

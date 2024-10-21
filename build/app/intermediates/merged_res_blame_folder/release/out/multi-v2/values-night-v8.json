@@ -4,7 +4,7 @@
             "outputFile": "com.example.showroom_maqueta.app-mergeReleaseResources-11:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "D:\\Usuario\\Desktop\\New folder\\Software\\showroom-pedidos\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "source": "C:\\flutter\\software\\showroom-pedidos\\android\\app\\src\\main\\res\\values-night\\styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",
