@@ -279,6 +279,10 @@ class _ProductPageState extends State<ProductPage> {
               icon: Icon(Icons.format_align_left),
               label: 'Totales'
             ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.price_change),
+              label: 'Cambio de precio'
+            ),
           ],
           onTap: (value) async {
             buttonIndex = value;
@@ -328,14 +332,15 @@ class _ProductPageState extends State<ProductPage> {
                   }
                 );
               break;
+              case 2:
+                await cambioDePrecios(context);
+              break;
             }
           },
         ),
       ),
     );
   }
-
-
 
   middleBody() {
     List<dynamic> listaTalles = _products!.where((talle) => talles.add(talle.talle)).toList();
@@ -392,6 +397,13 @@ class _ProductPageState extends State<ProductPage> {
                             ),
                           ],
                         ],
+                      ),
+                      SizedBox(
+                        width: double.infinity,  // Para que el botón ocupe todo el ancho
+                        child: ElevatedButton(
+                          onPressed: agregarTodasLasVariantes,
+                          child: const Text("Agregar todos"),
+                        ),
                       ),
                     ],
                   ],
@@ -560,14 +572,14 @@ class _ProductPageState extends State<ProductPage> {
     int indexProducto;
     if (productoExistente.codItem == producto.codItem) {
       // Si el producto ya existe, aumentar la cantidad
-      if (productoExistente.cantidad < producto.disponible) {
-        setState(() {
-          productoExistente.cantidad += 1;
-        });
-        // actualizarLineaConVariante(productoExistente);
-      } else {
-        _mostrarSnackBar('No hay más disponibles de la variante ${producto.codItem}');
-      }
+      // if (productoExistente.cantidad < producto.disponible) {
+      //   setState(() {
+      //     productoExistente.cantidad += 1;
+      //   });
+      //   // actualizarLineaConVariante(productoExistente);
+      // } else {
+      //   _mostrarSnackBar('No hay más disponibles de la variante ${producto.codItem}');
+      // }
       indexProducto = productosAgregados.indexOf(productoExistente);
       actualizarLineaConVariante(productoExistente);
     } else {
@@ -625,5 +637,83 @@ class _ProductPageState extends State<ProductPage> {
       );
     }
   }
+
+  void agregarTodasLasVariantes() {
+    for (var producto in productosFiltrados) {
+      _agregarOActualizarVariante(producto);
+    }
+  }
+
+  void cambiarPreciosVariantesYLineas(double nuevoPrecio) {
+    for (var variante in productosAgregados) {
+      // Cambiar el precio de cada variante
+      variante.precioIvaIncluido = nuevoPrecio;
+
+      // Actualizar las líneas correspondientes
+      var lineaCorrespondiente = lineasGenericas.firstWhere(
+        (linea) => linea.itemId == variante.itemId,
+        orElse: () => Linea.empty(),
+      );
+
+      if (lineaCorrespondiente.lineaId != 0) {
+        lineaCorrespondiente.costoUnitario = nuevoPrecio;
+        lineaCorrespondiente.metodo = 'PUT';  // Cambiar el método a PUT
+      } else {
+        lineaCorrespondiente.costoUnitario = nuevoPrecio;
+        lineaCorrespondiente.metodo = 'POST'; 
+      }
+    }
+
+    // Actualizar la UI si es necesario
+    setState(() {});
+  }
+
+  Future<void> cambioDePrecios(BuildContext context) async {
+    double nuevoPrecio = 0.0;
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Cambiar precios'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Introduce el nuevo precio para la raiz $raiz:'),
+              const SizedBox(height: 10),
+              TextField(
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Nuevo precio',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) {
+                  // Convertir el valor del campo a double
+                  nuevoPrecio = double.tryParse(value) ?? 0.0;
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Cerrar el pop-up sin hacer nada
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Llamar al método para cambiar los precios
+                cambiarPreciosVariantesYLineas(nuevoPrecio);
+                Navigator.of(context).pop(); // Cerrar el pop-up
+              },
+              child: const Text('Confirmar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
 }

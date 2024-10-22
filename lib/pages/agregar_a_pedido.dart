@@ -8,6 +8,7 @@ import 'package:showroom_maqueta/models/linea.dart';
 import 'package:showroom_maqueta/models/product.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/product_services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 
 class AgregarPedido extends StatefulWidget {
@@ -140,7 +141,11 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                 ),
               ),
             ),
-            IconButton(onPressed: (){}, icon: const Icon(Icons.camera_alt))
+            IconButton(
+              onPressed: readQRCode,
+              icon: const Icon(Icons.qr_code_scanner_rounded),
+              color: Colors.white,
+            ),
           ],
         ),
         body: !cargando ? SafeArea(
@@ -243,5 +248,16 @@ class _AgregarPedidoState extends State<AgregarPedido> {
         ),
       ),
     );
+  }
+
+  readQRCode() async {
+    String code = await FlutterBarcodeScanner.scanBarcode('#FFFFFF', 'Cancelar', false, ScanMode.QR);
+    print('el codigo escaneado es $code');
+    if (code == '') {
+      return null;
+    } else {
+      listItems = await ProductServices().getProductByName(code, cliente.codTipoLista, almacen, '', offset.toString(), token);
+      setState(() {});
+    }
   }
 }
