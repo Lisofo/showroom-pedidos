@@ -186,15 +186,11 @@ class _ProductPageState extends State<ProductPage> {
                                         initialValue: item.cantidad.toString(),
                                         keyboardType: TextInputType.number,
                                         onFieldSubmitted: (newValue) {
-                                          if(item.disponible > 0){
-                                            setState(() {
-                                              item.cantidad = int.parse(newValue);
-                                              actualizarLineaConVariante(item); // Actualiza la línea al editar
-                                              _isEditing[i] = false; 
-                                            });
-                                          } else {
-
-                                          }
+                                          setState(() {
+                                            item.cantidad = int.parse(newValue);
+                                            actualizarLineaConVariante(item); // Actualiza la línea al editar
+                                            _isEditing[i] = false; 
+                                          });
                                         },
                                       ),
                                       const SizedBox(height: 10),

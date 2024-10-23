@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
 import 'package:showroom_maqueta/models/product.dart';
@@ -20,7 +19,7 @@ class _PaginaSimpleProductoState extends State<PaginaSimpleProducto> {
   late String almacen = '';
   late String token = '';
   late int currentIndex = 0;
-
+  //////
   @override
   void initState() {
     super.initState();
