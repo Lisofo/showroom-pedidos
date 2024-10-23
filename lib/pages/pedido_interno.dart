@@ -145,16 +145,23 @@ class _PedidoInternoState extends State<PedidoInterno> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                SizedBox(
-                                  height: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.09, //ToDo mediaquery isMobile agregar
-                                  width: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.1,
-                                  child: Image.network( 
-                                    url,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Placeholder(
-                                        child: Text('No Image'),
-                                      );
-                                    },
+                                InkWell(
+                                  onTap: () {
+                                    //Provider.of<ItemProvider>(context, listen: false).setLineas(listaVariantes);
+                                    Provider.of<ItemProvider>(context, listen: false).setRaiz(raiz);
+                                    appRouter.push('/productoSimple');
+                                  },
+                                  child: SizedBox(
+                                    height: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.09, //ToDo mediaquery isMobile agregar
+                                    width: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.1,
+                                    child: Image.network( 
+                                      url,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return const Placeholder(
+                                          child: Text('No Image'),
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
                                 SizedBox(

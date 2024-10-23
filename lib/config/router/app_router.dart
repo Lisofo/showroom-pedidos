@@ -7,6 +7,7 @@ import "package:showroom_maqueta/pages/pagina_cliente.dart";
 import "package:showroom_maqueta/pages/pedido_interno.dart";
 import "package:showroom_maqueta/pages/product_page.dart";
 import "package:showroom_maqueta/pages/seleccion_origen.dart";
+import "package:showroom_maqueta/pages/simple_product_page.dart";
 final appRouter = GoRouter(
   initialLocation: '/login',
   routes: [
@@ -42,6 +43,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/nuevoPedido',
       builder: (context, state) => const NuevoPedido(),
+    ),
+    GoRoute(
+      path: '/productoSimple',
+      builder: (context, state) => const PaginaSimpleProducto(),
     ),
     // GoRoute(
     //   path: '/',
