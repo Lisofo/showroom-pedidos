@@ -52,6 +52,8 @@ class _ProductPageState extends State<ProductPage> {
   final _pedidosServices = PedidosServices();
   late ScaffoldMessengerState scaffoldMessenger;
   late String colorYTalleSeleccionado = '';
+  late String precioSeleccionado = '';
+  late String precioNuevo = '';
 
 
   @override
@@ -343,6 +345,18 @@ class _ProductPageState extends State<ProductPage> {
     late String? talleSeleccionado;
     final colores = Theme.of(context).colorScheme;
 
+    if(productoSeleccionado.precioIvaIncluidoMin != productoSeleccionado.precioIvaIncluidoMax){
+      precioSeleccionado = '${productoSeleccionado.precioIvaIncluidoMin} - ${productoSeleccionado.precioIvaIncluidoMax}';
+    } else {
+      precioSeleccionado = productoSeleccionado.precioIvaIncluidoMax.toString();
+    }
+
+    if(productoNuevo.precioIvaIncluidoMin != productoNuevo.precioIvaIncluidoMax){
+      precioNuevo = '${productoNuevo.precioIvaIncluidoMin} - ${productoNuevo.precioIvaIncluidoMax}';
+    } else {
+      precioNuevo = productoNuevo.precioIvaIncluidoMax.toString();
+    }
+
     return buscando
       ? const Center(child: CircularProgressIndicator())
       : _products!.isEmpty || _products == null
@@ -376,7 +390,7 @@ class _ProductPageState extends State<ProductPage> {
                           child: FittedBox(
                             fit: BoxFit.contain,
                             child: Text(
-                              raiz == "" ? '${productoSeleccionado.signo} ${productoSeleccionado.precioIvaIncluido}' : '${productoNuevo.signo} ${productoNuevo.precioIvaIncluido}',
+                              raiz == "" ? '${productoSeleccionado.signo} $precioSeleccionado' : '${productoNuevo.signo} $precioNuevo',
                               style: const TextStyle(fontSize: 24),
                             ),
                           ),

@@ -251,12 +251,17 @@ class _AgregarPedidoState extends State<AgregarPedido> {
   }
 
   readQRCode() async {
+    Product productoRetorno;
+    List<Product> listaProductosTemporal;
     String code = await FlutterBarcodeScanner.scanBarcode('#FFFFFF', 'Cancelar', false, ScanMode.QR);
     print('el codigo escaneado es $code');
     if (code == '') {
       return null;
     } else {
-      listItems[0] = await ProductServices().getSingleProductByRaiz(code, almacen, token);
+      listaProductosTemporal = await ProductServices().getProductByName(code, cliente.codTipoLista ,almacen,'', "0", token,);
+      productoRetorno = listaProductosTemporal[0];
+      Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
+      appRouter.push('/product_page');
       setState(() {});
     }
   }
