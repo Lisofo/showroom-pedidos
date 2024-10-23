@@ -387,10 +387,53 @@ class _ProductPageState extends State<ProductPage> {
                         ),
                         TextButton(
                           onPressed: () async {
+                            double nuevoPrecio2 = 0.0;
                             await showDialog(
                               context: context,
                               builder: (context) {
-                                return AlertDialog();
+                                return AlertDialog(
+                                  title: const Text('Cambiar precio de la raiz'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('Introduce el nuevo precio para la raiz $raiz:'),
+                                      const SizedBox(height: 10),
+                                      TextField(
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Nuevo precio',
+                                          border: OutlineInputBorder(),
+                                        ),
+                                        onChanged: (value) {
+                                          // Convertir el valor del campo a double
+                                          nuevoPrecio2 = double.tryParse(value) ?? 0.0;
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        // Cerrar el pop-up sin hacer nada
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Cancelar'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        // Llamar al método para cambiar los precios
+                                        productoSeleccionado.precioIvaIncluido = nuevoPrecio2;
+                                        productoNuevo.precioIvaIncluido = nuevoPrecio2;
+                                        for(var variante in _products!){
+                                          variante.precioIvaIncluido = nuevoPrecio2;
+                                        }
+                                        setState(() {});
+                                        Navigator.of(context).pop(); // Cerrar el pop-up
+                                      },
+                                      child: const Text('Confirmar'),
+                                    ),
+                                  ],
+                                );
                               }
                             );
                           },

@@ -256,7 +256,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
     if (code == '') {
       return null;
     } else {
-      listItems = await ProductServices().getProductByName(code, cliente.codTipoLista, almacen, '', offset.toString(), token);
+      listItems[0] = await ProductServices().getSingleProductByRaiz(code, almacen, token);
       setState(() {});
     }
   }

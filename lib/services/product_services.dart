@@ -65,7 +65,7 @@ class ProductServices {
   }
 
 
-  Future<Product>   getSingleProductByRaiz(String raiz, String codAlmacen, String token) async {
+  Future<Product> getSingleProductByRaiz(String raiz, String codAlmacen, String token) async {
     String link = apirUrl +='/api/v1/itemsRaiz/$raiz?almacenId=$codAlmacen';
 
     try {
