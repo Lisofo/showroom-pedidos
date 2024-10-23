@@ -17,16 +17,16 @@ class VarianteItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        if (producto.disponible <= 0) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Center(child: Text('No hay disponibles de esa variante')),
-              duration: Duration(seconds: 2),
-            ),
-          );
-        } else {
-          onAgregar();
-        }
+        // if (producto.disponible <= 0) {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(
+        //       content: Center(child: Text('No hay disponibles de esa variante')),
+        //       duration: Duration(seconds: 2),
+        //     ),
+        //   );
+        // } else {
+        onAgregar();
+        // }
       },
       child: Container(
         decoration: BoxDecoration(
