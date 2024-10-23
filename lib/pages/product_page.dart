@@ -373,6 +373,31 @@ class _ProductPageState extends State<ProductPage> {
                         ),
                       ),
                     ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Center(
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: Text(
+                              raiz == "" ? '${productoSeleccionado.signo} ${productoSeleccionado.precioIvaIncluido}' : '${productoNuevo.signo} ${productoNuevo.precioIvaIncluido}',
+                              style: const TextStyle(fontSize: 24),
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            await showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog();
+                              }
+                            );
+                          },
+                          child: const Text('Cambiar precio')
+                        )
+                      ],
+                    ),
                     showColorButtons(),
                     const SizedBox(height: 10),
                     Text(
@@ -486,81 +511,84 @@ class _ProductPageState extends State<ProductPage> {
 
   // Método para manejar la actualización de variantes
   void actualizarLineaConVariante(ProductoVariante variante) {
-    Linea lineaExistente = Linea.empty();
+  Linea lineaExistente = Linea.empty();
     lineaExistente = lineasGenericas.firstWhere(
       (linea) => linea.itemId == variante.itemId, 
       orElse: () => Linea.empty(),
     );    
     var cantidad = variante.cantidad;
 
-    if(variante.cantidad != lineaExistente.cantidad){
+    if (variante.cantidad != lineaExistente.cantidad) {
       cantidad = variante.cantidad;
     }
 
     if (lineaExistente.itemId == variante.itemId && lineaExistente.lineaId != 0) {
       setState(() {
-        lineaExistente.cantidad = variante.cantidad;
+        lineaExistente.cantidad += variante.cantidad;  // Incrementa la cantidad actual
         lineaExistente.costoUnitario = variante.precioIvaIncluido;
         lineaExistente.metodo = 'PUT';
       });
-    } else if(lineaExistente.lineaId == 0 && lineaExistente.cantidad == 0){
+    } else if (lineaExistente.lineaId == 0 && lineaExistente.cantidad == 0) {
       setState(() {
         Provider.of<ItemProvider>(context, listen: false).addLinea(
-        Linea(
-          lineaId: 0, // Asigna un valor apropiado si lo tienes
-          ordenTrabajoId: 0, // Asigna un valor apropiado si lo tienes
-          numeroOrdenTrabajo: '', // Asigna un valor apropiado si lo tienes
-          monedaId: variante.monedaId,
-          fechaOrdenTrabajo: DateTime.now(), // O cualquier fecha que corresponda
-          estado: 'Pendiente', // Puedes ajustar este valor según el estado de tu aplicación
-          itemId: variante.itemId,
-          codItem: variante.codItem,
-          raiz: raiz == '' ? productoSeleccionado.raiz : raiz,
-          descripcion: '${variante.color} - ${variante.talle}',
-          macroFamilia: '', // Puedes asignar un valor aquí
-          familia: '', // Puedes asignar un valor aquí
-          grupoInventario: '', // Puedes asignar un valor aquí
-          ordinal: 0, // Puedes definir el ordinal si es necesario
-          cantidad: cantidad,
-          costoUnitario: variante.precioIvaIncluido, // Asigna el costo unitario si lo tienes disponible
-          descuento1: 0, // Asigna los descuentos si los tienes
-          descuento2: 0,
-          descuento3: 0,
-          precioVenta: 0,
-          comentario: '', // Asigna comentarios si los hay
-          ivaId: variante.ivaId,
-          iva: '', // Puedes ajustar este valor
-          valor: variante.valor,
-          gruInvId: 0, // Puedes asignar el id del grupo de inventario
-          codGruInv: '', // Código del grupo de inventario si aplica
-          cantFacturada: 0, // Puedes modificar este valor si tienes datos
-          cantDevuelta: 0,
-          totNetoFacturada: 0.0, // Asigna valores si los tienes
-          totBrutoFacturada: 0.0,
-          cantFac: 0,
-          cantRem: 0,
-          netoFac: 0.0,
-          netoRem: 0.0,
-          brutoFac: 0.0,
-          brutoRem: 0.0,
-          cantEPend: 0,
-          fotoURL: variante.imagenes.isNotEmpty ? variante.imagenes[0] : '',
-          codColor: variante.codColor,
-          color: variante.color,
-          colorHexCode: variante.colorHexCode.toString(),
-          R: variante.r,
-          G: variante.g,
-          B: variante.b,
-          talle: variante.talle,
-          isExpanded: false, // Para el estado de expansión si es necesario
-          metodo: 'POST', // Puedes ajustar el método según tu lógica
-        ));
+          Linea(
+            lineaId: 0, 
+            ordenTrabajoId: 0, 
+            numeroOrdenTrabajo: '', 
+            monedaId: variante.monedaId,
+            fechaOrdenTrabajo: DateTime.now(),
+            estado: 'Pendiente',
+            itemId: variante.itemId,
+            codItem: variante.codItem,
+            raiz: raiz == '' ? productoSeleccionado.raiz : raiz,
+            descripcion: '${variante.color} - ${variante.talle}',
+            macroFamilia: '',
+            familia: '',
+            grupoInventario: '',
+            ordinal: 0,
+            cantidad: cantidad,
+            costoUnitario: variante.precioIvaIncluido,
+            descuento1: 0,
+            descuento2: 0,
+            descuento3: 0,
+            precioVenta: 0,
+            comentario: '',
+            ivaId: variante.ivaId,
+            iva: '',
+            valor: variante.valor,
+            gruInvId: 0,
+            codGruInv: '',
+            cantFacturada: 0,
+            cantDevuelta: 0,
+            totNetoFacturada: 0.0,
+            totBrutoFacturada: 0.0,
+            cantFac: 0,
+            cantRem: 0,
+            netoFac: 0.0,
+            netoRem: 0.0,
+            brutoFac: 0.0,
+            brutoRem: 0.0,
+            cantEPend: 0,
+            fotoURL: variante.imagenes.isNotEmpty ? variante.imagenes[0] : '',
+            codColor: variante.codColor,
+            color: variante.color,
+            colorHexCode: variante.colorHexCode.toString(),
+            R: variante.r,
+            G: variante.g,
+            B: variante.b,
+            talle: variante.talle,
+            isExpanded: false,
+            metodo: 'POST',
+          ));
       });
     } else {
-      lineaExistente.cantidad = cantidad;
-      lineaExistente.costoUnitario = variante.precioIvaIncluido;
+      setState(() {
+        lineaExistente.cantidad += cantidad;  // Incrementa la cantidad actual si no es línea nueva
+        lineaExistente.costoUnitario = variante.precioIvaIncluido;
+      });
     }
   }
+
 
   void _agregarOActualizarVariante(producto) {
     ProductoVariante? productoExistente = productosAgregados.firstWhere(
@@ -568,20 +596,14 @@ class _ProductPageState extends State<ProductPage> {
       orElse: () => ProductoVariante.empty(),
     );
 
-  
     int indexProducto;
     if (productoExistente.codItem == producto.codItem) {
       // Si el producto ya existe, aumentar la cantidad
-      // if (productoExistente.cantidad < producto.disponible) {
-      //   setState(() {
-      //     productoExistente.cantidad += 1;
-      //   });
-      //   // actualizarLineaConVariante(productoExistente);
-      // } else {
-      //   _mostrarSnackBar('No hay más disponibles de la variante ${producto.codItem}');
-      // }
-      indexProducto = productosAgregados.indexOf(productoExistente);
+      setState(() {
+        productoExistente.cantidad += 1;  // Incrementa la cantidad
+      });
       actualizarLineaConVariante(productoExistente);
+      indexProducto = productosAgregados.indexOf(productoExistente);
     } else {
       // Agregar nuevo producto a productosAgregados
       ProductoVariante productoAAgregar = ProductoVariante(
@@ -610,9 +632,8 @@ class _ProductPageState extends State<ProductPage> {
       _isEditing.add(false);
       indexProducto = productosAgregados.length - 1;
       actualizarLineaConVariante(productoAAgregar);
-      
     }
-  
+
     // Desplazar hacia el producto agregado o actualizado
     _scrollToProducto(indexProducto);
     setState(() {});
