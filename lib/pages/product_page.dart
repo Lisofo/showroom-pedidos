@@ -49,6 +49,7 @@ class _ProductPageState extends State<ProductPage> {
   int buttonIndex = 0;
   late Pedido pedido = Pedido.empty();
   late List<Linea> lineasGenericas = [];
+  late List<Linea> nuevasLineas= [];
   final _pedidosServices = PedidosServices();
   late ScaffoldMessengerState scaffoldMessenger;
   late String colorYTalleSeleccionado = '';
@@ -84,8 +85,8 @@ class _ProductPageState extends State<ProductPage> {
     pedido = context.read<ItemProvider>().pedido;
     lineasGenericas = context.read<ItemProvider>().lineasGenericas;
     raiz = context.read<ItemProvider>().raiz;
-    productoSeleccionado = context.read<ItemProvider>().product;
-    productoNuevo = raiz == '' ? await ProductServices().getSingleProductByRaiz(productoSeleccionado.raiz, almacen, token) : await ProductServices().getSingleProductByRaiz(raiz, almacen, token);
+    productoSeleccionado = Product.copy(context.read<ItemProvider>().product);
+    productoNuevo = productoSeleccionado.raiz != '' ? await ProductServices().getSingleProductByRaiz(productoSeleccionado.raiz, almacen, token) : await ProductServices().getSingleProductByRaiz(raiz, almacen, token);
     _products = productoNuevo.variantes;
     List<dynamic> listaTalles = _products!.where((productoVariante) => talles.add(productoVariante.talle)).toList();
     var models = <ProductColor>{};
@@ -102,9 +103,14 @@ class _ProductPageState extends State<ProductPage> {
         ),
       );
     }
+    for(var linea in lineasGenericas) {
+      if(linea.raiz == productoNuevo.raiz){
+        nuevasLineas.add(Linea.copy(linea));
+      }
+    }
     colors = models.toSet().toList();
-    if(_products!.isNotEmpty && lineasGenericas.isNotEmpty){
-      for (var linea in lineasGenericas) {
+    if(_products!.isNotEmpty && nuevasLineas.isNotEmpty){
+      for (var linea in nuevasLineas) {
         var agregar = _products!.where((prod) => prod.itemId == linea.itemId).toList();
 
         if (agregar.isNotEmpty) {
@@ -114,7 +120,8 @@ class _ProductPageState extends State<ProductPage> {
           _isEditing.add(false);
         }
       }
-    } 
+    }
+    
     buscando = false;
     setState(() {});
   }
@@ -277,10 +284,6 @@ class _ProductPageState extends State<ProductPage> {
               icon: Icon(Icons.format_align_left),
               label: 'Totales'
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.price_change),
-              label: 'Cambio de precio'
-            ),
           ],
           onTap: (value) async {
             buttonIndex = value;
@@ -288,21 +291,24 @@ class _ProductPageState extends State<ProductPage> {
               case 0:
                 int? statusCode;
                 List<Linea> lineasAEnviar = [];
-                lineasAEnviar = lineasGenericas.where((linea) => linea.raiz == productoNuevo.raiz).toList();
+                lineasAEnviar = nuevasLineas.where((linea) => linea.raiz == productoNuevo.raiz).toList();
                 await _pedidosServices.putPedido(context, pedido, lineasAEnviar, token);
                 statusCode = await _pedidosServices.getStatusCode();
                 await _pedidosServices.resetStatusCode();
                 if(statusCode == 1) {
                   Carteles.showDialogs(context, 'Productos actualizados', true, false, false);
+                  for(var linea in nuevasLineas) {
+                    lineasGenericas.add(linea);
+                  }
                 }
               break;
               case 1:
                 var cantidad = 0;
                 var costoTotal = 0.0;
-                var lineasDeLaRaiz = lineasGenericas.where((linea) => linea.raiz == productoNuevo.raiz && linea.metodo != "DELETE").toList();                
+                var lineasDeLaRaiz = nuevasLineas.where((linea) => linea.raiz == productoNuevo.raiz && linea.metodo != "DELETE").toList();                
                 for(var linea in lineasDeLaRaiz) {
                   cantidad += linea.cantidad;
-                  costoTotal += linea.costoUnitario * linea.cantidad;
+                  costoTotal += (linea.costoUnitario * linea.cantidad);
                 }
                 await showDialog(
                   context: context, 
@@ -329,9 +335,6 @@ class _ProductPageState extends State<ProductPage> {
                     );
                   }
                 );
-              break;
-              case 2:
-                await cambioDePrecios(context);
               break;
             }
           },
@@ -390,58 +393,14 @@ class _ProductPageState extends State<ProductPage> {
                           child: FittedBox(
                             fit: BoxFit.contain,
                             child: Text(
-                              raiz == "" ? '${productoSeleccionado.signo} $precioSeleccionado' : '${productoNuevo.signo} $precioNuevo',
+                              productoSeleccionado.raiz != "" ? '${productoSeleccionado.signo} $precioSeleccionado' : '${productoNuevo.signo} $precioNuevo',
                               style: const TextStyle(fontSize: 24),
                             ),
                           ),
                         ),
                         TextButton(
                           onPressed: () async {
-                            double nuevoPrecio2 = 0.0;
-                            await showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: const Text('Cambiar precio de la raiz'),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text('Introduce el nuevo precio para la raiz $raiz:'),
-                                      const SizedBox(height: 10),
-                                      TextField(
-                                        keyboardType: TextInputType.number,
-                                        decoration: const InputDecoration(
-                                          labelText: 'Nuevo precio',
-                                          border: OutlineInputBorder(),
-                                        ),
-                                        onChanged: (value) {
-                                          // Convertir el valor del campo a double
-                                          nuevoPrecio2 = double.tryParse(value) ?? 0.0;
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        // Cerrar el pop-up sin hacer nada
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Cancelar'),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        // Llamar al método para cambiar los precios
-                                        
-                                        setState(() {});
-                                        Navigator.of(context).pop(); // Cerrar el pop-up
-                                      },
-                                      child: const Text('Confirmar'),
-                                    ),
-                                  ],
-                                );
-                              }
-                            );
+                            await cambioDePrecios(context);
                           },
                           child: const Text('Cambiar precio')
                         )
@@ -550,25 +509,25 @@ class _ProductPageState extends State<ProductPage> {
     // Eliminar variante de productosAgregados
     productosAgregados.removeWhere((variante) => variante.itemId == varianteAEliminar.itemId);
     // Buscar la línea correspondiente en lineasProvider
-    int indexLinea = lineasGenericas.indexWhere((linea) => linea.itemId == varianteAEliminar.itemId);
+    int indexLinea = nuevasLineas.indexWhere((linea) => linea.itemId == varianteAEliminar.itemId);
   
     if (indexLinea != -1) {
       // Si existe en lineasProvider, cambiar el método a DELETE
-      if(lineasGenericas[indexLinea].lineaId != 0){
-        lineasGenericas[indexLinea].metodo = 'DELETE';
+      if(nuevasLineas[indexLinea].lineaId != 0){
+        nuevasLineas[indexLinea].metodo = 'DELETE';
       } else {
-        lineasGenericas.removeWhere((linea) => linea.itemId == varianteAEliminar.itemId);
+        nuevasLineas.removeWhere((linea) => linea.itemId == varianteAEliminar.itemId);
       }
     }
   }
 
   // Método para manejar la actualización de variantes
   void actualizarLineaConVariante(ProductoVariante variante) {
-  Linea lineaExistente = Linea.empty();
-    lineaExistente = lineasGenericas.firstWhere(
+    Linea lineaExistente = Linea.empty();
+    lineaExistente = nuevasLineas.firstWhere(
       (linea) => linea.itemId == variante.itemId, 
       orElse: () => Linea.empty(),
-    );    
+    );
     var cantidad = variante.cantidad;
 
     if (variante.cantidad != lineaExistente.cantidad) {
@@ -577,13 +536,13 @@ class _ProductPageState extends State<ProductPage> {
 
     if (lineaExistente.itemId == variante.itemId && lineaExistente.lineaId != 0) {
       setState(() {
-        lineaExistente.cantidad += variante.cantidad;  // Incrementa la cantidad actual
+        lineaExistente.cantidad = cantidad;  // Incrementa la cantidad actual
         lineaExistente.costoUnitario = variante.precioIvaIncluido;
         lineaExistente.metodo = 'PUT';
       });
     } else if (lineaExistente.lineaId == 0 && lineaExistente.cantidad == 0) {
       setState(() {
-        Provider.of<ItemProvider>(context, listen: false).addLinea(
+        nuevasLineas.add(
           Linea(
             lineaId: 0, 
             ordenTrabajoId: 0, 
@@ -725,7 +684,7 @@ class _ProductPageState extends State<ProductPage> {
       variante.precioIvaIncluido = nuevoPrecio;
 
       // Actualizar las líneas correspondientes
-      var lineaCorrespondiente = lineasGenericas.firstWhere(
+      var lineaCorrespondiente = nuevasLineas.firstWhere(
         (linea) => linea.itemId == variante.itemId,
         orElse: () => Linea.empty(),
       );
@@ -780,7 +739,11 @@ class _ProductPageState extends State<ProductPage> {
               onPressed: () {
                 // Llamar al método para cambiar los precios
                 productoSeleccionado.precioIvaIncluido = nuevoPrecio;
+                productoSeleccionado.precioIvaIncluidoMin = nuevoPrecio;
+                productoSeleccionado.precioIvaIncluidoMax = nuevoPrecio;
                 productoNuevo.precioIvaIncluido = nuevoPrecio;
+                productoNuevo.precioIvaIncluidoMin = nuevoPrecio;
+                productoNuevo.precioIvaIncluidoMax = nuevoPrecio;
                 for(var variante in _products!){
                   variante.precioIvaIncluido = nuevoPrecio;
                 }

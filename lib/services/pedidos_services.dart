@@ -138,6 +138,7 @@ class PedidosServices {
             if(lineas[i].lineaId == 0){
               lineas[i].lineaId = resp.data["lineas"][i]['lineaId'];
               print('id asignado: ${lineas[i].lineaId}');
+              // Provider.of<ItemProvider>(context, listen: false).setLineasGenericas(resp.data['lineas'] as List<Linea>);
             }
             if(lineas[i].metodo == "DELETE") {
               Provider.of<ItemProvider>(context, listen: false).removeLinea(lineas[i]);

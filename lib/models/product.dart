@@ -89,5 +89,25 @@ class Product {
   String toString() {
     return 'Instance of Product: $descripcion';
   }
+
+  Product.copy(Product producto)
+    : almacenId = producto.almacenId,
+      raiz = producto.raiz,
+      descripcion = producto.descripcion,
+      monedaId = producto.monedaId,
+      memo = producto.memo,
+      signo = producto.signo,
+      precioVentaActualMin = producto.precioVentaActualMin,
+      precioVentaActualMax = producto.precioVentaActualMax,
+      precioVentaActual = producto.precioVentaActual,
+      precioIvaIncluidoMin = producto.precioIvaIncluidoMin,
+      precioIvaIncluidoMax = producto.precioIvaIncluidoMax,
+      precioIvaIncluido = producto.precioIvaIncluido,
+      ivaId = producto.ivaId,
+      valor = producto.valor,
+      disponibleRaiz = producto.disponibleRaiz,
+      existenciaRaiz = producto.existenciaRaiz,
+      variantes = producto.variantes,
+      imagenes = producto.imagenes;
 }
 
