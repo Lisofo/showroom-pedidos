@@ -94,12 +94,13 @@ class _PedidoInternoState extends State<PedidoInterno> {
         backgroundColor: Colors.blueGrey[100],
         appBar: AppBar(
           centerTitle: true,
-          title: Text(pedidoSeleccionado.numeroOrdenTrabajo,
-            style: const TextStyle(
+          title: Text(
+            pedidoSeleccionado.numeroOrdenTrabajo,
+            style: TextStyle(
               fontWeight: FontWeight.w800,
               letterSpacing: 1,
               fontSize: 30,
-              color: Colors.black
+              color: colores.onPrimary
             )
           ),
           iconTheme: const IconThemeData(

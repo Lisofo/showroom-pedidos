@@ -83,12 +83,20 @@ class _NuevoPedidoState extends State<NuevoPedido> {
 
   @override
   Widget build(BuildContext context) {
-
+    final colores = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: Text(pedido.ordenTrabajoId == 0 ? 'Nuevo Pedido' : 'Datos del pedido'),
+        title: Text(
+          pedido.ordenTrabajoId == 0 ? 'Nuevo Pedido' : 'Datos del pedido',
+          style: TextStyle(
+            color: colores.onPrimary
+          ),
+        ),
         elevation: 0,
-        backgroundColor: const Color(0xFFFD725A),
+        backgroundColor: colores.primary,
+        iconTheme: const IconThemeData(
+          color: Colors.white
+        ),
       ),
       body: SafeArea(
         child: Padding(

@@ -41,10 +41,12 @@ class _PaginaClienteState extends State<PaginaCliente> {
     final colores = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        
+        iconTheme: const IconThemeData(
+          color: Colors.white
+        ),
         elevation: 0,
         backgroundColor: colores.primary,
-        title: const Text('Pedidos del Cliente'),
+        title: Text('Pedidos del Cliente', style: TextStyle(color: colores.onPrimary),),
       ),
       body: SafeArea(
         child: Column(

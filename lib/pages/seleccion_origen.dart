@@ -74,6 +74,9 @@ class _SeleccionOrigenState extends State<SeleccionOrigen> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
+          iconTheme: const IconThemeData(
+            color: Colors.white
+          ),
           actions: [
             IconButton(
               onPressed: () {

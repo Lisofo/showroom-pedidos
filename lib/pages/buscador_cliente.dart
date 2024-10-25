@@ -23,13 +23,18 @@ class _BuscadorClienteState extends State<BuscadorCliente> {
     final colores = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Buscar Cliente',
+        title: Text(
+          'Buscar Cliente',
           style: TextStyle(
             fontSize: 24,
+            color: colores.onPrimary
           )
         ),
         elevation: 0,
         backgroundColor: colores.primary,
+        iconTheme: const IconThemeData(
+          color: Colors.white
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
