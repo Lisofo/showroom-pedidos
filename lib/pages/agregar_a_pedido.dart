@@ -180,22 +180,16 @@ class _AgregarPedidoState extends State<AgregarPedido> {
       
                       return Row(
                         children: [
-                          GestureDetector(
-                            onTap: () {
-                              Provider.of<ItemProvider>(context, listen: false).setRaiz(item.raiz);
-                              appRouter.push('/productoSimple');
-                            },
-                            child: SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.15,
-                              width: MediaQuery.of(context).size.width * 0.1,
-                              child: Image.network(
-                                foto,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Placeholder(
-                                    child: Text('No Image'),
-                                  );
-                                },
-                              ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.15,
+                            width: MediaQuery.of(context).size.width * 0.1,
+                            child: Image.network(
+                              foto,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Placeholder(
+                                  child: Text('No Image'),
+                                );
+                              },
                             ),
                           ),
                           SizedBox(
