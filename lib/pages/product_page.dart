@@ -31,7 +31,7 @@ class _ProductPageState extends State<ProductPage> {
   late Client cliente = Client.empty();
   var talles = <String>{};
   late List<ProductColor> colors;
-
+  late Product _productoOriginal;
   late num cantidadTotal = 0;
   late double montoTotal = 0.0;
   Map<String, int> cantidadPorTalle = {};
@@ -66,7 +66,8 @@ class _ProductPageState extends State<ProductPage> {
 
   @override
   void dispose() {
-    // Limpiar los SnackBars pendientes usando la referencia guardada
+    // Asegurarse de que los datos se reinicien al salir
+    productoNuevo = _productoOriginal;
     scaffoldMessenger.clearSnackBars();
     super.dispose();
   }
@@ -79,16 +80,39 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   cargarDatos() async {
+    setState(() {
+      buscando = true;
+      // Reiniciar las variables a su estado inicial
+      _products = [];
+      productosFiltrados = [];
+      productosAgregados = [];
+      nuevasLineas = [];
+      talles = <String>{};
+    });
+
     almacen = context.read<ItemProvider>().almacen;
     token = context.read<ItemProvider>().token;
     cliente = context.read<ItemProvider>().client;
     pedido = context.read<ItemProvider>().pedido;
     lineasGenericas = context.read<ItemProvider>().lineasGenericas;
     raiz = context.read<ItemProvider>().raiz;
-    productoSeleccionado = Product.copy(context.read<ItemProvider>().product);
-    productoNuevo = productoSeleccionado.raiz != '' ? await ProductServices().getSingleProductByRaiz(productoSeleccionado.raiz, almacen, token) : await ProductServices().getSingleProductByRaiz(raiz, almacen, token);
+    
+    if(raiz == '') {
+      productoSeleccionado = Product.copy(context.read<ItemProvider>().product);
+    }
+    
+    // Obtener datos frescos de la API
+    productoNuevo = productoSeleccionado.raiz != '' 
+      ? await ProductServices().getSingleProductByRaiz(productoSeleccionado.raiz, almacen, token) 
+      : await ProductServices().getSingleProductByRaiz(raiz, almacen, token);
+    
+    // Guardar una copia del producto original
+    _productoOriginal = Product.copy(productoNuevo);
+    
     _products = productoNuevo.variantes;
+
     List<dynamic> listaTalles = _products!.where((productoVariante) => talles.add(productoVariante.talle)).toList();
+    
     var models = <ProductColor>{};
     for (var i = 0; i < _products!.length; i++) {
       models.add(
@@ -103,13 +127,16 @@ class _ProductPageState extends State<ProductPage> {
         ),
       );
     }
+
     for(var linea in lineasGenericas) {
-      if(linea.raiz == productoNuevo.raiz){
+      if(linea.raiz == productoNuevo.raiz) {
         nuevasLineas.add(Linea.copy(linea));
       }
     }
+
     colors = models.toSet().toList();
-    if(_products!.isNotEmpty && nuevasLineas.isNotEmpty){
+    
+    if(_products!.isNotEmpty && nuevasLineas.isNotEmpty) {
       for (var linea in nuevasLineas) {
         var agregar = _products!.where((prod) => prod.itemId == linea.itemId).toList();
 
@@ -121,9 +148,36 @@ class _ProductPageState extends State<ProductPage> {
         }
       }
     }
+
+    if(nuevasLineas.isEmpty){
+      if(productoSeleccionado.precioIvaIncluidoMin != productoSeleccionado.precioIvaIncluidoMax){
+        precioSeleccionado = '${productoSeleccionado.precioIvaIncluidoMin} - ${productoSeleccionado.precioIvaIncluidoMax}';
+      } else {
+        precioSeleccionado = productoSeleccionado.precioIvaIncluido.toString();
+      }
+
+      if(productoNuevo.precioIvaIncluidoMin != productoNuevo.precioIvaIncluidoMax){
+        precioNuevo = '${productoNuevo.precioIvaIncluidoMin} - ${productoNuevo.precioIvaIncluidoMax}';
+      } else {
+        precioNuevo = productoNuevo.precioIvaIncluido.toString();
+      }
+    } else {
+      productoNuevo.precioIvaIncluido = nuevasLineas[0].costoUnitario;
+      productoNuevo.precioIvaIncluidoMin = nuevasLineas[0].costoUnitario;
+      productoNuevo.precioIvaIncluidoMax = nuevasLineas[0].costoUnitario;
+      productoSeleccionado.precioIvaIncluido = nuevasLineas[0].costoUnitario;
+      productoSeleccionado.precioIvaIncluidoMin = nuevasLineas[0].costoUnitario;
+      productoSeleccionado.precioIvaIncluidoMax = nuevasLineas[0].costoUnitario;
+      precioNuevo = nuevasLineas[0].costoUnitario.toString();
+      precioSeleccionado = nuevasLineas[0].costoUnitario.toString();
+      for(var variante in _products!) {
+        variante.precioIvaIncluido = nuevasLineas[0].costoUnitario;
+      }
+    }
     
-    buscando = false;
-    setState(() {});
+    setState(() {
+      buscando = false;
+    });
   }
 
   @override
@@ -293,12 +347,16 @@ class _ProductPageState extends State<ProductPage> {
                 List<Linea> lineasAEnviar = [];
                 lineasAEnviar = nuevasLineas.where((linea) => linea.raiz == productoNuevo.raiz).toList();
                 await _pedidosServices.putPedido(context, pedido, lineasAEnviar, token);
-                statusCode = await _pedidosServices.getStatusCode();
+                statusCode =  await _pedidosServices.getStatusCode();
                 await _pedidosServices.resetStatusCode();
                 if(statusCode == 1) {
                   Carteles.showDialogs(context, 'Productos actualizados', true, false, false);
                   for(var linea in nuevasLineas) {
-                    lineasGenericas.add(linea);
+                    if(linea.metodo != 'DELETE'){
+                      lineasGenericas.add(linea);
+                    } else {
+                      lineasGenericas.remove(linea);
+                    }
                   }
                 }
               break;
@@ -346,19 +404,7 @@ class _ProductPageState extends State<ProductPage> {
   middleBody() {
     List<dynamic> listaTalles = _products!.where((talle) => talles.add(talle.talle)).toList();
     late String? talleSeleccionado;
-    final colores = Theme.of(context).colorScheme;
-
-    if(productoSeleccionado.precioIvaIncluidoMin != productoSeleccionado.precioIvaIncluidoMax){
-      precioSeleccionado = '${productoSeleccionado.precioIvaIncluidoMin} - ${productoSeleccionado.precioIvaIncluidoMax}';
-    } else {
-      precioSeleccionado = productoSeleccionado.precioIvaIncluidoMax.toString();
-    }
-
-    if(productoNuevo.precioIvaIncluidoMin != productoNuevo.precioIvaIncluidoMax){
-      precioNuevo = '${productoNuevo.precioIvaIncluidoMin} - ${productoNuevo.precioIvaIncluidoMax}';
-    } else {
-      precioNuevo = productoNuevo.precioIvaIncluidoMax.toString();
-    }
+    final colores = Theme.of(context).colorScheme;   
 
     return buscando
       ? const Center(child: CircularProgressIndicator())
@@ -433,7 +479,7 @@ class _ProductPageState extends State<ProductPage> {
                       ),
                       SizedBox(
                         width: double.infinity,  // Para que el botón ocupe todo el ancho
-                        child: ElevatedButton(
+                        child: TextButton(
                           onPressed: agregarTodasLasVariantes,
                           child: const Text("Agregar todos"),
                         ),
@@ -602,7 +648,6 @@ class _ProductPageState extends State<ProductPage> {
     }
   }
 
-
   void _agregarOActualizarVariante(producto) {
     ProductoVariante? productoExistente = productosAgregados.firstWhere(
       (item) => item.codItem == producto.codItem,
@@ -685,7 +730,7 @@ class _ProductPageState extends State<ProductPage> {
 
       // Actualizar las líneas correspondientes
       var lineaCorrespondiente = nuevasLineas.firstWhere(
-        (linea) => linea.itemId == variante.itemId,
+        (linea) => linea.itemId == variante.itemId && linea.metodo != 'DELETE',
         orElse: () => Linea.empty(),
       );
 
@@ -744,6 +789,8 @@ class _ProductPageState extends State<ProductPage> {
                 productoNuevo.precioIvaIncluido = nuevoPrecio;
                 productoNuevo.precioIvaIncluidoMin = nuevoPrecio;
                 productoNuevo.precioIvaIncluidoMax = nuevoPrecio;
+                precioNuevo = nuevoPrecio.toString();
+                precioSeleccionado = nuevoPrecio.toString();
                 for(var variante in _products!){
                   variante.precioIvaIncluido = nuevoPrecio;
                 }

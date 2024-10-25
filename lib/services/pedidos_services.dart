@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -121,6 +123,7 @@ class PedidosServices {
     	"comentarioTrabajo": pedido.comentarioTrabajo,
       "lineas": accionesLineas
     });
+    print(jsonEncode(data));
     try {
       var headers = {'Authorization': token};
       var resp = await _dio.request(
@@ -147,6 +150,7 @@ class PedidosServices {
         }
       }
     } catch (e) {
+      statusCode = 0;
       return e;
     }
   }

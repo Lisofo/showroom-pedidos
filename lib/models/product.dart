@@ -75,8 +75,10 @@ class Product {
     signo = '';
     precioVentaActualMin = 0.0;
     precioVentaActualMax = 0.0;
+    precioVentaActual = 0.0;
     precioIvaIncluidoMin = 0.0;
     precioIvaIncluidoMax = 0.0;
+    precioIvaIncluido = 0.0;
     ivaId = 0;
     valor = 0;
     disponibleRaiz = 0;

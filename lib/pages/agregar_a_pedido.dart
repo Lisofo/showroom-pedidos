@@ -180,9 +180,9 @@ class _AgregarPedidoState extends State<AgregarPedido> {
       
                       return Row(
                         children: [
-                          InkWell(
+                          GestureDetector(
                             onTap: () {
-                              Provider.of<ItemProvider>(context, listen: false).setRaiz(raiz);
+                              Provider.of<ItemProvider>(context, listen: false).setRaiz(item.raiz);
                               appRouter.push('/productoSimple');
                             },
                             child: SizedBox(

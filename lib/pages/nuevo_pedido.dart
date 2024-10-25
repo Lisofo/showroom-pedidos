@@ -289,6 +289,40 @@ class _NuevoPedidoState extends State<NuevoPedido> {
               await postPutPedido(context);
             break;
             case 1:
+              await showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Imprimir'),
+                    content: Text('Desea imprimir la OT: ${pedido.numeroOrdenTrabajo} con foto o sin foto?'),
+                    actions: [
+                      Row(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              appRouter.pop();
+                            },
+                            child: const Text('Cancelar')
+                          ),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: () async {
+
+                            },
+                            child: const Text('SI')
+                          ),
+                          TextButton(
+                            onPressed: () async {
+
+                            },
+                            child: const Text('NO')
+                          ),
+                        ],
+                      )
+                    ],
+                  );
+                }
+              );
             break;
             case 2:
             await showDialog(

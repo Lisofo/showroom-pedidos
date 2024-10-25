@@ -216,7 +216,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
                                     children: listaVariantes.map((line){
                                       return ListTile(
                                         title: Text(line.codItem),
-                                        subtitle: Text('Color: ${line.color} Talle: ${line.talle} Cantidad: ${line.cantidad.toString()}'),
+                                        subtitle: Text('Color: ${line.color} Talle: ${line.talle} Cantidad: ${line.cantidad.toString()} ${line.costoUnitario}'),
                                       );
                                     }).toList(),
                                   ),
