@@ -137,16 +137,18 @@ class PedidosServices {
       statusCode = 1;
       if(resp.statusCode == 200){
         if (resp.data != null) {
-          for(int i = 0; i < lineas.length; i++){
-            if(lineas[i].lineaId == 0){
-              lineas[i].lineaId = resp.data["lineas"][i]['lineaId'];
-              print('id asignado: ${lineas[i].lineaId}');
-              // Provider.of<ItemProvider>(context, listen: false).setLineasGenericas(resp.data['lineas'] as List<Linea>);
-            }
-            if(lineas[i].metodo == "DELETE") {
-              Provider.of<ItemProvider>(context, listen: false).removeLinea(lineas[i]);
-            }
-          }
+          final List<dynamic> lineasList = resp.data['lineas'];
+          List<Linea> list = lineasList.map((obj) => Linea.fromJson(obj)).toList();
+          // for(int i = 0; i < lineas.length; i++){
+          //   if(lineas[i].lineaId == 0){
+          //     lineas[i].lineaId = resp.data["lineas"][i]['lineaId'];
+          //     print('id asignado: ${lineas[i].lineaId}');
+          //   }
+          //   if(lineas[i].metodo == "DELETE") {
+          //     Provider.of<ItemProvider>(context, listen: false).removeLinea(lineas[i]);
+          //   }
+          // }
+          Provider.of<ItemProvider>(context, listen: false).setLineasGenericas(list);
         }
       }
     } catch (e) {

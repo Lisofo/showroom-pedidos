@@ -352,7 +352,8 @@ class _ProductPageState extends State<ProductPage> {
                 if(statusCode == 1) {
                   Carteles.showDialogs(context, 'Productos actualizados', true, false, false);
                   for(var linea in nuevasLineas) {
-                    if(linea.metodo != 'DELETE'){
+                    bool existe = lineasGenericas.contains(linea);
+                    if(!existe && linea.metodo != 'DELETE'){
                       lineasGenericas.add(linea);
                     } else {
                       lineasGenericas.remove(linea);

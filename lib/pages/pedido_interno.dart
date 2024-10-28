@@ -43,7 +43,6 @@ class _PedidoInternoState extends State<PedidoInterno> {
     pedidoSeleccionado = context.read<ItemProvider>().pedido;
     lineas = await LineasServices().getLineasOrden(context, pedidoSeleccionado.ordenTrabajoId, token);
     cargarListas();
-    listaDeLista;
     raices = cargarRaices();
     var shortestSide = MediaQuery.of(context).size.shortestSide;
     isMobile = shortestSide < 600;
@@ -51,8 +50,14 @@ class _PedidoInternoState extends State<PedidoInterno> {
     cargando = false;
     setState(() {});
   }
+  reCargarDatos() async {
+    cargarListas();
+    raices = cargarRaices();
+    raices.sort();
+  }
 
   void cargarListas() {
+    listaDeLista = {};  
     for (var linea in lineas) {
       String raiz = linea.raiz;
       if (!listaDeLista.containsKey(raiz)) {
@@ -89,6 +94,8 @@ class _PedidoInternoState extends State<PedidoInterno> {
   Widget build(BuildContext context) {
     final colores = Theme.of(context).colorScheme;
     lineas = context.watch<ItemProvider>().lineasGenericas;
+    print(lineas.length);
+    reCargarDatos();
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.blueGrey[100],
@@ -148,12 +155,11 @@ class _PedidoInternoState extends State<PedidoInterno> {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    //Provider.of<ItemProvider>(context, listen: false).setLineas(listaVariantes);
                                     Provider.of<ItemProvider>(context, listen: false).setRaiz(raiz);
                                     appRouter.push('/productoSimple');
                                   },
                                   child: SizedBox(
-                                    height: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.09, //ToDo mediaquery isMobile agregar
+                                    height: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.09,
                                     width: isMobile ? MediaQuery.of(context).size.width * 0.2 : MediaQuery.of(context).size.width * 0.1,
                                     child: Image.network( 
                                       url,
