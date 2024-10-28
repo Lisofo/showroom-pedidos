@@ -201,6 +201,53 @@ class PedidosServices {
     }
   }
 
+  Future postInforme (BuildContext context, String almacenId, Pedido pedido, bool conFoto, String token) async {
+    String link = '$apirUrl/api/v1/rpts';
+    int informeId = 0;
+    if(conFoto){
+      if(almacenId == '1'){
+        informeId = Config.NYPCONFOTO;
+      } else {
+        informeId = Config.UFOCONFOTO;
+      }
+    } else {
+      if(almacenId == '1'){
+        informeId = Config.NYPSINFOTO;
+      } else {
+        informeId = Config.UFOSINFOTO;
+      }
+    }
+    var data = ({
+      "informeId": informeId,
+      "almacenId": int.tryParse(almacenId),
+      "tipoImpresion": "PDF",
+      "destino": 0,
+      "destFileName": null,
+      "destImpresora": null,
+      "parametros": [
+        {"p1": pedido.ordenTrabajoId},
+      ]
+    });
+    try {
+      var headers = {'Authorization': token};
+      var resp = await _dio.request(
+        link,
+        options: Options(
+          method: 'POST',
+          headers: headers,
+        ),
+        data: data
+      );
+      statusCode = 1;
+      if(resp.statusCode == 200){
+        Provider.of<ItemProvider>(context, listen: false).setRptId(resp.data["rptGenId"]);
+      }
+    } catch (e) {
+      print(e);
+      return e;
+    }
+  }
+
 
   String _formatFechas(DateTime? date) {
     return '${date?.year.toString().padLeft(4, '0')}-${date?.month.toString().padLeft(2, '0')}-${date?.day.toString().padLeft(2, '0')}';

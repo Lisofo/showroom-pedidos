@@ -45,6 +45,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
   late List<Linea> lineasGenericas = [];
   late int cantidad = 0;
   late double costoTotal = 0.0;
+  late String almacenId = '';
 
   @override
   void initState() {
@@ -56,6 +57,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
     pedido = context.read<ItemProvider>().pedido;
     cliente = context.read<ItemProvider>().client;
     token = context.read<ItemProvider>().token;
+    almacenId = context.read<ItemProvider>().almacen;
     if (pedido.ordenTrabajoId != 0) {
       numeroOrdenTrabajo.text = pedido.numeroOrdenTrabajo;
       comClienteController.text = pedido.comentarioCliente;
@@ -315,13 +317,14 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                           const Spacer(),
                           TextButton(
                             onPressed: () async {
-
+                              await PedidosServices().postInforme(context, almacenId, pedido, true, token);
+                              //armar contador para get de informe
                             },
                             child: const Text('SI')
                           ),
                           TextButton(
                             onPressed: () async {
-
+                              await PedidosServices().postInforme(context, almacenId, pedido, false, token);
                             },
                             child: const Text('NO')
                           ),

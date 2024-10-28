@@ -44,8 +44,16 @@ class ItemProvider with ChangeNotifier {
 
   String _raiz = '';
   String get raiz => _raiz;
+  
+  int _rptGenId = 0;
+  int get rptGenId => _rptGenId;
 
   // Métodos para actualizar las variables y notificar cambios
+
+  void setRptId(int rptGenId){
+    _rptGenId = rptGenId;
+    notifyListeners();
+  }
 
   void setRaiz(String raiz) {
     _raiz = raiz;
