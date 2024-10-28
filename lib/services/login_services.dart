@@ -34,7 +34,7 @@ class LoginServices {
         print(response.data['token']);
         print(response.data['vendedorId']);
         Provider.of<ItemProvider>(context, listen: false).setToken(response.data['token']);
-        Provider.of<ItemProvider>(context, listen: false).setVendedorId(response.data['vendedorId']);
+        Provider.of<ItemProvider>(context, listen: false).setVendedorId(response.data['vendedorId'] ?? 0);
       } else { 
         print(response.statusMessage);
       }
