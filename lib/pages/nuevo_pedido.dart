@@ -1,15 +1,18 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:showroom_maqueta/config/router/app_router.dart';
 import 'package:showroom_maqueta/models/client.dart';
 import 'package:showroom_maqueta/models/linea.dart';
 import 'package:showroom_maqueta/models/pedido.dart';
+import 'package:showroom_maqueta/models/reporte.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/pedidos_services.dart';
 import 'package:showroom_maqueta/widgets/confirmacion.dart';
 import 'package:showroom_maqueta/widgets/custom_form_field.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NuevoPedido extends StatefulWidget {
   const NuevoPedido({super.key});
@@ -46,6 +49,10 @@ class _NuevoPedidoState extends State<NuevoPedido> {
   late int cantidad = 0;
   late double costoTotal = 0.0;
   late String almacenId = '';
+  late Reporte reporte = Reporte.empty();
+  late int rptGenId = 0;
+  late bool generandoInforme = false;
+  late bool informeGeneradoEsS = false;
 
   @override
   void initState() {
@@ -107,170 +114,193 @@ class _NuevoPedidoState extends State<NuevoPedido> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    const Text(
-                      'Pedido: ',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: CustomTextFormField(
-                        textAlign: TextAlign.center,
-                        controller: numeroOrdenTrabajo,
-                        maxLines: 1,
+                if(!generandoInforme)...[
+                  Row(
+                    children: [
+                      const Text(
+                        'Pedido: ',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: CustomTextFormField(
+                          textAlign: TextAlign.center,
+                          controller: numeroOrdenTrabajo,
+                          maxLines: 1,
+                        )
                       )
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20,),
-                Row(
-                  children: [
-                    const Text(
-                      'Fecha: ',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        // border: Border.all(),
-                        borderRadius: BorderRadius.circular(5)
+                    ],
+                  ),
+                  const SizedBox(height: 20,),
+                  Row(
+                    children: [
+                      const Text(
+                        'Fecha: ',
+                        style: TextStyle(fontSize: 18),
                       ),
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: _crearFecha(context)
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20,),
-                Row(
-                  children: [
-                    const Text(
-                      'Vencimiento: ',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        // border: Border.all(),
-                        borderRadius: BorderRadius.circular(5)
-                      ),
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: _crearFechaVencimiento(context)
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20,),
-                Row(
-                  children: [
-                    const Text(
-                      'Entrega: ',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        // border: Border.all(),
-                        borderRadius: BorderRadius.circular(5)
-                      ),
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: _crearFechaEntrega(context)
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20,),
-                CustomTextFormField(
-                  maxLines: 1,
-                  hint: 'Descripción',
-                  controller: descripcionController,
-                ),
-                const SizedBox(height: 20,),
-                Row(
-                  children: [
-                    const Text(
-                      'Moneda:',
-                      style: TextStyle(fontSize: 18)
-                    ),
-                    const SizedBox(width: 20,),
-                    DropdownButton(
-                      value: _opcionSeleccionada,
-                      items: getOpcionesDropdown(), 
-                      onChanged: (opt){
-                        setState(() {
-                          _opcionSeleccionada = opt!;
-                        });
-                      }
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20,),
-                Row(
-                  children: [
-                    const Text(
-                      'Tipo:',
-                      style: TextStyle(fontSize: 18)
-                    ),
-                    const SizedBox(width: 20,),
-                    DropdownButton(
-                      value: _opcionTipo,
-                      items: getOpcionesDropdownTipo(),
-                      onChanged: (opt){
-                        setState(() {
-                          _opcionTipo = opt!;
-                        });
-                      }
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20,),
-                CustomTextFormField(
-                  controller: comClienteController,
-                  hint: 'Detalle',
-                  minLines: 1,
-                  maxLines: 10,
-                ),
-                const SizedBox(height: 20,),
-                CustomTextFormField(
-                  hint: 'Método de envío',
-                  controller: envioController,
-                  minLines: 1,
-                  maxLines: 10,
-                ),
-                // const SizedBox(height: 20,),
-                // Row(
-                //   children: [
-                //     const Text('Descuento: ', style: TextStyle(fontSize: 24)),
-                //     Container(
-                //       width: MediaQuery.of(context).size.width / 5,
-                //       decoration: BoxDecoration(
-                //         // border: Border.all(),
-                //         borderRadius: BorderRadius.circular(5)
-                //       ),
-                //       child: const TextField(
-                //         decoration: InputDecoration(),
-                //       ),
-                //     )
-                //   ],
-                // ),
-                const SizedBox(height: 20,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          'Cantidad total: $cantidad',
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.end,
+                      Container(
+                        decoration: BoxDecoration(
+                          // border: Border.all(),
+                          borderRadius: BorderRadius.circular(5)
                         ),
-                        Text(
-                          'Costo total: ${pedido.signo} $costoTotal', 
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.end,
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: _crearFecha(context)
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20,),
+                  Row(
+                    children: [
+                      const Text(
+                        'Vencimiento: ',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          // border: Border.all(),
+                          borderRadius: BorderRadius.circular(5)
                         ),
-                      ],
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20,)
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: _crearFechaVencimiento(context)
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20,),
+                  Row(
+                    children: [
+                      const Text(
+                        'Entrega: ',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          // border: Border.all(),
+                          borderRadius: BorderRadius.circular(5)
+                        ),
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: _crearFechaEntrega(context)
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20,),
+                  CustomTextFormField(
+                    maxLines: 1,
+                    hint: 'Descripción',
+                    controller: descripcionController,
+                  ),
+                  const SizedBox(height: 20,),
+                  Row(
+                    children: [
+                      const Text(
+                        'Moneda:',
+                        style: TextStyle(fontSize: 18)
+                      ),
+                      const SizedBox(width: 20,),
+                      DropdownButton(
+                        value: _opcionSeleccionada,
+                        items: getOpcionesDropdown(), 
+                        onChanged: (opt){
+                          setState(() {
+                            _opcionSeleccionada = opt!;
+                          });
+                        }
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20,),
+                  Row(
+                    children: [
+                      const Text(
+                        'Tipo:',
+                        style: TextStyle(fontSize: 18)
+                      ),
+                      const SizedBox(width: 20,),
+                      DropdownButton(
+                        value: _opcionTipo,
+                        items: getOpcionesDropdownTipo(),
+                        onChanged: (opt){
+                          setState(() {
+                            _opcionTipo = opt!;
+                          });
+                        }
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20,),
+                  CustomTextFormField(
+                    controller: comClienteController,
+                    hint: 'Detalle',
+                    minLines: 1,
+                    maxLines: 10,
+                  ),
+                  const SizedBox(height: 20,),
+                  CustomTextFormField(
+                    hint: 'Método de envío',
+                    controller: envioController,
+                    minLines: 1,
+                    maxLines: 10,
+                  ),
+                  // const SizedBox(height: 20,),
+                  // Row(
+                  //   children: [
+                  //     const Text('Descuento: ', style: TextStyle(fontSize: 24)),
+                  //     Container(
+                  //       width: MediaQuery.of(context).size.width / 5,
+                  //       decoration: BoxDecoration(
+                  //         // border: Border.all(),
+                  //         borderRadius: BorderRadius.circular(5)
+                  //       ),
+                  //       child: const TextField(
+                  //         decoration: InputDecoration(),
+                  //       ),
+                  //     )
+                  //   ],
+                  // ),
+                  const SizedBox(height: 20,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Cantidad total: $cantidad',
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.end,
+                          ),
+                          Text(
+                            'Costo total: ${pedido.signo} $costoTotal', 
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.end,
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20,)
+                ] else ... [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: CircularProgressIndicator(
+                          color: colores.primary,
+                          strokeWidth: 5,
+                        ),
+                      ),
+                      const Text('Generando PDF, espere por favor.'),
+                      TextButton(
+                        onPressed: () async {
+                          await PedidosServices().patchInforme(context, reporte, 'D', token);
+                          generandoInforme = false;
+                          setState(() {});
+                        }, 
+                        child: const Text('Cancelar'))
+                    ],
+                  )
+                ]
               ],
             ),
           ),
@@ -317,14 +347,17 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                           const Spacer(),
                           TextButton(
                             onPressed: () async {
-                              await PedidosServices().postInforme(context, almacenId, pedido, true, token);
-                              //armar contador para get de informe
+                              Navigator.of(context).pop();
+                              await postInforme(context, true);
+                              await generarInformeCompleto();
                             },
                             child: const Text('SI')
                           ),
                           TextButton(
                             onPressed: () async {
-                              await PedidosServices().postInforme(context, almacenId, pedido, false, token);
+                              Navigator.of(context).pop();
+                              await postInforme(context, false);
+                              await generarInformeCompleto();
                             },
                             child: const Text('NO')
                           ),
@@ -368,6 +401,40 @@ class _NuevoPedidoState extends State<NuevoPedido> {
         },
       ),
     );
+  }
+
+  Future<void> generarInformeCompleto() async {
+    int contador = 0;
+    generandoInforme = true;
+    informeGeneradoEsS = false;
+    
+    setState(() {});
+    while (contador < 15 && informeGeneradoEsS == false && generandoInforme){
+      print(contador);
+      
+      reporte = await PedidosServices().getReporte(context, rptGenId, token);
+
+      if(reporte.generado == 'S'){
+        informeGeneradoEsS = true;
+        await abrirUrl(reporte.archivoUrl, token);
+        generandoInforme = false;
+        setState(() {});
+      }else{
+        await Future.delayed(const Duration(seconds: 1));
+      }
+      contador++;
+    }
+    if(informeGeneradoEsS != true && generandoInforme){
+      await popUpInformeDemoro();
+      
+      print('informe demoro en generarse');
+    }
+    
+  }
+
+  Future<void> postInforme(BuildContext context, bool conFoto) async {
+    await PedidosServices().postInforme(context, almacenId, pedido, conFoto, token);
+    rptGenId = context.read<ItemProvider>().rptGenId;
   }
 
   Future<void> postPutPedido(BuildContext context) async {
@@ -553,5 +620,83 @@ class _NuevoPedidoState extends State<NuevoPedido> {
 
   String _formatDateAndTime(DateTime? date) {
     return '${date?.day.toString().padLeft(2, '0')}/${date?.month.toString().padLeft(2, '0')}/${date?.year.toString().padLeft(4, '0')}';
+  }
+
+  abrirUrl(String url, String token) async {
+    Dio dio = Dio();
+    String link = url += '?authorization=$token';
+    print(link);
+    try {
+      // Realizar la solicitud HTTP con el encabezado de autorización
+      Response response = await dio.get(
+        link,
+        options: Options(
+          headers: {
+            'Authorization': 'headers $token',
+          },
+        ),
+      );
+      // Verificar si la solicitud fue exitosa (código de estado 200)
+      if (response.statusCode == 200) {
+        // Si la respuesta fue exitosa, abrir la URL en el navegador
+        Uri uri = Uri.parse(url);
+        await launchUrl(uri);
+      } else {
+        // Si la solicitud no fue exitosa, mostrar un mensaje de error
+        print('Error al cargar la URL: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Manejar errores de solicitud
+      print('Error al realizar la solicitud: $e');
+    }
+  }
+
+  Future<void> popUpInformeDemoro() async{
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Su PDF esta tardando demasiado en generarse, quiere seguir esperando?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                generandoInforme = false;
+                await PedidosServices().patchInforme(context, reporte, 'D', token);
+                Navigator.of(context).pop();
+                setState(() {});
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              child: const Text('Si'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                print('dije SI');
+                await generarInformeInfinite();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> generarInformeInfinite() async {
+    
+    generandoInforme = true;
+    
+    while (informeGeneradoEsS == false){
+      reporte = await PedidosServices().getReporte(context, rptGenId, token);
+      if(reporte.generado == 'S'){
+        informeGeneradoEsS = true;
+        await abrirUrl(reporte.archivoUrl, token);
+        generandoInforme = false;
+        setState(() {});
+      }else{
+        await Future.delayed(const Duration(seconds: 1));
+      }
+    }
+    setState(() {});
+
   }
 }

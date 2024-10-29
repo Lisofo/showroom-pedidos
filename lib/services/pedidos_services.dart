@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:showroom_maqueta/config/config.dart';
 import 'package:showroom_maqueta/models/linea.dart';
 import 'package:showroom_maqueta/models/pedido.dart';
+import 'package:showroom_maqueta/models/reporte.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 
 class PedidosServices {
@@ -248,6 +249,93 @@ class PedidosServices {
     }
   }
 
+  Future getReporte(BuildContext context, int reporteId, String token) async {
+    String link = '$apirUrl/api/v1/rpts/$reporteId';
+    try {
+      var headers = {'Authorization': token};
+      var resp = await _dio.request(
+        link,
+        options: Options(
+          method: 'GET',
+          headers: headers,
+        ),
+      );
+
+      statusCode = 1;
+      final Reporte reporte = Reporte.fromJson(resp.data);
+      print(reporte.rptGenId);
+      return reporte;
+
+    } catch (e) {
+      statusCode = 0;
+      if (e is DioException) {
+        print(e);
+        // if (e.response != null) {
+        //   final responseData = e.response!.data;
+        //   if (responseData != null) {
+        //     if(e.response!.statusCode == 403){
+        //       showErrorDialog(context, 'Error: ${e.response!.data['message']}');
+        //     }else if(e.response!.statusCode! >= 500) {
+        //       showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        //     } else{
+        //       final errors = responseData['errors'] as List<dynamic>;
+        //       final errorMessages = errors.map((error) {
+        //         return "Error: ${error['message']}";
+        //       }).toList();
+        //       showErrorDialog(context, errorMessages.join('\n'));
+        //     }
+        //   } else {
+        //     showErrorDialog(context, 'Error: ${e.response!.data}');
+        //   }
+        // } else {
+        //   showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        // } 
+      } 
+    }
+  }
+
+  Future patchInforme(BuildContext context, Reporte reporte, String generado, String token) async {
+    String link = '$apirUrl/api/v1/rpts/${reporte.rptGenId}';
+
+    try {
+      var headers = {'Authorization': token};
+      var resp = await _dio.request(
+        link,
+        options: Options(
+          method: 'PATCH',
+          headers: headers,
+        ),
+      );
+
+      statusCode = 1;
+      return resp;
+    } catch (e) {
+      statusCode = 0;
+      if (e is DioException) {
+        print(e);
+        // if (e.response != null) {
+        //   final responseData = e.response!.data;
+        //   if (responseData != null) {
+        //     if(e.response!.statusCode == 403){
+        //       showErrorDialog(context, 'Error: ${e.response!.data['message']}');
+        //     }else if(e.response!.statusCode! >= 500) {
+        //       showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        //     } else{
+        //       final errors = responseData['errors'] as List<dynamic>;
+        //       final errorMessages = errors.map((error) {
+        //         return "Error: ${error['message']}";
+        //       }).toList();
+        //       showErrorDialog(context, errorMessages.join('\n'));
+        //     }
+        //   } else {
+        //     showErrorDialog(context, 'Error: ${e.response!.data}');
+        //   }
+        // } else {
+        //   showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        // } 
+      } 
+    }
+  }
 
   String _formatFechas(DateTime? date) {
     return '${date?.year.toString().padLeft(4, '0')}-${date?.month.toString().padLeft(2, '0')}-${date?.day.toString().padLeft(2, '0')}';
