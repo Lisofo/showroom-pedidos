@@ -13,6 +13,7 @@ import 'package:showroom_maqueta/services/pedidos_services.dart';
 import 'package:showroom_maqueta/widgets/confirmacion.dart';
 import 'package:showroom_maqueta/widgets/custom_form_field.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart' show kIsWeb; // Para detectar si está en web
 
 class NuevoPedido extends StatefulWidget {
   const NuevoPedido({super.key});
@@ -347,7 +348,6 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                           const Spacer(),
                           TextButton(
                             onPressed: () async {
-                              Navigator.of(context).pop();
                               await postInforme(context, true);
                               await generarInformeCompleto();
                             },
@@ -355,7 +355,6 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                           ),
                           TextButton(
                             onPressed: () async {
-                              Navigator.of(context).pop();
                               await postInforme(context, false);
                               await generarInformeCompleto();
                             },
@@ -416,7 +415,11 @@ class _NuevoPedidoState extends State<NuevoPedido> {
 
       if(reporte.generado == 'S'){
         informeGeneradoEsS = true;
-        await abrirUrl(reporte.archivoUrl, token);
+        if(kIsWeb){
+          abrirUrlWeb(reporte.archivoUrl);
+        } else{
+          await abrirUrl(reporte.archivoUrl, token);
+        }
         generandoInforme = false;
         setState(() {});
       }else{
@@ -435,6 +438,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
   Future<void> postInforme(BuildContext context, bool conFoto) async {
     await PedidosServices().postInforme(context, almacenId, pedido, conFoto, token);
     rptGenId = context.read<ItemProvider>().rptGenId;
+    appRouter.pop();
   }
 
   Future<void> postPutPedido(BuildContext context) async {
@@ -624,7 +628,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
 
   abrirUrl(String url, String token) async {
     Dio dio = Dio();
-    String link = url += '?authorization=$token';
+    String link = url; // += '?authorization=$token';
     print(link);
     try {
       // Realizar la solicitud HTTP con el encabezado de autorización
@@ -648,6 +652,19 @@ class _NuevoPedidoState extends State<NuevoPedido> {
     } catch (e) {
       // Manejar errores de solicitud
       print('Error al realizar la solicitud: $e');
+    }
+  }
+
+  Future<void> abrirUrlWeb(String url) async {
+    Uri uri = Uri.parse(url);
+    
+    // Verificar si la URL puede ser abierta
+    if (await canLaunchUrl(uri)) {
+      // Si la URL es válida, abrirla en el navegador
+      await launchUrl(uri);
+    } else {
+      // Si no se puede abrir la URL, imprimir un mensaje de error
+      print('No se puede abrir la URL: $url');
     }
   }
 
@@ -689,7 +706,11 @@ class _NuevoPedidoState extends State<NuevoPedido> {
       reporte = await PedidosServices().getReporte(context, rptGenId, token);
       if(reporte.generado == 'S'){
         informeGeneradoEsS = true;
-        await abrirUrl(reporte.archivoUrl, token);
+        if(kIsWeb) {
+          abrirUrlWeb(reporte.archivoUrl);
+        } else {
+          await abrirUrl(reporte.archivoUrl, token);
+        }
         generandoInforme = false;
         setState(() {});
       }else{

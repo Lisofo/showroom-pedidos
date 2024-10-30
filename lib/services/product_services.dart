@@ -10,22 +10,13 @@ class ProductServices {
   final _dio = Dio();
   late String apirUrl = Config.APIURL;
   
-  Future<List<Product>> getProductByName(String raiz, String codTipoLista, String almacenId, String descripcion, String offset, String token) async {
-    String link = apirUrl += '/api/v1/itemsRaiz/?limit=20&offset=$offset&almacenId=$almacenId';
-    bool yaTieneFiltro = true;
-    if (raiz != '') {
-      link += '&raiz=$raiz';
-      yaTieneFiltro = true;
+  Future<List<Product>> getProductByName(String condicion, String codTipoLista, String almacenId, String codBarra, String offset, String token) async {
+    String link = apirUrl += '/api/v1/itemsRaiz/?limit=20&offset=$offset&almacenId=$almacenId&codTipoLista=$codTipoLista';
+    if (condicion != '') {
+      link += '&condicion=$condicion';
     }
-    if (codTipoLista != '') {
-      yaTieneFiltro ? link += '&' : link += '?';
-      link += 'codTipoLista=$codTipoLista';
-      yaTieneFiltro = true;
-    }
-    if (descripcion != '') {
-      yaTieneFiltro ? link += '&' : link += '?';
-      link += 'descripcion=$descripcion';
-      yaTieneFiltro = true;
+    if (codBarra != '') {     
+      link += '&codBarra=$codBarra';
     }
     try {
       var headers = {'Authorization': token};

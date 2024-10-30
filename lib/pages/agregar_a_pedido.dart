@@ -113,22 +113,14 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                   onSubmitted: (value) async {
                     cargando = true;
                     setState((){});
-                    if (value.contains('-')) {
-                      query.text = value;
-                      raiz = query.text.trim();
-                      descripcion = '';
-                      print(raiz);
-                    } else {
-                      raiz = '';
-                      descripcion = value.trim();
-                      print(descripcion);
-                    }
+                    query.text = value;
+                    raiz = query.text.trim();
                     offset = 0;
                     listItems = await ProductServices().getProductByName(
                       raiz, 
                       cliente.codTipoLista, 
                       almacen, 
-                      descripcion, 
+                      '', 
                       offset.toString(), 
                       token
                     );
@@ -264,7 +256,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
     if (code == '') {
       return null;
     } else {
-      listaProductosTemporal = await ProductServices().getProductByName(code, cliente.codTipoLista ,almacen,'', "0", token,);
+      listaProductosTemporal = await ProductServices().getProductByName('', cliente.codTipoLista ,almacen, code, "0", token,);
       productoRetorno = listaProductosTemporal[0];
       Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
       appRouter.push('/product_page');
