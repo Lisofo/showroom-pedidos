@@ -1,3 +1,4 @@
+import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
@@ -77,6 +78,7 @@ class _PaginaSimpleProductoState extends State<PaginaSimpleProducto> {
                         currentIndex = index;
                       });
                     },
+                    pageController: PageController(initialPage: currentIndex),
                     scrollPhysics: const BouncingScrollPhysics(),
                     backgroundDecoration: BoxDecoration(
                       color: Theme.of(context).canvasColor,
@@ -84,6 +86,15 @@ class _PaginaSimpleProductoState extends State<PaginaSimpleProducto> {
                   ),
                 ),
               ),
+              const SizedBox(height: 10),
+                DotsIndicator(
+                  dotsCount: productoNuevo.imagenes.length,
+                  position: currentIndex.toInt(),
+                  decorator: const DotsDecorator(
+                    color: Colors.grey, // Inactive color
+                    activeColor: Colors.blue, // Active color
+                  ),
+                ),
             ] else ... [
               const Center(
                 child: Column(
