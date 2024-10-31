@@ -9,6 +9,8 @@ import 'package:showroom_maqueta/models/product.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/product_services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
 
 
 class AgregarPedido extends StatefulWidget {
@@ -35,6 +37,9 @@ class _AgregarPedidoState extends State<AgregarPedido> {
   bool busco = false;
   late List<Linea> lineas = [];
   bool existe = false;
+  bool isMobile = false;
+  late bool visible;
+  String? _barcode;
 
   @override
   void initState() {
@@ -49,7 +54,13 @@ class _AgregarPedidoState extends State<AgregarPedido> {
     });
   }
 
-  cargarDatos() async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    cargarDatos();
+  }
+
+  void cargarDatos() async {
     almacen = context.read<ItemProvider>().almacen;
     token = context.read<ItemProvider>().token;
     cliente = context.read<ItemProvider>().client;
@@ -82,6 +93,8 @@ class _AgregarPedidoState extends State<AgregarPedido> {
   Widget build(BuildContext context) {
     lineas = context.watch<ItemProvider>().lineasGenericas;
     final colores = Theme.of(context).colorScheme;
+    var shortestSide = MediaQuery.of(context).size.shortestSide;
+    isMobile = shortestSide < 600;
     print('REconstruido');
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -133,11 +146,46 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                 ),
               ),
             ),
-            IconButton(
-              onPressed: readQRCode,
-              icon: const Icon(Icons.qr_code_scanner_rounded),
-              color: Colors.white,
-            ),
+            if(isMobile)...[
+              IconButton(
+                onPressed: readQRCode,
+                icon: const Icon(Icons.qr_code_scanner_rounded),
+                color: Colors.white,
+              ),
+            ] else ...[
+              VisibilityDetector(
+                onVisibilityChanged: (VisibilityInfo info){
+                  visible = info.visibleFraction > 0;
+                },
+                key: const Key('visible-detector-key'),
+                child: BarcodeKeyboardListener(
+                  bufferDuration: const Duration(milliseconds: 200),
+                  onBarcodeScanned: (barcode) async{
+                    if(!visible) return;
+                    print(barcode);
+                    setState(() {
+                      _barcode = barcode;
+                    });
+                    if (_barcode != null){     
+                      Product productoRetorno;
+                      List<Product> listaProductosTemporal;    
+                      listaProductosTemporal = await ProductServices().getProductByName('', cliente.codTipoLista ,almacen, _barcode.toString(), "0", token,);
+                      productoRetorno = listaProductosTemporal[0];
+                      Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
+                      appRouter.push('/product_page');
+                      setState(() {});
+                    }
+                  }, 
+                  child: const Text(
+                    'Acerque producto al lector',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ) 
+                )
+              )
+            ]
           ],
         ),
         body: !cargando ? SafeArea(
