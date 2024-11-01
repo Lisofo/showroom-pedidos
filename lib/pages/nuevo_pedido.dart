@@ -6,8 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:showroom_maqueta/config/router/app_router.dart';
 import 'package:showroom_maqueta/models/client.dart';
 import 'package:showroom_maqueta/models/linea.dart';
+import 'package:showroom_maqueta/models/moneda.dart';
 import 'package:showroom_maqueta/models/pedido.dart';
 import 'package:showroom_maqueta/models/reporte.dart';
+import 'package:showroom_maqueta/models/transaccion.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/pedidos_services.dart';
 import 'package:showroom_maqueta/widgets/confirmacion.dart';
@@ -54,6 +56,10 @@ class _NuevoPedidoState extends State<NuevoPedido> {
   late int rptGenId = 0;
   late bool generandoInforme = false;
   late bool informeGeneradoEsS = false;
+  late List<Moneda> monedas = [];
+  late List<Transaccion> transacciones = [];
+  late Transaccion transaccionSeleccionada = Transaccion.empty();
+  late Moneda monedaSeleccionada = Moneda.empty();
 
   @override
   void initState() {
@@ -66,12 +72,17 @@ class _NuevoPedidoState extends State<NuevoPedido> {
     cliente = context.read<ItemProvider>().client;
     token = context.read<ItemProvider>().token;
     almacenId = context.read<ItemProvider>().almacen;
+    monedas = await PedidosServices().getMonedas(context, token);
+    transacciones = await PedidosServices().getTransacciones(context, token);
     if (pedido.ordenTrabajoId != 0) {
       numeroOrdenTrabajo.text = pedido.numeroOrdenTrabajo;
       comClienteController.text = pedido.comentarioCliente;
       fechaOrdenController.text = pedido.fechaOrdenTrabajo == null ? '' : _formatDateAndTime(pedido.fechaOrdenTrabajo);
       fechaVencimientoController.text = pedido.fechaVencimiento == null ? "" : _formatDateAndTime(pedido.fechaVencimiento);
       fechaEntregaController.text = pedido.fechaEntrega == null ? '' : _formatDateAndTime(pedido.fechaEntrega);
+      descripcionController.text = pedido.descripcion;
+      monedaSeleccionada = monedas.firstWhere((moneda) => moneda.monedaId == pedido.monedaId);
+      transaccionSeleccionada = transacciones.firstWhere((transaccion) => transaccion.transaccionId == pedido.transaccionId);
       if (pedido.fechaOrdenTrabajo != null) {
         fechaOrden = pedido.fechaOrdenTrabajo!;
       }
@@ -86,6 +97,9 @@ class _NuevoPedidoState extends State<NuevoPedido> {
         cantidad += linea.cantidad;
         costoTotal += linea.costoUnitario * linea.cantidad;
       }
+    } else {
+      transaccionSeleccionada = transacciones[0];
+      monedaSeleccionada = monedas[0];
     }
     setState(() {});
   }
@@ -198,14 +212,19 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                         style: TextStyle(fontSize: 18)
                       ),
                       const SizedBox(width: 20,),
-                      DropdownButton(
-                        value: _opcionSeleccionada,
-                        items: getOpcionesDropdown(), 
-                        onChanged: (opt){
+                      DropdownButton<Moneda>(
+                        value: monedaSeleccionada,
+                        items: monedas.map((moneda) {
+                          return DropdownMenuItem(
+                            value: moneda,
+                            child: Text(moneda.signo),
+                          );
+                        }).toList(),
+                        onChanged: (Moneda? nuevaMoneda) {
                           setState(() {
-                            _opcionSeleccionada = opt!;
+                            monedaSeleccionada = nuevaMoneda!;
                           });
-                        }
+                        },
                       ),
                     ],
                   ),
@@ -217,14 +236,19 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                         style: TextStyle(fontSize: 18)
                       ),
                       const SizedBox(width: 20,),
-                      DropdownButton(
-                        value: _opcionTipo,
-                        items: getOpcionesDropdownTipo(),
-                        onChanged: (opt){
+                      DropdownButton<Transaccion>(
+                        value: transaccionSeleccionada,
+                        items: transacciones.map((transaccion) {
+                          return DropdownMenuItem(
+                            value: transaccion,
+                            child: Text(transaccion.descripcion),
+                          );
+                        }).toList(),
+                        onChanged: (Transaccion? nuevaTransaccion) {
                           setState(() {
-                            _opcionTipo = opt!;
+                            transaccionSeleccionada = nuevaTransaccion!;
                           });
-                        }
+                        },
                       ),
                     ],
                   ),
@@ -448,12 +472,12 @@ class _NuevoPedidoState extends State<NuevoPedido> {
         numeroOrdenTrabajo: numeroOrdenTrabajo.text,
         fechaOrdenTrabajo: fechaOrden,
         descripcion: descripcionController.text,
-        transaccionId: 17,
+        transaccionId: transaccionSeleccionada.transaccionId,
         clienteId: cliente.clienteId,
         codCliente: cliente.codCliente,
         ruc: cliente.ruc,
         nombre: cliente.nombre,
-        monedaId: 1,
+        monedaId: monedaSeleccionada.monedaId,
         codMoneda: '1',
         descMoneda: '',
         signo: '',
@@ -482,8 +506,8 @@ class _NuevoPedidoState extends State<NuevoPedido> {
       pedido.fechaVencimiento = fechaVencimiento;
       pedido.fechaEntrega = fechaEntrega;
       pedido.descripcion = descripcionController.text;
-      pedido.transaccionId = 17;
-      pedido.monedaId = 1;
+      pedido.transaccionId = transaccionSeleccionada.transaccionId;
+      pedido.monedaId = monedaSeleccionada.monedaId;
       pedido.comentarioCliente = comClienteController.text;
       pedido.comentarioTrabajo = 'comentarioTrabajo';
       await _pedidosServices.putPedido(context, pedido, [], token);
@@ -594,32 +618,6 @@ class _NuevoPedidoState extends State<NuevoPedido> {
         fechaEntregaController.text = _fechaEntrega;
       });
     }
-  }
-
-  List<DropdownMenuItem<String>> getOpcionesDropdown(){
-
-    List<DropdownMenuItem<String>> lista = [];
-
-    for (var moneda in _opcionesMoneda) {
-      lista.add(DropdownMenuItem(
-        value: moneda,
-        child: Text(moneda),
-      ));
-    }
-    return lista;
-  }
-
-  List<DropdownMenuItem<String>> getOpcionesDropdownTipo(){
-
-    List<DropdownMenuItem<String>> lista = [];
-
-    for (var tipo in _opcionesTipo) {
-      lista.add(DropdownMenuItem(
-        value: tipo,
-        child: Text(tipo),
-      ));
-    }
-    return lista;
   }
 
   String _formatDateAndTime(DateTime? date) {

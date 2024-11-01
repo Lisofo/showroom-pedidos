@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:showroom_maqueta/config/config.dart';
 import 'package:showroom_maqueta/models/linea.dart';
+import 'package:showroom_maqueta/models/moneda.dart';
 import 'package:showroom_maqueta/models/pedido.dart';
 import 'package:showroom_maqueta/models/reporte.dart';
+import 'package:showroom_maqueta/models/transaccion.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 
 class PedidosServices {
@@ -309,6 +311,94 @@ class PedidosServices {
 
       statusCode = 1;
       return resp;
+    } catch (e) {
+      statusCode = 0;
+      if (e is DioException) {
+        print(e);
+        // if (e.response != null) {
+        //   final responseData = e.response!.data;
+        //   if (responseData != null) {
+        //     if(e.response!.statusCode == 403){
+        //       showErrorDialog(context, 'Error: ${e.response!.data['message']}');
+        //     }else if(e.response!.statusCode! >= 500) {
+        //       showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        //     } else{
+        //       final errors = responseData['errors'] as List<dynamic>;
+        //       final errorMessages = errors.map((error) {
+        //         return "Error: ${error['message']}";
+        //       }).toList();
+        //       showErrorDialog(context, errorMessages.join('\n'));
+        //     }
+        //   } else {
+        //     showErrorDialog(context, 'Error: ${e.response!.data}');
+        //   }
+        // } else {
+        //   showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        // } 
+      } 
+    }
+  }
+
+  Future getMonedas(BuildContext context, String token) async {
+    String link = '$apirUrl/api/v1/caja/monedas';
+    try {
+      var headers = {'Authorization': token};
+      var resp = await _dio.request(
+        link,
+        options: Options(
+          method: 'GET',
+          headers: headers,
+        ),
+      );
+
+      statusCode = 1;
+      final List<dynamic> monedasList = resp.data;
+      return monedasList.map((obj) => Moneda.fromJson(obj)).toList();
+
+    } catch (e) {
+      statusCode = 0;
+      if (e is DioException) {
+        print(e);
+        // if (e.response != null) {
+        //   final responseData = e.response!.data;
+        //   if (responseData != null) {
+        //     if(e.response!.statusCode == 403){
+        //       showErrorDialog(context, 'Error: ${e.response!.data['message']}');
+        //     }else if(e.response!.statusCode! >= 500) {
+        //       showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        //     } else{
+        //       final errors = responseData['errors'] as List<dynamic>;
+        //       final errorMessages = errors.map((error) {
+        //         return "Error: ${error['message']}";
+        //       }).toList();
+        //       showErrorDialog(context, errorMessages.join('\n'));
+        //     }
+        //   } else {
+        //     showErrorDialog(context, 'Error: ${e.response!.data}');
+        //   }
+        // } else {
+        //   showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        // } 
+      } 
+    }
+  }
+
+  Future getTransacciones(BuildContext context, String token) async {
+    String link = '$apirUrl/api/v1/facturacion/transacciones';
+    try {
+      var headers = {'Authorization': token};
+      var resp = await _dio.request(
+        link,
+        options: Options(
+          method: 'GET',
+          headers: headers,
+        ),
+      );
+
+      statusCode = 1;
+      final List<dynamic> transaccionesList = resp.data;
+      return transaccionesList.map((obj) => Transaccion.fromJson(obj)).toList();
+
     } catch (e) {
       statusCode = 0;
       if (e is DioException) {
