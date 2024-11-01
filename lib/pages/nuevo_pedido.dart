@@ -476,7 +476,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
       );
       await _pedidosServices.postPedido(context, nuevoPedido, token);
       Provider.of<ItemProvider>(context, listen: false).setPedido(nuevoPedido);
-      appRouter.go('/pedidoInterno');
+      appRouter.pushReplacement('/pedidoInterno');
     } else {
       pedido.fechaOrdenTrabajo = fechaOrden;
       pedido.fechaVencimiento = fechaVencimiento;

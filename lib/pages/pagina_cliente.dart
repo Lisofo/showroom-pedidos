@@ -21,6 +21,7 @@ class _PaginaClienteState extends State<PaginaCliente> {
   late Client clienteSeleccionado = Client.empty();
   late String token = '';
   late String alamcenId = '';
+  final GlobalKey<RefreshIndicatorState> _refreshKey = GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
@@ -34,6 +35,12 @@ class _PaginaClienteState extends State<PaginaCliente> {
     clienteSeleccionado = context.read<ItemProvider>().client;
     listaPedidos = await PedidosServices().getPedidosCliente(context, clienteSeleccionado.clienteId, alamcenId, token);
     setState(() {});
+  }
+
+  Future<void> _refreshData() async {
+    listaPedidos = [];
+    setState(() {});
+    await cargarDatos();
   }
 
   @override
@@ -73,20 +80,24 @@ class _PaginaClienteState extends State<PaginaCliente> {
             ),
             const Divider(thickness: 2.0),
             Expanded(
-              child: ListView.builder(
-                itemCount: listaPedidos.length,
-                itemBuilder: (context, i) {
-                  var pedido = listaPedidos[i];
-                  return ListTile(
-                    onTap: () {
-                      Provider.of<ItemProvider>(context, listen: false).setPedido(pedido);
-                      appRouter.push('/pedidoInterno');
-                    },
-                    title: Text(pedido.numeroOrdenTrabajo),
-                    subtitle: Text('Estado: ${pedido.estado}\nFecha: ${_formatDateAndTime(pedido.fechaOrdenTrabajo)}\n${pedido.comentarioCliente}'),
-                    trailing: const Icon(Icons.chevron_right,size: 25,),
-                  );
-                }
+              child: RefreshIndicator(
+                key: _refreshKey,
+                onRefresh: _refreshData,
+                child: ListView.builder(
+                  itemCount: listaPedidos.length,
+                  itemBuilder: (context, i) {
+                    var pedido = listaPedidos[i];
+                    return ListTile(
+                      onTap: () {
+                        Provider.of<ItemProvider>(context, listen: false).setPedido(pedido);
+                        appRouter.push('/pedidoInterno');
+                      },
+                      title: Text(pedido.numeroOrdenTrabajo),
+                      subtitle: Text('Estado: ${pedido.estado}\nFecha: ${_formatDateAndTime(pedido.fechaOrdenTrabajo)}\n${pedido.comentarioCliente}'),
+                      trailing: const Icon(Icons.chevron_right,size: 25,),
+                    );
+                  }
+                ),
               )
             ),
             Padding(
