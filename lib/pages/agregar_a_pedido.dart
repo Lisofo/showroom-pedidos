@@ -153,38 +153,43 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                 color: Colors.white,
               ),
             ] else ...[
-              VisibilityDetector(
-                onVisibilityChanged: (VisibilityInfo info){
-                  visible = info.visibleFraction > 0;
-                },
-                key: const Key('visible-detector-key'),
-                child: BarcodeKeyboardListener(
-                  bufferDuration: const Duration(milliseconds: 200),
-                  onBarcodeScanned: (barcode) async{
-                    if(!visible) return;
-                    print(barcode);
-                    setState(() {
-                      _barcode = barcode;
-                    });
-                    if (_barcode != null){     
-                      Product productoRetorno;
-                      List<Product> listaProductosTemporal;    
-                      listaProductosTemporal = await ProductServices().getProductByName('', cliente.codTipoLista ,almacen, _barcode.toString(), "0", token,);
-                      productoRetorno = listaProductosTemporal[0];
-                      Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
-                      appRouter.push('/product_page');
-                      setState(() {});
-                    }
-                  }, 
-                  child: const Text(
-                    'Acerque producto al lector',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                  ) 
-                )
-              )
+              IconButton(
+                onPressed: readQRCode,
+                icon: const Icon(Icons.qr_code_scanner_rounded),
+                color: Colors.white,
+              ), ///ESTO ES TEMPORALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
+              // VisibilityDetector(
+              //   onVisibilityChanged: (VisibilityInfo info){
+              //     visible = info.visibleFraction > 0;
+              //   },
+              //   key: const Key('visible-detector-key'),
+              //   child: BarcodeKeyboardListener(
+              //     bufferDuration: const Duration(milliseconds: 200),
+              //     onBarcodeScanned: (barcode) async{
+              //       if(!visible) return;
+              //       print(barcode);
+              //       setState(() {
+              //         _barcode = barcode;
+              //       });
+              //       if (_barcode != null){     
+              //         Product productoRetorno;
+              //         List<Product> listaProductosTemporal;    
+              //         listaProductosTemporal = await ProductServices().getProductByName('', cliente.codTipoLista ,almacen, _barcode.toString(), "0", token,);
+              //         productoRetorno = listaProductosTemporal[0];
+              //         Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
+              //         appRouter.push('/product_page');
+              //         setState(() {});
+              //       }
+              //     }, 
+              //     child: const Text(
+              //       'Acerque producto al lector',
+              //       style: TextStyle(
+              //         fontSize: 16,
+              //         color: Colors.white,
+              //       ),
+              //     ) 
+              //   )
+              // )
             ]
           ],
         ),

@@ -14,54 +14,70 @@ class PaginaSimpleProducto extends StatefulWidget {
 }
 
 class _PaginaSimpleProductoState extends State<PaginaSimpleProducto> {
-
   late String raiz = '';
   Product productoNuevo = Product.empty();
   late String almacen = '';
   late String token = '';
   late int currentIndex = 0;
-  //////
+  late PageController _pageController;
+
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: currentIndex);
     cargarDatos();
   }
 
-  cargarDatos() async{
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  cargarDatos() async {
     almacen = context.read<ItemProvider>().almacen;
     token = context.read<ItemProvider>().token;
     raiz = context.read<ItemProvider>().raiz;
     productoNuevo = await ProductServices().getSingleProductByRaiz(raiz, almacen, token);
-    setState(() {
-      
-    });
+    setState(() {});
+  }
+
+  void _scrollToIndex(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    
     final colores = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           raiz,
           style: TextStyle(
-            color: colores.onPrimary
+            color: colores.onPrimary,
           ),
         ),
         backgroundColor: colores.primary,
         iconTheme: const IconThemeData(
-          color: Colors.white
+          color: Colors.white,
         ),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (productoNuevo.imagenes.isNotEmpty) ... [
-              const SizedBox(height: 20,),
-              Text(productoNuevo.descripcion, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-              const SizedBox(height: 20,),
+            if (productoNuevo.imagenes.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              Text(
+                productoNuevo.descripcion,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
               Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.98,
@@ -78,7 +94,7 @@ class _PaginaSimpleProductoState extends State<PaginaSimpleProducto> {
                         currentIndex = index;
                       });
                     },
-                    pageController: PageController(initialPage: currentIndex),
+                    pageController: _pageController,
                     scrollPhysics: const BouncingScrollPhysics(),
                     backgroundDecoration: BoxDecoration(
                       color: Theme.of(context).canvasColor,
@@ -87,27 +103,40 @@ class _PaginaSimpleProductoState extends State<PaginaSimpleProducto> {
                 ),
               ),
               const SizedBox(height: 10),
-                DotsIndicator(
-                  dotsCount: productoNuevo.imagenes.length,
-                  position: currentIndex.toInt(),
-                  decorator: const DotsDecorator(
-                    color: Colors.grey, // Inactive color
-                    activeColor: Colors.blue, // Active color
-                  ),
-                ),
-            ] else ... [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(productoNuevo.imagenes.length, (index) {
+                  return GestureDetector(
+                    onTap: () {
+                      _scrollToIndex(index);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: Container(
+                        width: 16.0,
+                        height: 16.0,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: currentIndex == index ? Colors.blue : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ] else ...[
               const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     CircularProgressIndicator(),
-                    SizedBox(height: 20,),
-                    Text('Cargando...')
+                    SizedBox(height: 20),
+                    Text('Cargando...'),
                   ],
                 ),
-              )
-            ]
+              ),
+            ],
           ],
         ),
       ),
