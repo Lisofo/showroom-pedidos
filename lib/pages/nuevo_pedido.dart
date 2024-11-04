@@ -10,7 +10,7 @@ import 'package:showroom_maqueta/models/pedido.dart';
 import 'package:showroom_maqueta/models/reporte.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/pedidos_services.dart';
-import 'package:showroom_maqueta/widgets/confirmacion.dart';
+import 'package:showroom_maqueta/widgets/carteles.dart';
 import 'package:showroom_maqueta/widgets/custom_form_field.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart' show kIsWeb; // Para detectar si está en web
@@ -127,6 +127,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                         width: MediaQuery.of(context).size.width * 0.5,
                         child: CustomTextFormField(
                           textAlign: TextAlign.center,
+                          enableInteractiveSelection: true,
                           controller: numeroOrdenTrabajo,
                           maxLines: 1,
                         )
@@ -187,6 +188,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                   const SizedBox(height: 20,),
                   CustomTextFormField(
                     maxLines: 1,
+                    enableInteractiveSelection: true,
                     hint: 'Descripción',
                     controller: descripcionController,
                   ),
@@ -231,6 +233,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                   const SizedBox(height: 20,),
                   CustomTextFormField(
                     controller: comClienteController,
+                    enableInteractiveSelection: true,
                     hint: 'Detalle',
                     minLines: 1,
                     maxLines: 10,
@@ -238,6 +241,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                   const SizedBox(height: 20,),
                   CustomTextFormField(
                     hint: 'Método de envío',
+                    enableInteractiveSelection: true,
                     controller: envioController,
                     minLines: 1,
                     maxLines: 10,
@@ -330,75 +334,91 @@ class _NuevoPedidoState extends State<NuevoPedido> {
               await postPutPedido(context);
             break;
             case 1:
-              await showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: const Text('Imprimir'),
-                    content: Text('Desea imprimir la OT: ${pedido.numeroOrdenTrabajo} con foto o sin foto?'),
-                    actions: [
-                      Row(
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              appRouter.pop();
-                            },
-                            child: const Text('Cancelar')
-                          ),
-                          const Spacer(),
-                          TextButton(
-                            onPressed: () async {
-                              await postInforme(context, true);
-                              await generarInformeCompleto();
-                            },
-                            child: const Text('SI')
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              await postInforme(context, false);
-                              await generarInformeCompleto();
-                            },
-                            child: const Text('NO')
-                          ),
-                        ],
-                      )
-                    ],
-                  );
-                }
-              );
+              if(pedido.ordenTrabajoId != 0) {
+                await imprimirOrden(context);
+              } else {
+                Carteles.showDialogs(context, 'Guarde el pedido primero', false, false, false);
+              }
             break;
             case 2:
-            await showDialog(
-              context: context, 
-              builder: (context) {
-                return AlertDialog(
-                  title: const Text('Descartar'),
-                  content: Text('Esta por descartar el pedido ${pedido.numeroOrdenTrabajo}. Esta seguro de querer descartarlo?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {}, child: const Text('Cancelar')
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        int? statusCode;
-                        if(pedido.ordenTrabajoId != 0){
-                          await _pedidosServices.patchPedido(context, pedido.ordenTrabajoId, 3, token);
-                          statusCode = await _pedidosServices.getStatusCode();
-                          await _pedidosServices.resetStatusCode();
-                          if(statusCode == 1) {
-                            Carteles.showDialogs(context, 'Pedido descartado correctamente', true, true, true);
-                          }
-                        }
-                      }, child: const Text('Confirmar')
-                    ),
-                  ],
-                );
+              if(pedido.ordenTrabajoId != 0) {
+                await descartarPedido(context);
+              } else{
+                Carteles.showDialogs(context, 'Guarde el pedido primero', false, false, false);
               }
-            );
             break;
           }
         },
       ),
+    );
+  }
+
+  Future<void> imprimirOrden(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Imprimir'),
+          content: Text('Desea imprimir la OT: ${pedido.numeroOrdenTrabajo} con foto o sin foto?'),
+          actions: [
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    appRouter.pop();
+                  },
+                  child: const Text('Cancelar')
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: () async {
+                    await postInforme(context, true);
+                    await generarInformeCompleto();
+                  },
+                  child: const Text('SI')
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await postInforme(context, false);
+                    await generarInformeCompleto();
+                  },
+                  child: const Text('NO')
+                ),
+              ],
+            )
+          ],
+        );
+      }
+    );
+  }
+
+  Future<void> descartarPedido(BuildContext context) async {
+    await showDialog(
+      context: context, 
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Descartar'),
+          content: Text('Esta por descartar el pedido ${pedido.numeroOrdenTrabajo}. Esta seguro de querer descartarlo?'),
+          actions: [
+            TextButton(
+              onPressed: () {}, child: const Text('Cancelar')
+            ),
+            TextButton(
+              onPressed: () async {
+                int? statusCode;
+                if(pedido.ordenTrabajoId != 0){
+                  await _pedidosServices.patchPedido(context, pedido.ordenTrabajoId, 4, token);
+                  statusCode = await _pedidosServices.getStatusCode();
+                  await _pedidosServices.resetStatusCode();
+                  if(statusCode == 1) {
+                    Carteles.showDialogs(context, 'Pedido descartado correctamente', true, true, true);
+                  }
+                }
+              }, child: const Text('Confirmar')
+            ),
+          ],
+        );
+      }
     );
   }
 

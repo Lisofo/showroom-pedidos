@@ -11,7 +11,7 @@ import 'package:showroom_maqueta/models/producto_variante.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/pedidos_services.dart';
 import 'package:showroom_maqueta/services/product_services.dart';
-import 'package:showroom_maqueta/widgets/confirmacion.dart';
+import 'package:showroom_maqueta/widgets/carteles.dart';
 import 'package:showroom_maqueta/widgets/variante_items.dart';
 
 
@@ -103,8 +103,8 @@ class _ProductPageState extends State<ProductPage> {
     
     // Obtener datos frescos de la API
     productoNuevo = productoSeleccionado.raiz != '' 
-      ? await ProductServices().getSingleProductByRaiz(productoSeleccionado.raiz, almacen, token) 
-      : await ProductServices().getSingleProductByRaiz(raiz, almacen, token);
+      ? await ProductServices().getSingleProductByRaiz(context, productoSeleccionado.raiz, almacen, token) 
+      : await ProductServices().getSingleProductByRaiz(context, raiz, almacen, token);
     
     // Guardar una copia del producto original
     _productoOriginal = Product.copy(productoNuevo);

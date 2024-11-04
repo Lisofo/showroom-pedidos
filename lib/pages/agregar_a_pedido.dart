@@ -74,6 +74,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
     });
 
     List<Product> nuevosItems = await ProductServices().getProductByName(
+      context,
       raiz, 
       cliente.codTipoLista, 
       almacen, 
@@ -130,6 +131,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                     raiz = query.text.trim();
                     offset = 0;
                     listItems = await ProductServices().getProductByName(
+                      context,
                       raiz, 
                       cliente.codTipoLista, 
                       almacen, 
@@ -309,7 +311,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
     if (code == '') {
       return null;
     } else {
-      listaProductosTemporal = await ProductServices().getProductByName('', cliente.codTipoLista ,almacen, code, "0", token,);
+      listaProductosTemporal = await ProductServices().getProductByName(context, '', cliente.codTipoLista ,almacen, code, "0", token,);
       productoRetorno = listaProductosTemporal[0];
       Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
       appRouter.push('/product_page');

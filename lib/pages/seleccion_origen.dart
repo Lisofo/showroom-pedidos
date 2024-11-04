@@ -42,7 +42,7 @@ class _SeleccionOrigenState extends State<SeleccionOrigen> {
     bool isConnected = await _checkConnectivity();
     if(isConnected){
       token = context.read<ItemProvider>().token;
-      productosOffline = await ProductServices().getAllProducts(almacen,token);
+      productosOffline = await ProductServices().getAllProducts(context, almacen,token);
       
       // for (int i = 0; i<productosOffline.length; i++){
       //     _saveProductLocally(productosOffline[i]);

@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:showroom_maqueta/config/config.dart';
 import 'package:showroom_maqueta/models/producto_variante.dart';
+import 'package:showroom_maqueta/widgets/carteles.dart';
 // import 'package:showroom_maqueta/offline/boxes.dart';
 // almancenId 1 = nyp
 // almancenId 18 = ufo
@@ -10,7 +12,7 @@ class ProductServices {
   final _dio = Dio();
   late String apirUrl = Config.APIURL;
   
-  Future<List<Product>> getProductByName(String condicion, String codTipoLista, String almacenId, String codBarra, String offset, String token) async {
+  Future<List<Product>> getProductByName(BuildContext context, String condicion, String codTipoLista, String almacenId, String codBarra, String offset, String token) async {
     String link = apirUrl += '/api/v1/itemsRaiz/?limit=20&offset=$offset&almacenId=$almacenId&codTipoLista=$codTipoLista';
     if (condicion != '') {
       link += '&condicion=$condicion';
@@ -31,12 +33,33 @@ class ProductServices {
       final List<dynamic> productList = resp.data;
       return productList.map((obj) => Product.fromJson(obj)).toList();
     } catch (e) {
-      print(e);
+      if (e is DioException) {
+        if (e.response != null) {
+          final responseData = e.response!.data;
+          if (responseData != null) {
+            if(e.response!.statusCode == 403){
+             Carteles.showErrorDialog(context, 'Error: ${e.response!.data['message']}');
+            }else if(e.response!.statusCode! >= 500) {
+              Carteles.showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+            } else{
+              final errors = responseData['errors'] as List<dynamic>;
+              final errorMessages = errors.map((error) {
+                return "Error: ${error['message']}";
+              }).toList();
+              Carteles.showErrorDialog(context, errorMessages.join('\n'));
+            }
+          } else {
+            Carteles.showErrorDialog(context, 'Error: ${e.response!.data}');
+          }
+        } else {
+          Carteles.showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        } 
+      }
       return [];
     }
   }
 
-  Future<List<Product>> getProductByVariant(String raiz, String codAlmacen, String token, String codTipoLista) async {
+  Future<List<Product>> getProductByVariant(BuildContext context, String raiz, String codAlmacen, String token, String codTipoLista) async {
     String link = apirUrl += '/api/v1/servicios/variantesItem/$raiz?almacenId=$codAlmacen&mismoColor=n&codTipoLista=$codTipoLista';
 
     try {
@@ -50,13 +73,34 @@ class ProductServices {
       final List<dynamic> productList = resp.data;
       return productList.map((obj) => Product.fromJson(obj)).toList();
     } catch (e) {
-      print(e);
+      if (e is DioException) {
+        if (e.response != null) {
+          final responseData = e.response!.data;
+          if (responseData != null) {
+            if(e.response!.statusCode == 403){
+             Carteles.showErrorDialog(context, 'Error: ${e.response!.data['message']}');
+            }else if(e.response!.statusCode! >= 500) {
+              Carteles.showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+            } else{
+              final errors = responseData['errors'] as List<dynamic>;
+              final errorMessages = errors.map((error) {
+                return "Error: ${error['message']}";
+              }).toList();
+              Carteles.showErrorDialog(context, errorMessages.join('\n'));
+            }
+          } else {
+            Carteles.showErrorDialog(context, 'Error: ${e.response!.data}');
+          }
+        } else {
+          Carteles.showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        } 
+      }
       return [];
     }
   }
 
 
-  Future<Product> getSingleProductByRaiz(String raiz, String codAlmacen, String token) async {
+  Future<Product> getSingleProductByRaiz(BuildContext context, String raiz, String codAlmacen, String token) async {
     String link = apirUrl +='/api/v1/itemsRaiz/$raiz?almacenId=$codAlmacen';
 
     try {
@@ -71,7 +115,28 @@ class ProductServices {
       final Product product = Product.fromJson(resp.data);
       return product;
     } catch (e) {
-      print(e);
+      if (e is DioException) {
+        if (e.response != null) {
+          final responseData = e.response!.data;
+          if (responseData != null) {
+            if(e.response!.statusCode == 403){
+             Carteles.showErrorDialog(context, 'Error: ${e.response!.data['message']}');
+            }else if(e.response!.statusCode! >= 500) {
+              Carteles.showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+            } else{
+              final errors = responseData['errors'] as List<dynamic>;
+              final errorMessages = errors.map((error) {
+                return "Error: ${error['message']}";
+              }).toList();
+              Carteles.showErrorDialog(context, errorMessages.join('\n'));
+            }
+          } else {
+            Carteles.showErrorDialog(context, 'Error: ${e.response!.data}');
+          }
+        } else {
+          Carteles.showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        } 
+      }
       return Product.empty();
     }
   }
@@ -93,7 +158,7 @@ class ProductServices {
   //   }
   //  }
 
-  Future<List<Product>> getAllProducts(String codAlmacen, String token) async {
+  Future<List<Product>> getAllProducts(BuildContext context, String codAlmacen, String token) async {
     String link = apirUrl += '/api/v1/servicios/itemsRaiz/Todos/?almacenId=$codAlmacen';
     try {
       var headers = {'Authorization': token};
@@ -105,7 +170,28 @@ class ProductServices {
       final List<dynamic> productList = resp.data;
       return productList.map((obj) => Product.fromJson(obj)).toList();
     } catch (e) {
-      print(e);
+      if (e is DioException) {
+        if (e.response != null) {
+          final responseData = e.response!.data;
+          if (responseData != null) {
+            if(e.response!.statusCode == 403){
+             Carteles.showErrorDialog(context, 'Error: ${e.response!.data['message']}');
+            }else if(e.response!.statusCode! >= 500) {
+              Carteles.showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+            } else{
+              final errors = responseData['errors'] as List<dynamic>;
+              final errorMessages = errors.map((error) {
+                return "Error: ${error['message']}";
+              }).toList();
+              Carteles.showErrorDialog(context, errorMessages.join('\n'));
+            }
+          } else {
+            Carteles.showErrorDialog(context, 'Error: ${e.response!.data}');
+          }
+        } else {
+          Carteles.showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        } 
+      }
       return [];
     }
   }

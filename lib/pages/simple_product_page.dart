@@ -38,7 +38,7 @@ class _PaginaSimpleProductoState extends State<PaginaSimpleProducto> {
     almacen = context.read<ItemProvider>().almacen;
     token = context.read<ItemProvider>().token;
     raiz = context.read<ItemProvider>().raiz;
-    productoNuevo = await ProductServices().getSingleProductByRaiz(raiz, almacen, token);
+    productoNuevo = await ProductServices().getSingleProductByRaiz(context, raiz, almacen, token);
     setState(() {});
   }
 

@@ -3,6 +3,7 @@ class Carteles {
   
   static Future<void> showDialogs(BuildContext context, String errorMessage, bool doblePop, bool triplePop, bool cuadruplePop) async {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -21,6 +22,26 @@ class Carteles {
                 if(cuadruplePop) {
                   Navigator.of(context).pop();
                 }
+              },
+              child: const Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  static void showErrorDialog(BuildContext context, String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Mensaje'),
+          content: Text(errorMessage),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
               },
               child: const Text('Cerrar'),
             ),
