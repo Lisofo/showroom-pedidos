@@ -198,6 +198,7 @@ class _SeleccionOrigenState extends State<SeleccionOrigen> {
 
   void logout() {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) {
         return AlertDialog(

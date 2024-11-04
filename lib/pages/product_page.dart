@@ -370,6 +370,7 @@ class _ProductPageState extends State<ProductPage> {
                   costoTotal += (linea.costoUnitario * linea.cantidad);
                 }
                 await showDialog(
+                  barrierDismissible: false,
                   context: context, 
                   builder: (context) {
                     return AlertDialog(
@@ -751,6 +752,7 @@ class _ProductPageState extends State<ProductPage> {
   Future<void> cambioDePrecios(BuildContext context) async {
     double nuevoPrecio = 0.0;
     await showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(

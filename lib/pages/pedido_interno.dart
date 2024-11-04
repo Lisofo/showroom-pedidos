@@ -241,6 +241,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
                                     IconButton(
                                       onPressed: () async {
                                         showDialog(
+                                          barrierDismissible: false,
                                           context: context, 
                                           builder: (context) {
                                             return AlertDialog(

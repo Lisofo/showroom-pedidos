@@ -379,6 +379,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
   Future<void> imprimirOrden(BuildContext context) async {
     await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
           title: const Text('Imprimir'),
@@ -417,14 +418,18 @@ class _NuevoPedidoState extends State<NuevoPedido> {
 
   Future<void> descartarPedido(BuildContext context) async {
     await showDialog(
-      context: context, 
+      context: context,
+      barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
           title: const Text('Descartar'),
           content: Text('Esta por descartar el pedido ${pedido.numeroOrdenTrabajo}. Esta seguro de querer descartarlo?'),
           actions: [
             TextButton(
-              onPressed: () {}, child: const Text('Cancelar')
+              onPressed: () {
+                appRouter.pop();
+              },
+              child: const Text('Cancelar')
             ),
             TextButton(
               onPressed: () async {
@@ -687,6 +692,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
 
   Future<void> popUpInformeDemoro() async{
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(

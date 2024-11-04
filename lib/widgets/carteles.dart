@@ -33,6 +33,7 @@ class Carteles {
 
   static void showErrorDialog(BuildContext context, String errorMessage) {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) {
         return AlertDialog(

@@ -227,7 +227,7 @@ class PedidosServices {
   }
 
   Future patchPedido(BuildContext context, int ordenId, int accionId, String token) async {
-    String link = '$apirUrl/api/v1/ordenes/$ordenId';
+    String link = '$apirUrl/api/v1/pedidos/$ordenId';
 
     try {
       var headers = {'Authorization': token};
