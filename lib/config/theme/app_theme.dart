@@ -22,7 +22,7 @@ class AppTheme{
       onPrimary: Colors.white, 
       secondary: Colors.green, 
       onSecondary: Colors.white, 
-      error: Colors.white, 
+      error: Colors.red, 
       onError: Colors.black, 
       surface: Colors.white, 
       onSurface: Colors.black,
