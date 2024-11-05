@@ -9,6 +9,7 @@ import 'package:showroom_maqueta/models/product.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/product_services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:showroom_maqueta/widgets/carteles.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
 
@@ -160,38 +161,48 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                 icon: const Icon(Icons.qr_code_scanner_rounded),
                 color: Colors.white,
               ), ///ESTO ES TEMPORALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
-              // VisibilityDetector(
-              //   onVisibilityChanged: (VisibilityInfo info){
-              //     visible = info.visibleFraction > 0;
-              //   },
-              //   key: const Key('visible-detector-key'),
-              //   child: BarcodeKeyboardListener(
-              //     bufferDuration: const Duration(milliseconds: 200),
-              //     onBarcodeScanned: (barcode) async{
-              //       if(!visible) return;
-              //       print(barcode);
-              //       setState(() {
-              //         _barcode = barcode;
-              //       });
-              //       if (_barcode != null){     
-              //         Product productoRetorno;
-              //         List<Product> listaProductosTemporal;    
-              //         listaProductosTemporal = await ProductServices().getProductByName('', cliente.codTipoLista ,almacen, _barcode.toString(), "0", token,);
-              //         productoRetorno = listaProductosTemporal[0];
-              //         Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
-              //         appRouter.push('/product_page');
-              //         setState(() {});
-              //       }
-              //     }, 
-              //     child: const Text(
-              //       'Acerque producto al lector',
-              //       style: TextStyle(
-              //         fontSize: 16,
-              //         color: Colors.white,
-              //       ),
-              //     ) 
-              //   )
-              // )
+              VisibilityDetector(
+                onVisibilityChanged: (VisibilityInfo info){
+                  visible = info.visibleFraction > 0;
+                },
+                key: const Key('visible-detector-key'),
+                child: BarcodeKeyboardListener(
+                  bufferDuration: const Duration(milliseconds: 200),
+                  onBarcodeScanned: (barcode) async{
+                    if(!visible) return;
+                    print(barcode);
+                    setState(() {
+                      _barcode = barcode;
+                    });
+                    if (_barcode != null){     
+                      Product productoRetorno;
+                      List<Product> listaProductosTemporal;
+                      String code = await FlutterBarcodeScanner.scanBarcode('#FFFFFF', 'Cancelar', false, ScanMode.QR);
+                      print('el codigo escaneado es $code');
+                      if (code == '') {
+                        return null;
+                      } else {
+                        listaProductosTemporal = await ProductServices().getProductByName(context, '', cliente.codTipoLista ,almacen, code, "0", token,);
+                        if(listaProductosTemporal.isNotEmpty){
+                          productoRetorno = listaProductosTemporal[0];
+                          Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
+                          appRouter.push('/product_page');
+                        } else {
+                          Carteles.showDialogs(context, 'No se pudo conseguir ningun producto con el código $code', false, false, false);
+                        }
+                        setState(() {});
+                      }
+                    }
+                  }, 
+                  child: const Text(
+                    '',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ) 
+                )
+              )
             ]
           ],
         ),
@@ -308,13 +319,17 @@ class _AgregarPedidoState extends State<AgregarPedido> {
     List<Product> listaProductosTemporal;
     String code = await FlutterBarcodeScanner.scanBarcode('#FFFFFF', 'Cancelar', false, ScanMode.QR);
     print('el codigo escaneado es $code');
-    if (code == '') {
+    if (code == '-1') {
       return null;
     } else {
       listaProductosTemporal = await ProductServices().getProductByName(context, '', cliente.codTipoLista ,almacen, code, "0", token,);
-      productoRetorno = listaProductosTemporal[0];
-      Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
-      appRouter.push('/product_page');
+      if(listaProductosTemporal.isNotEmpty){
+        productoRetorno = listaProductosTemporal[0];
+        Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
+        appRouter.push('/product_page');
+      } else {
+        Carteles.showDialogs(context, 'No se pudo conseguir ningun producto con el código $code', false, false, false);
+      }
       setState(() {});
     }
   }

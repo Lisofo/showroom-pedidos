@@ -24,6 +24,7 @@ class ProductoVariante {
   late int b;
   late int cantidad;
   late List<dynamic> imagenes;
+  late int ordenTalle;
 
   ProductoVariante({
     required this.itemId,
@@ -46,6 +47,7 @@ class ProductoVariante {
     required this.b,
     required this.imagenes,
     required this.cantidad,
+    required this.ordenTalle,
   });
 
   static ProductoVariante fromJson(Map<String, dynamic> json) {
@@ -69,7 +71,8 @@ class ProductoVariante {
       disponible: json['disponible'] as int? ?? 0, 
       codColor: json['codColor'] as String? ?? '',
       imagenes: json['fotosUrl'] as List<dynamic>,
-      cantidad: 0
+      cantidad: 0,
+      ordenTalle: json['ordenTalle'] as int? ?? 0,
     );
   }
 
@@ -95,6 +98,7 @@ class ProductoVariante {
     b = 0;
     imagenes = [];
     cantidad = 0;
+    ordenTalle = 0;
   }
 
   map(Linea Function(dynamic producto) param0) {}

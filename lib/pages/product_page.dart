@@ -188,7 +188,7 @@ class _ProductPageState extends State<ProductPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            raiz == '' ? productoSeleccionado.raiz : raiz,
+            productoNuevo.raiz,
             style: TextStyle(
               color: colores.onPrimary
             ),
@@ -429,7 +429,7 @@ class _ProductPageState extends State<ProductPage> {
                       child: FittedBox(
                         fit: BoxFit.contain,
                         child: Text(
-                          raiz == "" ? productoSeleccionado.descripcion : productoNuevo.descripcion,
+                          productoNuevo.descripcion,
                           style: const TextStyle(fontSize: 24),
                         ),
                       ),
@@ -441,7 +441,7 @@ class _ProductPageState extends State<ProductPage> {
                           child: FittedBox(
                             fit: BoxFit.contain,
                             child: Text(
-                              productoSeleccionado.raiz != "" ? '${productoSeleccionado.signo} $precioSeleccionado' : '${productoNuevo.signo} $precioNuevo',
+                              '${productoNuevo.signo} $precioNuevo',
                               style: const TextStyle(fontSize: 24),
                             ),
                           ),
@@ -546,6 +546,7 @@ class _ProductPageState extends State<ProductPage> {
     if(color.isSelected){
       for (String talle in talles) {
         productosFiltrados = _products!.where((product) => product.color == color.nombreColor).toList();
+        productosFiltrados.sort((a, b) => a.ordenTalle.compareTo(b.ordenTalle));
       }
     } else {
       productosFiltrados = [];
@@ -687,6 +688,7 @@ class _ProductPageState extends State<ProductPage> {
         b: producto.b,
         imagenes: producto.imagenes,
         cantidad: 1,
+        ordenTalle: producto.ordenTalle
       );
       productosAgregados.add(productoAAgregar);
       _isEditing.add(false);
