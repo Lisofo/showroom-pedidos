@@ -42,6 +42,12 @@ class _AgregarPedidoState extends State<AgregarPedido> {
   late bool visible;
   String? _barcode;
 
+  String barcodeFinal = '';
+  String scannerResult = '';
+  TextEditingController textController = TextEditingController();
+
+  List<Product> productosScanner = [];
+
   @override
   void initState() {
     super.initState();
@@ -211,6 +217,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
             controller: scrollController, // Controlador del scroll
             child: Column(
               children: [
+
                 if(!busco || listItems.isNotEmpty)...[
                   ListView.builder(
                     shrinkWrap: true,

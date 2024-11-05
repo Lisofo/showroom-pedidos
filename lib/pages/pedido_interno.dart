@@ -127,6 +127,7 @@ class _PedidoInternoState extends State<PedidoInterno> {
           ),
         ) : SingleChildScrollView(
           child: Column(
+            
             children: [
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.8,
@@ -309,6 +310,10 @@ class _PedidoInternoState extends State<PedidoInterno> {
               icon: Icon(Icons.notes),
               label: 'Orden'
             ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.qr_code_scanner_sharp),
+              label: 'Agregar item scanner'
+            ),
           ],
           onTap: (index) async {
             buttonIndex = index;
@@ -320,6 +325,9 @@ class _PedidoInternoState extends State<PedidoInterno> {
               case 1:
                 Provider.of<ItemProvider>(context, listen: false).setPedido(pedidoSeleccionado);
                 appRouter.push('/nuevoPedido');
+              break;
+              case 2:
+                appRouter.push('/testScanner');
               break;
             }
           },

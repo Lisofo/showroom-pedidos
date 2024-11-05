@@ -3,6 +3,7 @@ import "package:showroom_maqueta/pages/agregar_a_pedido.dart";
 import "package:showroom_maqueta/pages/buscador_cliente.dart";
 import "package:showroom_maqueta/pages/login.dart";
 import "package:showroom_maqueta/pages/nuevo_pedido.dart";
+import "package:showroom_maqueta/pages/paginaTestScanner.dart";
 import "package:showroom_maqueta/pages/pagina_cliente.dart";
 import "package:showroom_maqueta/pages/pedido_interno.dart";
 import "package:showroom_maqueta/pages/product_page.dart";
@@ -47,6 +48,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/productoSimple',
       builder: (context, state) => const PaginaSimpleProducto(),
+    ),
+    GoRoute(
+      path: '/testScanner',
+      builder: (context, state) => const PaginaTestScanner(),
     ),
     // GoRoute(
     //   path: '/',
