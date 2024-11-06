@@ -37,7 +37,6 @@ class _NuevoPedidoState extends State<NuevoPedido> {
   final TextEditingController comClienteController = TextEditingController();
   final TextEditingController envioController = TextEditingController();
   final List<String> _opcionesMoneda = ['U\$S', 'UYU'];
-  String _opcionSeleccionada = 'UYU';
   late Pedido pedido = Pedido.empty();
   late DateTime fechaOrden = DateTime.now();
   late DateTime fechaVencimiento = DateTime.now();
@@ -46,7 +45,6 @@ class _NuevoPedidoState extends State<NuevoPedido> {
   late String token = '';
   int buttonIndex = 0;
   final List<String> _opcionesTipo = ['Contado','Credito', 'Remito'];
-  String _opcionTipo = 'Contado';
   final _pedidosServices = PedidosServices();
   late List<Linea> lineasGenericas = [];
   late int cantidad = 0;
@@ -338,7 +336,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
         items: const[
           BottomNavigationBarItem(
             icon: Icon(Icons.play_arrow),
-            label: 'Confirmar'
+            label: 'Guardar'
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.print),
@@ -526,6 +524,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
       Provider.of<ItemProvider>(context, listen: false).setPedido(nuevoPedido);
       appRouter.pushReplacement('/pedidoInterno');
     } else {
+      pedido.numeroOrdenTrabajo = numeroOrdenTrabajo.text;
       pedido.fechaOrdenTrabajo = fechaOrden;
       pedido.fechaVencimiento = fechaVencimiento;
       pedido.fechaEntrega = fechaEntrega;

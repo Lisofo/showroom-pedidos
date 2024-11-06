@@ -48,6 +48,7 @@ class Linea {
   late String talle;
   late bool isExpanded;
   late String metodo;
+  late int ordenTalle;
 
   Linea({
     required this.lineaId,
@@ -99,6 +100,7 @@ class Linea {
     required this.talle,
     this.isExpanded = false,
     required this.metodo,
+    required this.ordenTalle,
   });
 
    // Constructor de copia
@@ -151,7 +153,8 @@ class Linea {
       B = linea.B,
       talle = linea.talle,
       isExpanded = linea.isExpanded,
-      metodo = linea.metodo;
+      metodo = linea.metodo,
+      ordenTalle = linea.ordenTalle;
 
   factory Linea.fromJson(Map<String, dynamic> json) => Linea(
     lineaId: json["lineaId"] as int? ?? 0,
@@ -201,7 +204,8 @@ class Linea {
     G: json["G"] as int? ?? 0,
     B: json["B"] as int? ?? 0,
     talle: json["talle"] as String? ?? '',
-    metodo: ''
+    metodo: '',
+    ordenTalle: json['ordenTalle'] as int? ?? 0,
   );
 
   Map<String, dynamic> toJson() => {
@@ -304,6 +308,7 @@ class Linea {
     talle = '';
     isExpanded = false;
     metodo = '';
+    ordenTalle = 0;
   }
 
   @override
