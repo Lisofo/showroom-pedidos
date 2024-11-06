@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:showroom_maqueta/widgets/carteles.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 
 class AgregarPedido extends StatefulWidget {
@@ -155,11 +157,50 @@ class _AgregarPedidoState extends State<AgregarPedido> {
               ),
             ),
             if(isMobile)...[
-              IconButton(
-                onPressed: readQRCode,
-                icon: const Icon(Icons.qr_code_scanner_rounded),
-                color: Colors.white,
-              ),
+              if(kIsWeb) ... [
+                IconButton(
+                  style: ButtonStyle(
+                    alignment: Alignment.center,
+                    backgroundColor: WidgetStatePropertyAll(colores.primary)
+                  ),
+                  onPressed: () async {
+                    Product productoRetorno;
+                    List<Product> listaProductosTemporal;
+                    var res = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SimpleBarcodeScannerPage(),
+                        
+                      ),
+                    );
+                    if (res == null) {
+                      print("El scanner se cerro o no se tiene permisos de cámara");
+                    }
+                    if (res is String) {
+                      barcodeFinal = res;
+                      if (barcodeFinal != '-1'){
+                         listaProductosTemporal = await ProductServices().getProductByName(context, '', cliente.codTipoLista ,almacen, barcodeFinal, "0", token,);
+                        if(listaProductosTemporal.isNotEmpty){
+                          productoRetorno = listaProductosTemporal[0];
+                          Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
+                          appRouter.push('/product_page');
+                        } else {
+                          Carteles.showDialogs(context, 'No se pudo conseguir ningun producto con el código $barcodeFinal', false, false, false);
+                        }
+                        setState(() {});
+                      } 
+                    }
+                  },
+                  icon: Icon(Icons.qr_code_scanner_outlined),
+                ),
+              ] else ... [
+                IconButton(
+                  onPressed: readQRCode,
+                  icon: const Icon(Icons.qr_code_scanner_rounded),
+                  color: Colors.white,
+                ),
+              ]
+              
             ] else ...[
               IconButton(
                 onPressed: readQRCode,
