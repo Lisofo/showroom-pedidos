@@ -222,6 +222,14 @@ class _ProductPageState extends State<ProductPage> {
                   itemCount: productosAgregados.length,
                   itemBuilder: (context, i) {
                     var item = productosAgregados[i];
+                    productosAgregados.sort((a,b) {
+                      int colorCompare = a.color.compareTo(b.color);
+                      if(colorCompare != 0) {
+                        return colorCompare;
+                      } else {
+                        return a.ordenTalle.compareTo(b.ordenTalle);
+                      }
+                    });
                     return ListTile(
                       title: Text(item.codItem),
                       subtitle: Column(
@@ -640,6 +648,7 @@ class _ProductPageState extends State<ProductPage> {
             talle: variante.talle,
             isExpanded: false,
             metodo: 'POST',
+            ordenTalle: 0
           ));
       });
     } else {

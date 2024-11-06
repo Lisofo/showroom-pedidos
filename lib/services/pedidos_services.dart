@@ -160,6 +160,7 @@ class PedidosServices {
       }
     }
     var data = ({
+      "numeroOrdenTrabajo": pedido.numeroOrdenTrabajo,
     	"fechaOrdenTrabajo": _formatFechas(pedido.fechaOrdenTrabajo),
     	"fechaVencimiento": pedido.fechaVencimiento == null ? null : _formatFechas(pedido.fechaVencimiento),
     	"fechaEntrega": pedido.fechaEntrega == null ? null :  _formatFechas(pedido.fechaEntrega),

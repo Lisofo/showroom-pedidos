@@ -147,6 +147,14 @@ class _PedidoInternoState extends State<PedidoInterno> {
                         precioTotalVariante += (variante.costoUnitario * variante.cantidad);
                       }
                       for (var variante in listaVariantes){
+                        listaVariantes.sort((a, b) {
+                          int colorCompare = a.color.compareTo(b.color);
+                          if(colorCompare != 0) {
+                            return colorCompare;
+                          } else {
+                            return a.ordenTalle.compareTo(b.ordenTalle);
+                          }
+                        });
                         url = Uri.encodeFull(variante.fotoURL);
                         return Card(
                           child: Padding(
@@ -310,10 +318,10 @@ class _PedidoInternoState extends State<PedidoInterno> {
               icon: Icon(Icons.notes),
               label: 'Orden'
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.qr_code_scanner_sharp),
-              label: 'Agregar item scanner'
-            ),
+            // BottomNavigationBarItem(
+              // icon: Icon(Icons.qr_code_scanner_sharp),
+              // label: 'Agregar item scanner'
+            // ),
           ],
           onTap: (index) async {
             buttonIndex = index;
@@ -326,9 +334,9 @@ class _PedidoInternoState extends State<PedidoInterno> {
                 Provider.of<ItemProvider>(context, listen: false).setPedido(pedidoSeleccionado);
                 appRouter.push('/nuevoPedido');
               break;
-              case 2:
-                appRouter.push('/testScanner');
-              break;
+              // case 2:
+                // appRouter.push('/testScanner');
+              // break;
             }
           },
         ),
