@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:showroom_maqueta/config/router/app_router.dart';
 import 'package:showroom_maqueta/models/client.dart';
@@ -45,8 +46,6 @@ class _AgregarPedidoState extends State<AgregarPedido> {
   String barcodeFinal = '';
   String scannerResult = '';
   TextEditingController textController = TextEditingController();
-
-  List<Product> productosScanner = [];
 
   @override
   void initState() {
@@ -189,6 +188,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                         return null;
                       } else {
                         listaProductosTemporal = await ProductServices().getProductByName(context, '', cliente.codTipoLista ,almacen, code, "0", token,);
+                        barcodeFinal = code;
                         if(listaProductosTemporal.isNotEmpty){
                           productoRetorno = listaProductosTemporal[0];
                           Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
@@ -211,13 +211,55 @@ class _AgregarPedidoState extends State<AgregarPedido> {
               )
             ]
           ],
-        ),
+        ), 
         body: !cargando ? SafeArea(
           child: SingleChildScrollView(
             controller: scrollController, // Controlador del scroll
             child: Column(
               children: [
-
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(child: Text('Ultimo escaneado: $barcodeFinal', textAlign: TextAlign.center,)),
+                ),
+                
+                Visibility(
+                  visible: false,
+                  maintainState: true,
+                  child: TextFormField(
+                    cursorColor: Colors.white,
+                    decoration: const InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white), // Cambia el color a rojo
+                        borderRadius: BorderRadius.all(Radius.zero)
+                      ),
+                      contentPadding: EdgeInsets.all(0)
+                    ),
+                    autofocus: true,
+                    canRequestFocus: true,
+                    keyboardType: TextInputType.none, // Deshabilita el teclado virtual
+                    onChanged: (value) async {
+                      Product productoRetorno;
+                      List<Product> listaProductosTemporal;
+                      barcodeFinal = value;
+                  
+                      listaProductosTemporal = await ProductServices().getProductByName(context, '', cliente.codTipoLista ,almacen, barcodeFinal, "0", token,);
+                      if(listaProductosTemporal.isNotEmpty){
+                        productoRetorno = listaProductosTemporal[0];
+                        Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
+                        appRouter.push('/product_page');
+                      } else {
+                        Carteles.showDialogs(context, 'No se pudo conseguir ningun producto con el código $barcodeFinal', false, false, false);
+                      }             
+                      // Guarda el resultado del escaneo
+                      
+                      // Resetea el campo de texto
+                      setState(() {
+                        textController.clear(); // Asume que tienes un TextEditingController llamado _controller
+                      });
+                    },
+                    controller: textController, // Asume que tienes un TextEditingController llamado _controller
+                  ),
+                ),
                 if(!busco || listItems.isNotEmpty)...[
                   ListView.builder(
                     shrinkWrap: true,
@@ -329,6 +371,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
     if (code == '-1') {
       return null;
     } else {
+      barcodeFinal = code;
       listaProductosTemporal = await ProductServices().getProductByName(context, '', cliente.codTipoLista ,almacen, code, "0", token,);
       if(listaProductosTemporal.isNotEmpty){
         productoRetorno = listaProductosTemporal[0];

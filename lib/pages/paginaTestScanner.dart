@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
 import 'package:provider/provider.dart';
 import 'package:showroom_maqueta/config/router/app_router.dart';
 import 'package:showroom_maqueta/models/client.dart';
 import 'package:showroom_maqueta/models/product.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
 import 'package:showroom_maqueta/services/product_services.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 class PaginaTestScanner extends StatefulWidget {
   
@@ -79,12 +76,13 @@ class _PaginaTestScannerState extends State<PaginaTestScanner> {
                     0.toString(),
                     token,
                   );
-                  if (productosScanner != []) {
+                  if (productosScanner.isNotEmpty) {
                     Provider.of<ItemProvider>(context, listen: false).setProduct(productosScanner[0]);
                     Provider.of<ItemProvider>(context, listen: false).setRaiz(productosScanner[0].raiz);
+                    appRouter.push('/product_page');
                   }
                   // Navega a la siguiente página
-                  appRouter.push('/product_page');
+                  
                   // Guarda el resultado del escaneo
                   scannerResult = barcodeFinal;
                   // Resetea el campo de texto
