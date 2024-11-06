@@ -143,10 +143,19 @@ class _ProductPageState extends State<ProductPage> {
         if (agregar.isNotEmpty) {
           agregar.first.cantidad = linea.cantidad;
           agregar.first.precioIvaIncluido = linea.costoUnitario;
+          agregar.first.ordenTalle = linea.ordenTalle;
           productosAgregados.add(agregar.first);
           _isEditing.add(false);
         }
       }
+      productosAgregados.sort((a,b) {
+        int colorCompare = a.color.compareTo(b.color);
+        if(colorCompare != 0) {
+          return colorCompare;
+        } else {
+          return a.ordenTalle.compareTo(b.ordenTalle);
+        }
+      });
     }
 
     if(nuevasLineas.isEmpty){
@@ -222,14 +231,6 @@ class _ProductPageState extends State<ProductPage> {
                   itemCount: productosAgregados.length,
                   itemBuilder: (context, i) {
                     var item = productosAgregados[i];
-                    productosAgregados.sort((a,b) {
-                      int colorCompare = a.color.compareTo(b.color);
-                      if(colorCompare != 0) {
-                        return colorCompare;
-                      } else {
-                        return a.ordenTalle.compareTo(b.ordenTalle);
-                      }
-                    });
                     return ListTile(
                       title: Text(item.codItem),
                       subtitle: Column(
