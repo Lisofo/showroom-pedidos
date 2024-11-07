@@ -288,15 +288,16 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                         productoRetorno = listaProductosTemporal[0];
                         Provider.of<ItemProvider>(context, listen: false).setProduct(productoRetorno);
                         appRouter.push('/product_page');
+                        setState(() {
+                          textController.clear(); // Asume que tienes un TextEditingController llamado _controller
+                        });
                       } else {
                         Carteles.showDialogs(context, 'No se pudo conseguir ningun producto con el código $barcodeFinal', false, false, false);
                       }             
                       // Guarda el resultado del escaneo
                       
                       // Resetea el campo de texto
-                      setState(() {
-                        textController.clear(); // Asume que tienes un TextEditingController llamado _controller
-                      });
+                      
                     },
                     controller: textController, // Asume que tienes un TextEditingController llamado _controller
                   ),
