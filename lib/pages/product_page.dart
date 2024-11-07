@@ -96,6 +96,7 @@ class _ProductPageState extends State<ProductPage> {
     pedido = context.read<ItemProvider>().pedido;
     lineasGenericas = context.read<ItemProvider>().lineasGenericas;
     raiz = context.read<ItemProvider>().raiz;
+      //productoSeleccionado = context.read<ItemProvider>().product;
     
     if(raiz == '') {
       productoSeleccionado = Product.copy(context.read<ItemProvider>().product);
