@@ -21,29 +21,41 @@ class CustomTextFormField extends StatelessWidget {
   final int? maxLength;
   final bool enableInteractiveSelection;
   final Icon? icon;
+  final FocusNode? focusNode;
+  final Icon? preffixIcon;
+  final Widget? suffixIcon;
+  final Color? fillColor;
+  final Color? prefixIconColor;
+  final Color? suffixIconColor;
 
-  const CustomTextFormField(
-      {super.key,
-      this.label,
-      this.hint,
-      this.errorMessage,
-      this.onChanged,
-      this.validator,
-      this.maxLines,
-      this.minLines,
-      this.obscure = false,
-      this.enabled = true,
-      this.controller,
-      this.onSaved,
-      this.textAlign = TextAlign.start,
-      this.initialValue,
-      this.keyboard,
-      this.mascara,
-      this.onFieldSubmitted,
-      this.maxLength,
-      this.enableInteractiveSelection = false,
-      this.icon,
-    });
+  const CustomTextFormField({
+    super.key,
+    this.label,
+    this.hint,
+    this.errorMessage,
+    this.onChanged,
+    this.validator,
+    this.maxLines,
+    this.minLines,
+    this.obscure = false,
+    this.enabled = true,
+    this.controller,
+    this.onSaved,
+    this.textAlign = TextAlign.start,
+    this.initialValue,
+    this.keyboard,
+    this.mascara,
+    this.onFieldSubmitted,
+    this.maxLength,
+    this.enableInteractiveSelection = false,
+    this.icon,
+    this.focusNode,
+    this.preffixIcon,
+    this.suffixIcon,
+    this.fillColor,
+    this.prefixIconColor,
+    this.suffixIconColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +89,7 @@ class CustomTextFormField extends StatelessWidget {
       maxLength: maxLength,
       onFieldSubmitted: onFieldSubmitted,
       enableInteractiveSelection: enableInteractiveSelection,
+      focusNode: focusNode,
     );
   }
 }

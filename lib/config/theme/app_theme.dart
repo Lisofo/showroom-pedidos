@@ -19,12 +19,12 @@ class AppTheme{
     colorScheme: ColorScheme(
       brightness: Brightness.light,
       primary: colorList[selectedColor],
-      onPrimary: Colors.white, 
-      secondary: Colors.green, 
-      onSecondary: Colors.white, 
-      error: Colors.red, 
-      onError: Colors.black, 
-      surface: Colors.white, 
+      onPrimary: Colors.white,
+      secondary: Colors.green,
+      onSecondary: Colors.white,
+      error: Colors.red,
+      onError: Colors.black,
+      surface: Colors.white,
       onSurface: Colors.black,
       
     ),

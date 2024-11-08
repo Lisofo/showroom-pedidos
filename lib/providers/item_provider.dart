@@ -33,6 +33,9 @@ class ItemProvider with ChangeNotifier {
   String _token = '';
   String get token => _token;
 
+  String _token2 = '';
+  String get token2 => _token2;
+
   Pedido _pedido = Pedido.empty();
   Pedido get pedido => _pedido;
 
@@ -122,6 +125,11 @@ class ItemProvider with ChangeNotifier {
 
   void setToken(String tok) {
     _token = tok;
+    notifyListeners();
+  }
+
+  void setToken2(String tok) {
+    _token2 = tok;
     notifyListeners();
   }
 
