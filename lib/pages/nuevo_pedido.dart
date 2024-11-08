@@ -58,6 +58,9 @@ class _NuevoPedidoState extends State<NuevoPedido> {
   late List<Transaccion> transacciones = [];
   late Transaccion transaccionSeleccionada = Transaccion.empty();
   late Moneda monedaSeleccionada = Moneda.empty();
+  final TextEditingController pinController = TextEditingController();
+  bool isObscured = true;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -333,6 +336,9 @@ class _NuevoPedidoState extends State<NuevoPedido> {
         )
       ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: colores.primary,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
         items: const[
           BottomNavigationBarItem(
             icon: Icon(Icons.play_arrow),
@@ -346,6 +352,10 @@ class _NuevoPedidoState extends State<NuevoPedido> {
             icon: Icon(Icons.delete_forever),
             label: 'Descartar'
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check),
+            label: 'Aprobar'
+          )
         ],
         currentIndex: buttonIndex,
         onTap: (value) async {
@@ -368,9 +378,73 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                 Carteles.showDialogs(context, 'Guarde el pedido primero', false, false, false);
               }
             break;
+            case 3:
+              await aprobarPedido(context);
+            break;
           }
         },
       ),
+    );
+  }
+
+  Future<void> aprobarPedido(BuildContext context) async {
+    pinController.text = '';
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setStateBd) => AlertDialog(
+            surfaceTintColor: Colors.white,
+            title: const Text("Confirmar"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("Ingrese su PIN para aprobar el pedido ${pedido.numeroOrdenTrabajo}"),
+                const SizedBox(height: 5,),
+                CustomTextFormField(
+                  preffixIcon: const Icon(Icons.lock),
+                  keyboard: const TextInputType.numberWithOptions(),
+                  controller: pinController,
+                  hint: 'Ingrese PIN',
+                  maxLines: 1,
+                  obscure: isObscured,
+                  suffixIcon: IconButton(
+                    icon: isObscured
+                    ? const Icon(
+                        Icons.visibility_off,
+                        color: Colors.black,
+                      )
+                    : const Icon(
+                        Icons.visibility,
+                        color: Colors.black,
+                      ),
+                    onPressed: () {
+                      setStateBd(() {
+                        isObscured = !isObscured;
+                      });
+                    },
+                  ),
+                )
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text("CANCELAR"),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.red,
+                ),
+                onPressed: () {
+    
+                },                
+                child: const Text("APROBAR")
+              ),
+            ],
+          ),
+        );
+      }
     );
   }
 
