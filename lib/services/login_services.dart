@@ -49,7 +49,7 @@ class LoginServices {
     }
   }
 
-  Future<void> pin2(pin2, BuildContext context) async {
+  Future pin2(pin2, BuildContext context) async {
     var headers = {'Content-Type': 'application/json'};
     var data = json.encode({"pin2": pin2});
     var dio = Dio();
@@ -75,6 +75,7 @@ class LoginServices {
       } else {
         print(response.statusMessage);
       }
+      return response.data['token'];
     } catch (e) {
       statusCode = 0;
       if (e is DioException) {

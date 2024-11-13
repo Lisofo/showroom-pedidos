@@ -11,6 +11,7 @@ import 'package:showroom_maqueta/models/pedido.dart';
 import 'package:showroom_maqueta/models/reporte.dart';
 import 'package:showroom_maqueta/models/transaccion.dart';
 import 'package:showroom_maqueta/providers/item_provider.dart';
+import 'package:showroom_maqueta/services/login_services.dart';
 import 'package:showroom_maqueta/services/pedidos_services.dart';
 import 'package:showroom_maqueta/widgets/carteles.dart';
 import 'package:showroom_maqueta/widgets/custom_form_field.dart';
@@ -379,7 +380,13 @@ class _NuevoPedidoState extends State<NuevoPedido> {
               }
             break;
             case 3:
-              await aprobarPedido(context);
+              var solicitarPin = '';
+              solicitarPin = await PedidosServices().siguienteEstadoOrden(context, pedido, 23, token);
+              if(solicitarPin == 'S'){
+                await aprobarPedido(context);
+              } else {
+                await PedidosServices().patchPedido(context, pedido.ordenTrabajoId, 23, token, '');
+              }
             break;
           }
         },
@@ -436,8 +443,14 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.red,
                 ),
-                onPressed: () {
-    
+                onPressed: () async {
+                  var pin2 = pinController.text;
+                  var token2 = '';
+                  // token2 = await LoginServices().pin2(pin2, context);
+                  token2 = 'asdasdasd';
+                  if(token2 != ''){
+                    await PedidosServices().patchPedido(context, pedido.ordenTrabajoId, 23, token, token2);
+                  }
                 },                
                 child: const Text("APROBAR")
               ),
@@ -507,7 +520,7 @@ class _NuevoPedidoState extends State<NuevoPedido> {
               onPressed: () async {
                 int? statusCode;
                 if(pedido.ordenTrabajoId != 0){
-                  await _pedidosServices.patchPedido(context, pedido.ordenTrabajoId, 4, token);
+                  await _pedidosServices.patchPedido(context, pedido.ordenTrabajoId, 4, token, '');
                   statusCode = await _pedidosServices.getStatusCode();
                   await _pedidosServices.resetStatusCode();
                   if(statusCode == 1) {

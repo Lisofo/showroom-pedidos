@@ -14,11 +14,11 @@ import 'package:showroom_maqueta/widgets/carteles.dart';
 
 class PedidosServices {
   final _dio = Dio();
-  late String apirUrl = Config.APIURL;
+  late String apiUrl = Config.APIURL;
   late int? statusCode;
 
   Future getPedidosCliente (BuildContext context, int clienteId, String almacen, String token) async {
-    String link = '$apirUrl/api/v1/pedidos?clienteId=$clienteId&almacenId=$almacen';
+    String link = '$apiUrl/api/v1/pedidos?clienteId=$clienteId&almacenId=$almacen';
     try {
       var headers = {'Authorization': token};
       var resp = await _dio.request(
@@ -67,7 +67,7 @@ class PedidosServices {
   }
 
   Future postPedido (BuildContext context, Pedido pedido, String token) async {
-    String link = '$apirUrl/api/v1/pedidos';
+    String link = '$apiUrl/api/v1/pedidos';
     var data = ({
       "numeroOrdenTrabajo": pedido.numeroOrdenTrabajo,
     	"fechaOrdenTrabajo": _formatFechas(pedido.fechaOrdenTrabajo),
@@ -125,7 +125,7 @@ class PedidosServices {
   }
 
   Future putPedido (BuildContext context, Pedido pedido, List<Linea> lineas, String token) async {
-    String link = '$apirUrl/api/v1/pedidos/${pedido.ordenTrabajoId}';
+    String link = '$apiUrl/api/v1/pedidos/${pedido.ordenTrabajoId}';
     var accionesLineas = [];
     for(var linea in lineas){
       if (linea.metodo == 'POST' && linea.lineaId == 0) {
@@ -227,12 +227,15 @@ class PedidosServices {
     }
   }
 
-  Future patchPedido(BuildContext context, int ordenId, int accionId, String token) async {
-    String link = '$apirUrl/api/v1/pedidos/$ordenId';
+  Future patchPedido(BuildContext context, int ordenId, int accionId, String token, String tokenAutorizacion) async {
+    String link = '$apiUrl/api/v1/pedidos/$ordenId';
 
     try {
       var headers = {'Authorization': token};
-      var data = ({"accionId": accionId});
+      var data = ({
+        "accionId": accionId,
+        "token": tokenAutorizacion
+      });
       var resp = await _dio.request(
         link,
         options: Options(
@@ -272,7 +275,7 @@ class PedidosServices {
   }
 
   Future postInforme (BuildContext context, String almacenId, Pedido pedido, bool conFoto, String token) async {
-    String link = '$apirUrl/api/v1/rpts';
+    String link = '$apiUrl/api/v1/rpts';
     int informeId = 0;
     if(conFoto){
       if(almacenId == '1'){
@@ -319,7 +322,7 @@ class PedidosServices {
   }
 
   Future getReporte(BuildContext context, int reporteId, String token) async {
-    String link = '$apirUrl/api/v1/rpts/$reporteId';
+    String link = '$apiUrl/api/v1/rpts/$reporteId';
     try {
       var headers = {'Authorization': token};
       var resp = await _dio.request(
@@ -363,7 +366,7 @@ class PedidosServices {
   }
 
   Future patchInforme(BuildContext context, Reporte reporte, String generado, String token) async {
-    String link = '$apirUrl/api/v1/rpts/${reporte.rptGenId}';
+    String link = '$apiUrl/api/v1/rpts/${reporte.rptGenId}';
 
     try {
       var headers = {'Authorization': token};
@@ -405,7 +408,7 @@ class PedidosServices {
   }
 
    Future getMonedas(BuildContext context, String token) async {
-    String link = '$apirUrl/api/v1/caja/monedas';
+    String link = '$apiUrl/api/v1/caja/monedas';
     try {
       var headers = {'Authorization': token};
       var resp = await _dio.request(
@@ -449,7 +452,7 @@ class PedidosServices {
   }
 
   Future getTransacciones(BuildContext context, String token) async {
-    String link = '$apirUrl/api/v1/facturacion/transacciones';
+    String link = '$apiUrl/api/v1/facturacion/transacciones';
     try {
       var headers = {'Authorization': token};
       var resp = await _dio.request(
@@ -468,6 +471,54 @@ class PedidosServices {
       statusCode = 0;
       if (e is DioException) {
         print(e);
+        if (e.response != null) {
+          final responseData = e.response!.data;
+          if (responseData != null) {
+            if(e.response!.statusCode == 403){
+              Carteles.showErrorDialog(context, 'Error: ${e.response!.data['message']}');
+            }else if(e.response!.statusCode! >= 500) {
+              Carteles.showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+            } else{
+              final errors = responseData['errors'] as List<dynamic>;
+              final errorMessages = errors.map((error) {
+                return "Error: ${error['message']}";
+              }).toList();
+              Carteles.showErrorDialog(context, errorMessages.join('\n'));
+            }
+          } else {
+            Carteles.showErrorDialog(context, 'Error: ${e.response!.data}');
+          }
+        } else {
+          Carteles.showErrorDialog(context, 'Error: No se pudo completar la solicitud');
+        } 
+      } 
+    }
+  }
+
+  Future siguienteEstadoOrden(BuildContext context, Pedido pedido, int accionId, String token) async {
+    String link = apiUrl;
+    link += '/api/v1/pedidos/${pedido.ordenTrabajoId}/accion/$accionId';
+
+    try {
+      var headers = {'Authorization': token};
+      var resp = await _dio.request(
+        link,
+        options: Options(
+          method: 'GET',
+          headers: headers,
+        ),
+      );
+      statusCode = 1;
+      if (resp.statusCode == 200) {
+        // Provider.of<OrdenProvider>(context, listen: false).cambiarEstadoOrden(resp.data["estadoSiguiente"]);
+      } else {
+        Carteles.showErrorDialog(context, 'Hubo un error al momento de cambiar el estado');
+      }
+
+      return resp.data["solicitarPin"];  
+    } catch (e) {
+      statusCode = 0;
+      if (e is DioException) {
         if (e.response != null) {
           final responseData = e.response!.data;
           if (responseData != null) {
