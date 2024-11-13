@@ -1,16 +1,9 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print, unrelated_type_equality_checks
-
-// import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-// import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showroom_maqueta/config/router/app_router.dart';
 import 'package:showroom_maqueta/services/login_services.dart';
-// import 'package:showroom_maqueta/config/router/app_router.dart';
-// import 'package:showroom_maqueta/providers/item_provider.dart';
-// import 'package:showroom_maqueta/services/login_services.dart';
-
 
 class LoginNew extends StatefulWidget {
   static const String name = 'login';
@@ -39,8 +32,6 @@ class _LoginNewState extends State<LoginNew> {
   @override
   void initState() {
     super.initState();
-    
-    
   }
 
   @override
@@ -79,11 +70,6 @@ class _LoginNewState extends State<LoginNew> {
     // Check if the absolute difference in hours is greater than or equal to 24
     return differenceInHours.abs() >= 30;
   }
-
-
-
-
-
 
   // Future<bool> _checkConnectivity() async {
   //   var connectivityResult = await Connectivity().checkConnectivity();

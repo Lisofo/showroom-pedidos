@@ -1,9 +1,7 @@
 // ignore_for_file: must_be_immutable
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:showroom_maqueta/config/router/app_router.dart';
 import 'package:showroom_maqueta/models/client.dart';
@@ -245,7 +243,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                             alignment: Alignment.center,
                               child: ElevatedButton(
                                 style: const ButtonStyle(
-                                  iconSize: const WidgetStatePropertyAll(100),
+                                  iconSize: WidgetStatePropertyAll(100),
                                 ),
                                 onPressed: readQRCode,
                                 child: const Icon(Icons.qr_code_scanner_outlined),

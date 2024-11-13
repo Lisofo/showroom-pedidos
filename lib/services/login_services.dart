@@ -16,7 +16,11 @@ class LoginServices {
 
   Future<void> login(String login, password, BuildContext context) async {
     var headers = {'Content-Type': 'application/json'};
-    var data = json.encode({"login": login, "pin2": password});
+    var data = json.encode({
+      "login": login, 
+      "pin2": password,
+      "modulo": 'pedidos_sr'
+    });
     var dio = Dio();
     String link = apiLink;
     try {
