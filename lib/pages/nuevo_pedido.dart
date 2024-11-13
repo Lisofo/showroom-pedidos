@@ -380,12 +380,18 @@ class _NuevoPedidoState extends State<NuevoPedido> {
               }
             break;
             case 3:
+              int? statusCode;
               var solicitarPin = '';
               solicitarPin = await PedidosServices().siguienteEstadoOrden(context, pedido, 23, token);
               if(solicitarPin == 'S'){
                 await aprobarPedido(context);
               } else {
-                await PedidosServices().patchPedido(context, pedido.ordenTrabajoId, 23, token, '');
+                await _pedidosServices.patchPedido(context, pedido.ordenTrabajoId, 23, token, '');
+                statusCode = await _pedidosServices.getStatusCode();
+                await _pedidosServices.resetStatusCode();
+                if(statusCode == 1) {
+                  Carteles.showDialogs(context, 'Pedido aprobado', true, true, false);
+                }
               }
             break;
           }
@@ -444,12 +450,18 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                   foregroundColor: Colors.red,
                 ),
                 onPressed: () async {
+                  int? statusCode;
                   var pin2 = pinController.text;
-                  var token2 = '';
-                  // token2 = await LoginServices().pin2(pin2, context);
-                  token2 = 'asdasdasd';
-                  if(token2 != ''){
-                    await PedidosServices().patchPedido(context, pedido.ordenTrabajoId, 23, token, token2);
+                  String? token2 = '';
+                  token2 = await LoginServices().pin2(pin2, context);
+                  print('el token 2 es $token2');
+                  if(token2 != '' && token2 != null){
+                    await _pedidosServices.patchPedido(context, pedido.ordenTrabajoId, 23, token, token2.toString());
+                    statusCode = await _pedidosServices.getStatusCode();
+                    await _pedidosServices.resetStatusCode();
+                    if(statusCode == 1) {
+                      Carteles.showDialogs(context, 'Pedido aprobado', true, true, true);
+                    }
                   }
                 },                
                 child: const Text("APROBAR")

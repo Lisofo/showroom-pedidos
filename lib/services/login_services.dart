@@ -87,12 +87,12 @@ class LoginServices {
               Carteles.showErrorDialog(context, 'Error: ${e.response!.data['message']}');
             }else if(e.response!.statusCode! >= 500) {
               Carteles.showErrorDialog(context, 'Error: No se pudo completar la solicitud');
-            // } else{
-            //   final errors = responseData['errors'] as List<dynamic>;
-            //   final errorMessages = errors.map((error) {
-            //   return "Error: ${error['message']}";
-            // }).toList();
-            // Carteles.showErrorDialog(context, errorMessages.join('\n'));
+            } else{
+              final errors = responseData['errors'] as List<dynamic>;
+              final errorMessages = errors.map((error) {
+              return "Error: ${error['message']}";
+            }).toList();
+            Carteles.showErrorDialog(context, errorMessages.join('\n'));
           }
           } else {
             Carteles.showErrorDialog(context, 'Error: ${e.response!.data}');

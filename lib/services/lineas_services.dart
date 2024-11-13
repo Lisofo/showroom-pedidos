@@ -25,6 +25,7 @@ class LineasServices {
       final List<dynamic> lineasList = resp.data;
       return lineasList.map((obj) => Linea.fromJson(obj)).toList();
     } catch (e) {
+      statusCode = 0;
       if (e is DioException) {
         if (e.response != null) {
           final responseData = e.response!.data;

@@ -36,6 +36,7 @@ class ClientServices {
       final List<dynamic> clientList = resp.data;
       return clientList.map((obj) => Client.fromJson(obj)).toList();
     } catch (e) {
+      statusCode = 0;
       if (e is DioException) {
         if (e.response != null) {
           final responseData = e.response!.data;

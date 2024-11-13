@@ -40,8 +40,9 @@ class _BuscadorClienteState extends State<BuscadorCliente> {
             icon: const Icon(Icons.search),
             onPressed: () async {
               final cliente = await showSearch(
-                  context: context,
-                  delegate: ClientSearchDelegate('Buscar Cliente', historial));
+                context: context,
+                delegate: ClientSearchDelegate('Buscar Cliente', historial)
+              );
               if (cliente != null) {
                 setState(() {
                   clienteSeleccionado = cliente;
@@ -55,6 +56,10 @@ class _BuscadorClienteState extends State<BuscadorCliente> {
               }
             },
           ),
+          IconButton(
+            onPressed: logout,
+            icon: const Icon(Icons.logout)
+          )
         ],
       ),
       body: SafeArea(
@@ -92,6 +97,36 @@ class _BuscadorClienteState extends State<BuscadorCliente> {
           ),
         ),
       ),
+    );
+  }
+
+  void logout() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Cerrar sesion'),
+          content: const Text('Esta seguro de querer cerrar sesion?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                appRouter.pop();
+              },
+              child: const Text('Cancelar')
+            ),
+            TextButton(
+              onPressed: () {
+                Provider.of<ItemProvider>(context, listen: false).setToken('');
+                appRouter.pushReplacement('/login');
+              },
+              child: const Text(
+                'Cerrar Sesion',
+                style: TextStyle(color: Colors.red),
+              )
+            ),
+          ],
+        );
+      },
     );
   }
 }
