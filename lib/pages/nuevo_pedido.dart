@@ -380,19 +380,24 @@ class _NuevoPedidoState extends State<NuevoPedido> {
               }
             break;
             case 3:
-              int? statusCode;
-              var solicitarPin = '';
-              solicitarPin = await PedidosServices().siguienteEstadoOrden(context, pedido, 23, token);
-              if(solicitarPin == 'S'){
-                await aprobarPedido(context);
-              } else {
-                await _pedidosServices.patchPedido(context, pedido.ordenTrabajoId, 23, token, '');
-                statusCode = await _pedidosServices.getStatusCode();
-                await _pedidosServices.resetStatusCode();
-                if(statusCode == 1) {
-                  Carteles.showDialogs(context, 'Pedido aprobado', true, true, false);
+              if(pedido.ordenTrabajoId != 0) {
+                int? statusCode;
+                var solicitarPin = '';
+                solicitarPin = await PedidosServices().siguienteEstadoOrden(context, pedido, 23, token);
+                if(solicitarPin == 'S'){
+                  await aprobarPedido(context);
+                } else {
+                  await _pedidosServices.patchPedido(context, pedido.ordenTrabajoId, 23, token, '');
+                  statusCode = await _pedidosServices.getStatusCode();
+                  await _pedidosServices.resetStatusCode();
+                  if(statusCode == 1) {
+                    Carteles.showDialogs(context, 'Pedido aprobado', true, true, false);
+                  }
                 }
+              } else {
+                Carteles.showDialogs(context, 'Guarde el pedido primero', false, false, false);
               }
+              
             break;
           }
         },
@@ -492,11 +497,14 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                 ),
                 const Spacer(),
                 TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
                   onPressed: () async {
                     await postInforme(context, true);
                     await generarInformeCompleto();
                   },
-                  child: const Text('SI')
+                  child: const Text('SI',)
                 ),
                 TextButton(
                   onPressed: () async {
@@ -526,9 +534,12 @@ class _NuevoPedidoState extends State<NuevoPedido> {
               onPressed: () {
                 appRouter.pop();
               },
-              child: const Text('Cancelar')
+              child: const Text('CANCELAR')
             ),
             TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
               onPressed: () async {
                 int? statusCode;
                 if(pedido.ordenTrabajoId != 0){
@@ -539,7 +550,8 @@ class _NuevoPedidoState extends State<NuevoPedido> {
                     Carteles.showDialogs(context, 'Pedido descartado correctamente', true, true, true);
                   }
                 }
-              }, child: const Text('Confirmar')
+              },
+              child: const Text('CONFIRMAR')
             ),
           ],
         );

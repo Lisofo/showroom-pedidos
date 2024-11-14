@@ -241,15 +241,14 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                           const SizedBox(height: 100,),
                           Align(
                             alignment: Alignment.center,
-                              child: ElevatedButton(
-                                style: const ButtonStyle(
-                                  iconSize: WidgetStatePropertyAll(100),
-                                ),
-                                onPressed: readQRCode,
-                                child: const Icon(Icons.qr_code_scanner_outlined),
+                            child: ElevatedButton(
+                              style: const ButtonStyle(
+                                iconSize: WidgetStatePropertyAll(100),
                               ),
+                              onPressed: readQRCode,
+                              child: const Icon(Icons.qr_code_scanner_outlined),
                             ),
-
+                          ),
                           ///ESTO ES TEMPORALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
                           VisibilityDetector(
                             onVisibilityChanged: (VisibilityInfo info) {
@@ -350,69 +349,70 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                         ),
                         if (!busco || listItems.isNotEmpty) ...[
                           ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: listItems.length,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, i) {
-                                var item = listItems[i];
-                                var foto = item.imagenes[0];
-                                var precio = '';
-                                existe = false; // Reiniciar la variable 'existe' para cada item
+                            shrinkWrap: true,
+                            itemCount: listItems.length,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, i) {
+                              var item = listItems[i];
+                              var foto = item.imagenes[0];
+                              var precio = '';
+                              existe = false; // Reiniciar la variable 'existe' para cada item
 
-                                // Verificar si el itemId existe en la lista de 'lineas'
-                                for (var linea in lineas) {
-                                  if (linea.raiz == item.raiz) {
-                                    existe = true; // Si se encuentra el itemId en lineas, marcar 'existe' como true
-                                    break; // No es necesario seguir buscando, ya encontramos el itemId
-                                  }
+                              // Verificar si el itemId existe en la lista de 'lineas'
+                              for (var linea in lineas) {
+                                if (linea.raiz == item.raiz) {
+                                  existe = true; // Si se encuentra el itemId en lineas, marcar 'existe' como true
+                                  break; // No es necesario seguir buscando, ya encontramos el itemId
                                 }
+                              }
 
-                                if (item.precioIvaIncluidoMin != item.precioIvaIncluidoMax) {
-                                  precio = '${item.precioIvaIncluidoMin} - ${item.precioIvaIncluidoMax}';
-                                } else {
-                                  precio = item.precioIvaIncluidoMax.toString();
-                                }
+                              if (item.precioIvaIncluidoMin != item.precioIvaIncluidoMax) {
+                                precio = '${item.precioIvaIncluidoMin} - ${item.precioIvaIncluidoMax}';
+                              } else {
+                                precio = item.precioIvaIncluidoMax.toString();
+                              }
 
-                                return Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        Provider.of<ItemProvider>(context, listen: false).setRaiz(item.raiz);
-                                        appRouter.push('/productoSimple');
-                                      },
-                                      child: SizedBox(
-                                        height: MediaQuery.of(context).size.height * 0.15,
-                                        width: MediaQuery.of(context).size.width * 0.1,
-                                        child: Image.network(
-                                          foto,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return const Placeholder(
-                                              child: Text('No Image'),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width * 0.9,
-                                      child: ListTile(
-                                        onTap: () {
-                                          FocusScope.of(context).unfocus();
-                                          irAProductPage(context, item);
+                              return Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Provider.of<ItemProvider>(context, listen: false).setRaiz(item.raiz);
+                                      appRouter.push('/productoSimple');
+                                    },
+                                    child: SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.15,
+                                      width: MediaQuery.of(context).size.width * 0.1,
+                                      child: Image.network(
+                                        foto,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return const Placeholder(
+                                            child: Text('No Image'),
+                                          );
                                         },
-                                        title: Text(item.raiz),
-                                        subtitle: Text('${item.descripcion} \nPrecio: ${item.signo}$precio    Disponibilidad: ${item.disponibleRaiz}'),
-                                        trailing: const Icon(
-                                          Icons.chevron_right,
-                                          size: 35,
-                                        ),
-                                        // Si 'existe' es true, pintar el ListTile de azul claro
-                                        tileColor: existe ? Colors.lightBlue[100] : null,
                                       ),
                                     ),
-                                  ],
-                                );
-                              }),
+                                  ),
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width * 0.9,
+                                    child: ListTile(
+                                      onTap: () {
+                                        FocusScope.of(context).unfocus();
+                                        irAProductPage(context, item);
+                                      },
+                                      title: Text(item.raiz),
+                                      subtitle: Text('${item.descripcion} \nPrecio: ${item.signo}$precio    Disponibilidad: ${item.disponibleRaiz}'),
+                                      trailing: const Icon(
+                                        Icons.chevron_right,
+                                        size: 35,
+                                      ),
+                                      // Si 'existe' es true, pintar el ListTile de azul claro
+                                      tileColor: existe ? Colors.lightBlue[100] : null,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                          ),
                         ] else ...[
                           if (listItems.isEmpty && busco) ...[
                             const Text(
@@ -434,7 +434,7 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: FloatingActionButton(
-                            child: const Icon(Icons.qr_code_scanner_outlined),
+                            child: const Icon(Icons.delete),
                             onPressed: () {
                               Provider.of<ItemProvider>(context, listen: false).setProduct(Product.empty());
                               query.clear();
@@ -451,9 +451,9 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                 ),
               )
             : const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Center(
-                    child: Column(
+              padding: EdgeInsets.all(8.0),
+              child: Center(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -463,8 +463,9 @@ class _AgregarPedidoState extends State<AgregarPedido> {
                     ),
                     Text('Buscando...')
                   ],
-                )),
+                )
               ),
+            ),
       ),
     );
   }
