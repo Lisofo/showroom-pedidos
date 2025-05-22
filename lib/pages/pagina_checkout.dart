@@ -127,7 +127,7 @@ class PaginaCheckout extends StatelessWidget {
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 1,
-                            color: Colors.white.withOpacity(0.9)),
+                            color: Colors.white.withValues(alpha: 0.9)),
                       ),
                     ),
                   ),

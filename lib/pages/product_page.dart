@@ -504,7 +504,7 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   Color getTextColor(Color backgroundColor) {
-    var luminance = 0.2126 * backgroundColor.red + 0.7152 * backgroundColor.green + 0.0722 * backgroundColor.blue;
+    var luminance = 0.2126 * backgroundColor.r + 0.7152 * backgroundColor.g + 0.0722 * backgroundColor.b;
     // Decide si el texto debería ser oscuro o claro en función de la luminosidad
     return luminance > 128 ? Colors.black : Colors.white;
   }
@@ -720,6 +720,7 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
   
+  // ignore: unused_element
   void _mostrarSnackBar(String mensaje) {
     if(mounted){
       scaffoldMessenger.showSnackBar(
